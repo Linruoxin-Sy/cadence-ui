@@ -1,11 +1,34 @@
 "use client";
 
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
-import { createContext, useContext, useId, useState } from "react";
+import { useRender } from "@base-ui/react/use-render";
+import {
+  Children,
+  type CSSProperties,
+  createContext,
+  isValidElement,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "../lib/cn";
-import { hasCallerTransition, usePopupPresence } from "../lib/popup-presence";
-import { popupClasses, popupStyle } from "../lib/popup-style";
-import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
+import { useStateColor } from "../lib/css-motion";
+import { createMeasuredGeometry, naturalGeometry } from "../lib/measured-geometry";
+import { bindMotionParameters, geometryCompact } from "../lib/motion";
+import { useMotionHostRef } from "../lib/motion-ref";
+import { createMotionTransaction } from "../lib/motion-transaction";
+import { popupClockStyle } from "../lib/popup-style";
+import { type CadenceMotion, useCadenceMotion, withCadenceScope } from "../lib/provider";
+import { createTooltipPresence } from "../lib/tooltip-presence";
+import { useNumberPresentation } from "../lib/use-number-presentation";
+import { useTextPresentation } from "../lib/use-text-presentation";
+
+const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * Base UI's tooltip wires neither `role="tooltip"` nor `aria-describedby`, so a
@@ -13,30 +36,91 @@ import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
  * and the pair has to agree on an id, which is the one thing this context carries.
  * `open` is here because a dangling `aria-describedby` id is an axe violation: the
  * reference only exists while the popup does.
+ *
+ * `entity` is the hint's identity: one Tooltip root is one hint, so reusing a
+ * Content node for another trigger starts a fresh text/reel baseline instead of
+ * replacing the previous hint's characters.
  */
 interface TooltipContextValue {
   id: string;
   open: boolean;
+  entity: object;
 }
 
 const TooltipContext = createContext<TooltipContextValue | null>(null);
+
+/** A caller palette this surface cannot verify keeps its paint immediate. */
+const layoutClass =
+  /^(?:[\w-]+:)*(?:w-|h-|size-|min-|max-|p[xytrblse]?-|m[xytrblse]?-|gap-|flex|inline-|block|grid|shrink|grow|basis-|items-|justify-|self-|order-|relative|absolute|fixed|sticky|inset-|top-|bottom-|left-|right-|overflow-|truncate|text-(?:xs|sm|base|lg|xl)$)/;
+
+/** The hint's own paint classes are tokens; only an unprovable caller palette is
+ * forced immediate, and the arrow is never a second colour writer. */
+function knownPalette(className: unknown, style: unknown) {
+  if (typeof className === "function" || typeof style === "function") return false;
+  const layoutOnly =
+    !className ||
+    String(className)
+      .split(/\s+/)
+      .every((name) => layoutClass.test(name));
+  const knownStyle =
+    !style ||
+    !Object.keys(style as object).some((key) =>
+      /color|background|fill|stroke|shadow|filter|blend|opacity|^--(?!motion-|cadence-|ease-)/i.test(key),
+    );
+  return layoutOnly && knownStyle;
+}
+
+/** A stable, committed content signature: the measured hint is what it renders,
+ * never a render counter, so an unrelated render is not a size revision. */
+function contentRevision(children: ReactNode): string {
+  const shape = (child: ReactNode, depth: number): unknown => {
+    if (typeof child === "string" || typeof child === "number") return child;
+    if (!isValidElement(child) || depth > 4) return null;
+    const type = child.type;
+    const name =
+      typeof type === "string"
+        ? type
+        : ((type as { displayName?: string; name?: string }).displayName ?? (type as { name?: string }).name ?? "part");
+    const nested = (child.props as { children?: ReactNode }).children;
+    return [name, child.key, Children.toArray(nested).map((next) => shape(next, depth + 1))];
+  };
+  return JSON.stringify(Children.toArray(children).map((child) => shape(child, 0)));
+}
+
+/** Portal clock variables only; presence, geometry and colour own their properties. */
+function clockVariables(cm: CadenceMotion): CSSProperties {
+  const variables: Record<string, string | number> = { ...popupClockStyle(cm) };
+  delete variables.transition;
+  return variables as CSSProperties;
+}
 
 /** Optional app-level provider: one delay for every tooltip inside it. */
 function TooltipProvider({ delay = 0, ...props }: TooltipPrimitive.Provider.Props) {
   return <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delay} {...props} />;
 }
 
-function Tooltip({ children, open, defaultOpen = false, onOpenChange, ...props }: TooltipPrimitive.Root.Props) {
+function Tooltip({
+  children,
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  triggerId,
+  ...props
+}: TooltipPrimitive.Root.Props) {
   const id = useId();
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = open ?? uncontrolledOpen;
+  // One hint identity per trigger: a reused Content node for another trigger
+  // establishes an exact baseline instead of replacing the old hint's runs.
+  const entity = useMemo(() => ({ key: triggerId ?? id }), [triggerId, id]);
 
   return (
-    <TooltipContext.Provider value={{ id, open: isOpen }}>
+    <TooltipContext.Provider value={{ id, open: isOpen, entity }}>
       <TooltipPrimitive.Root
         data-slot="tooltip"
         open={open}
         defaultOpen={defaultOpen}
+        triggerId={triggerId}
         onOpenChange={(next, details) => {
           onOpenChange?.(next, details);
           if (!details.isCanceled) setUncontrolledOpen(next);
@@ -62,15 +146,14 @@ function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
 }
 
 /**
- * Motion contract (CSS-only, Base UI `data-starting-style` / `data-ending-style`):
- * - full: the label fades and grows out of its anchor (`--transform-origin`) from
- *   `--motion-scale-in`, on `duration.fast`
- * - reduced: the fade stays, the scale is dropped
- * - none: `--motion-duration-*` resolves to 0ms, so the label appears on the first
- *   frame
- *
- * The arrow is part of the popup, so it moves with it; it is not animated on its
- * own. `text-balance` keeps a two-word label from breaking badly in the max width.
+ * Motion contract: a hint is a small visual layer, not a second reading surface.
+ * It fades in over `duration.instant` and fades out on the same channel, with no
+ * travel or scale. The positioner, the arrow and the provider's intent delays
+ * stay native: `TooltipPrimitive.Portal`/`Positioner` keep the coordinates, the
+ * arrow is a child of the fading surface, and `sideOffset`/`alignOffset` are
+ * never animated. A changed hint re-measures its natural width and height once
+ * and animates only the shell, so the text never rewraps through intermediate
+ * widths, and a change of only the hint's characters replaces the changed runs.
  */
 function TooltipContent({
   className,
@@ -80,12 +163,10 @@ function TooltipContent({
   align = "center",
   alignOffset = 0,
   children,
+  render,
   ...props
 }: TooltipPrimitive.Popup.Props &
   Pick<TooltipPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const { cm, ref: scopeRef, node } = useCadenceMotionScope(props.ref);
-  const callerFamily = hasCallerTransition(className, style);
-  const presence = usePopupPresence(node, ["opacity", "scale"], callerFamily, cm, "fast");
   const tooltip = useContext(TooltipContext);
 
   return (
@@ -96,44 +177,224 @@ function TooltipContent({
         side={side}
         sideOffset={sideOffset}
         className="isolate z-50"
+        data-slot="tooltip-positioner"
       >
-        {withCadenceScope(
-          cm,
-          presence(
-            <TooltipPrimitive.Popup
-              id={tooltip?.id}
-              data-slot="tooltip-content"
-              data-motion={cm.mode}
-              data-cadence-scope=""
-              style={popupStyle(cm, style, callerFamily)}
-              role="tooltip"
-              className={popupClasses(
-                cm,
-                cn(
-                  "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:not-data-[cadence-entry-settled]:opacity-0",
-                  !cm.reduced &&
-                    "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:not-data-[cadence-entry-settled]:scale-(--motion-scale-in)",
-                ),
-                className,
-                callerFamily,
-              )}
-              {...props}
-              ref={scopeRef}
+        <TooltipPrimitive.Popup
+          {...props}
+          className={className}
+          style={style}
+          render={(elementProps, state) => (
+            <TooltipContentSurface
+              elementProps={elementProps}
+              state={state}
+              render={render}
+              entity={tooltip?.entity}
+              describedBy={tooltip?.id}
             >
               {children}
-              <TooltipPrimitive.Arrow
-                className={cn(
-                  "z-50 size-2.5 rotate-45 rounded-[2px] bg-foreground fill-foreground",
-                  "data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1",
-                  "data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1",
-                  "data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5",
-                )}
-              />
-            </TooltipPrimitive.Popup>,
-          ),
-        )}
+            </TooltipContentSurface>
+          )}
+        />
       </TooltipPrimitive.Positioner>
     </TooltipPrimitive.Portal>
+  );
+}
+
+function TooltipContentSurface({
+  elementProps,
+  state,
+  render,
+  entity,
+  describedBy,
+  children,
+}: {
+  elementProps: React.ComponentPropsWithRef<"div">;
+  state: TooltipPrimitive.Popup.State;
+  render: TooltipPrimitive.Popup.Props["render"];
+  entity?: object;
+  /** The id the trigger's `aria-describedby` points at while the hint is open. */
+  describedBy?: string;
+  children?: ReactNode;
+}) {
+  const host = useMotionHostRef<HTMLDivElement>(elementProps.ref);
+  const cm = useCadenceMotion(host.node);
+  const paint = useStateColor(host.ref, cm, ["background-color", "color"], {
+    readability: knownPalette(elementProps.className, elementProps.style) ? "verified" : "immediate",
+  });
+  const presence = useRef<ReturnType<typeof createTooltipPresence> | null>(null);
+  const connected = useRef<HTMLElement | null>(null);
+  const lastOpen = useRef<boolean | null>(null);
+  const [transaction] = useState(createMotionTransaction);
+  const geometry = useRef<ReturnType<typeof createMeasuredGeometry> | null>(null);
+  const release = useRef<(() => void) | null>(null);
+  const geometryHost = useRef<HTMLElement | null>(null);
+  const revision = contentRevision(children);
+
+  committed(() => {
+    const node = host.node.current;
+    if (connected.current !== node) {
+      presence.current?.dispose();
+      presence.current = null;
+      connected.current = node;
+    }
+    if (node && !presence.current) presence.current = createTooltipPresence(node);
+    const open = state.open;
+    presence.current?.commit({
+      open,
+      enter: open && (state.transitionStatus === "starting" || lastOpen.current === false),
+      cm,
+    });
+    lastOpen.current = open;
+  });
+  committed(() => {
+    const node = host.node.current;
+    if (!node) return;
+    if (!geometry.current) geometry.current = createMeasuredGeometry(transaction);
+    if (geometryHost.current !== node) {
+      release.current?.();
+      release.current = null;
+      geometryHost.current = node;
+      release.current = geometry.current.register({
+        host: host.node,
+        content: node,
+        axes: ["width", "height"],
+        observeChildren: true,
+        measure() {
+          const box = naturalGeometry(node);
+          if (!box) return null;
+          const css = node.ownerDocument.defaultView?.getComputedStyle(node);
+          const view = node.ownerDocument.defaultView;
+          // Base UI clamps the hint to the measured available space; a missing
+          // value never narrows it below its own natural box.
+          const availableWidth = Number.parseFloat(css?.getPropertyValue("--available-width") ?? "");
+          const availableHeight = Number.parseFloat(css?.getPropertyValue("--available-height") ?? "");
+          return {
+            // Never animate below the natural box: the required hint stays laid out.
+            width: {
+              size: box.width,
+              min: 0,
+              max: Math.max(box.width, Number.isFinite(availableWidth) ? availableWidth : box.width),
+              readable: true,
+              independent: true,
+            },
+            height: {
+              size: box.height,
+              min: 0,
+              max: Math.max(
+                box.height,
+                Number.isFinite(availableHeight) ? availableHeight : (view?.innerHeight ?? box.height),
+              ),
+              readable: true,
+              independent: true,
+            },
+          };
+        },
+      });
+    }
+    const parameters = cm.parameters(bindMotionParameters(geometryCompact, "geometry.resize/measured"));
+    if (parameters.kind !== "geometry") return;
+    geometry.current.commit(transaction.revision("content", revision, node), {
+      reduced: cm.reduced,
+      transition: parameters.transition,
+      available: state.open,
+    });
+  });
+  committed(
+    () => () => {
+      release.current?.();
+      release.current = null;
+      geometry.current?.dispose();
+      presence.current?.dispose();
+      presence.current = null;
+    },
+    [],
+  );
+
+  return withCadenceScope(
+    cm,
+    useRender({
+      defaultTagName: "div",
+      render,
+      state: { ...state, slot: "tooltip-content" },
+      props: {
+        ...elementProps,
+        ...paint,
+        // The trigger's description id and the ARIA tooltip role are what make the
+        // hint announceable at all; a caller-supplied role still wins.
+        id: describedBy ?? elementProps.id,
+        role: elementProps.role ?? "tooltip",
+        "data-slot": "tooltip-content",
+        "data-motion": cm.mode,
+        className: cn(
+          "z-50 w-fit origin-(--transform-origin) max-w-xs rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none",
+          elementProps.className,
+        ),
+        style: { ...paint.style, ...clockVariables(cm), ...elementProps.style },
+        children: (
+          <>
+            {typeof children === "string" ? (
+              <TooltipText value={children} entity={entity} visible={state.open} />
+            ) : typeof children === "number" ? (
+              <TooltipValue value={children} entity={entity} visible={state.open} />
+            ) : (
+              children
+            )}
+            <TooltipPrimitive.Arrow
+              className={cn(
+                "z-50 size-2.5 rotate-45 rounded-[2px] bg-inherit fill-foreground",
+                "data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1",
+                "data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1",
+                "data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5",
+              )}
+            />
+          </>
+        ),
+      },
+    }),
+  );
+}
+
+/** A primitive hint string replaces only its changed runs, with no stagger: the
+ * tooltip is too small for a per-character entrance. */
+function TooltipText({
+  value,
+  entity,
+  visible,
+}: {
+  value: string;
+  entity: object | undefined;
+  /** A closing hint commits its current text immediately instead of animating. */
+  visible: boolean;
+}) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const text = useTextPresentation(node, value, cm, entity, { characterStagger: false, visible });
+  return (
+    <span ref={ref} data-slot="tooltip-text" data-motion={cm.mode}>
+      {text}
+    </span>
+  );
+}
+
+/** A supported direct numeric hint rolls only its changed places; strings,
+ * shortcuts, codes and dates stay text. */
+function TooltipValue({
+  value,
+  entity,
+  visible,
+}: {
+  value: number;
+  entity: object | undefined;
+  /** A closing hint settles its current quantity immediately instead of rolling. */
+  visible: boolean;
+}) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const text = useNumberPresentation(node, value, cm, entity, { compact: true, visible });
+  return (
+    <span ref={ref} data-slot="tooltip-number" data-motion={cm.mode}>
+      {text}
+    </span>
   );
 }
 

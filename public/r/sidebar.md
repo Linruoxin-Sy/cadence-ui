@@ -42,6 +42,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
 - [@cadence/sheet](https://cadence.dev/r/sheet.json) — direct registry dependency.
 - [@cadence/skeleton](https://cadence.dev/r/skeleton.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
 - [@cadence/tooltip](https://cadence.dev/r/tooltip.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -85,6 +86,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
 | skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | tooltip | `@components/cadence/tooltip/index.tsx` | [JSON files[].content](https://cadence.dev/r/tooltip.json) |
 | sidebar | `@components/cadence/sidebar/index.tsx` | [JSON files[].content](https://cadence.dev/r/sidebar.json) |
 
@@ -113,6 +116,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: sheet](https://cadence.dev/r/sheet.json)
 
 [Source files: skeleton](https://cadence.dev/r/skeleton.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: tooltip](https://cadence.dev/r/tooltip.json)
 

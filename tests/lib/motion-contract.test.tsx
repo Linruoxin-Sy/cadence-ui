@@ -287,7 +287,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       inputItem.meta.motion = [{ recipe: "state.color", form: "css-transition" }];
       const loopItem = stagedRegistry.items.find((item: { name: string }) => item.name === "skeleton");
       const tooltipItem = stagedRegistry.items.find((item: { name: string }) => item.name === "tooltip");
-      Object.assign(tooltipItem.meta.motionCoverage.effects["popup.anchored/css-transition"][0], {
+      Object.assign(tooltipItem.meta.motionCoverage.effects["popup.anchored/one-shot"][0], {
         relationship: "inherited",
         owner: "button",
       });
@@ -430,9 +430,17 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         );
       expect(output).toContain("static-fixture: state.color/css-transition: missing installed ownership");
       expect(output).toContain(
-        "tooltip: popup.anchored/css-transition: owner button is not the reached installed integration",
+        "tooltip: popup.anchored/one-shot: owner button is not the reached installed integration",
       );
       expect(output).toContain("tooltip: explicit authored motionProfile required");
+      // Tooltip is v2: a foreign installed owner now fails the strict adoption and
+      // action plan instead of the retired legacy "execute actual component parts"
+      // message, and its authored exit form is the tooltip's own opacity phase.
+      expect(output).toContain(
+        "tooltip: adoption: tooltip.content.enter: popup.anchored/one-shot lacks default installed owner tooltip",
+      );
+      expect(output).toContain("tooltip: v2 tooltip.content.enter: no source-bound action plan");
+      expect(output).not.toContain("tooltip: execute actual component parts");
       expect(output).toContain("skeleton: execute loop policy in full, reduced, none");
       for (const [id, form] of [
         ["animated-text", "text.change/changed-runs"],
@@ -440,7 +448,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         ["reveal", "reveal/viewport"],
       ])
         expect(output).toContain(`${id}: execute ${form} controller policy in full, reduced, none`);
-      for (const id of ["tooltip", "reveal-group"])
+      for (const id of ["reveal-group"])
         expect(output).toContain(`${id}: execute actual component parts in full, reduced, none`);
       expect(output).not.toContain("reveal-group: execute reveal/viewport controller policy");
       for (const [action, part, slot] of [
@@ -472,7 +480,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         "popover: v2 verify Native popover.position.place/@position native boundary on popover#PopoverContent",
       );
       expect(output).not.toContain("popover: execute popup.anchored/css-transition CSS owner");
-      for (const id of ["animated-text", "animated-number", "reveal", "reveal-group", "tooltip"])
+      for (const id of ["animated-text", "animated-number", "reveal", "reveal-group"])
         expect(output).toContain(`${id}: mount the actual registry component in full, reduced, none`);
     } finally {
       if (!process.env.CADENCE_GATE_EVIDENCE) await rm(fixture, { recursive: true, force: true });

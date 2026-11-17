@@ -75,6 +75,7 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -248,7 +249,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all thirty-one target files, keeping `popover/index.tsx` and the shared `lib/`
+Copy all thirty-two target files, keeping `popover/index.tsx` and the shared `lib/`
 directory in the same `cadence/` tree. Preserve relative imports and the
 sources' `"use client"` directives. Copy every file in the motion, utilities,
 provider, geometry, text, number and anchored-presence payloads, including

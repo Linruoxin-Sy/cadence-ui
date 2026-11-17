@@ -336,6 +336,23 @@ function anchoredPresenceForms(source) {
   return [];
 }
 
+/** Fixed-property factory used by the tooltip adapter. The hint owns one opacity
+ * envelope in both directions: there is no travel, scale or borrowed ending recipe. */
+function tooltipPresenceForms(source) {
+  const selected = motionSource(source);
+  if (!selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")))
+    return [];
+  if (
+    selected.source.includes("function createTooltipPresence(") &&
+    selected.source.includes("node.animate(") &&
+    selected.source.includes("owner.begin(") &&
+    selected.source.includes('"popup.anchored/opacity-enter"') &&
+    selected.source.includes('"popup.anchored/opacity-exit"')
+  )
+    return ["popup.anchored/opacity-enter", "popup.anchored/opacity-exit"];
+  return [];
+}
+
 /** Fixed-property factories used by the modal adapter. The panel and backdrop each
  * own one instance, so the surface form is selected by the adapter, not by a caller. */
 function modalPresentationForms(source) {
@@ -369,6 +386,7 @@ export function parameterWriterForms(source) {
       ...groupPositionForms(source),
       ...modalPresentationForms(source),
       ...anchoredPresenceForms(source),
+      ...tooltipPresenceForms(source),
     ]),
   ];
 }

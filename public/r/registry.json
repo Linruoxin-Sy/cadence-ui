@@ -75,7 +75,7 @@
       "name": "cadence-anchored-presence",
       "type": "registry:lib",
       "title": "Anchored popup presence",
-      "description": "Opacity and short anchor-side approach for one anchored popup surface, with Base UI's native positioning, focus and unmount completion.",
+      "description": "Opacity and short anchor-side approach for one anchored popup surface, with Base UI's native positioning, focus and unmount completion, plus the tooltip's short opacity-only hint envelope.",
       "categories": [
         "foundation"
       ],
@@ -252,7 +252,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -347,7 +347,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -439,7 +439,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -512,7 +512,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -599,7 +599,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -664,7 +664,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -729,7 +729,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -824,7 +824,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -897,7 +897,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -992,7 +992,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1039,7 +1039,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1142,7 +1142,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1246,7 +1246,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1342,7 +1342,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1457,7 +1457,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1581,7 +1581,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1758,7 +1758,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1791,7 +1791,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1824,7 +1824,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1870,7 +1870,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -1971,7 +1971,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2036,7 +2036,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2101,7 +2101,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2177,7 +2177,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2242,7 +2242,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2334,7 +2334,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2465,7 +2465,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2530,7 +2530,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2573,7 +2573,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2710,7 +2710,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2811,7 +2811,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2829,11 +2829,23 @@
         "motion": [
           {
             "recipe": "popup.anchored",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
           },
           {
-            "recipe": "exit.fade",
-            "form": "css-transition"
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -2847,28 +2859,49 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Tooltip opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Tooltip owns one short opacity envelope on its own hint surface, a clamped measured width and height when the hint changes, scoped surface and foreground paint, and the changed-run text and compact quantity owners; Base UI keeps positioning, focus, intent delays and unmount, and rich children keep their own composed owners."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "default",
                 "owner": "tooltip",
-                "reason": "Tooltip integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "The hint surface owns one short opacity entrance and its matching exit on the same channel; the positioner keeps its native coordinates and the arrow fades with the surface it belongs to."
               }
             ],
-            "exit.fade/css-transition": [
+            "geometry.resize/measured": [
               {
                 "relationship": "default",
                 "owner": "tooltip",
-                "reason": "Tooltip integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "The hint shell owns one clamped measured width and height transaction over its natural content inside Base UI's available space."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "tooltip",
+                "reason": "The hint owns its scoped surface and foreground paint; an unprovable caller palette or native focus settles that region immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "tooltip",
+                "reason": "A directly supplied plain hint string replaces only its changed graphemes without stagger; rich children keep their native identity and are composed."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "tooltip",
+                "reason": "A directly supplied supported numeric hint quantity rolls only its changed places; shortcuts, codes, dates and numeric-looking strings remain text."
               }
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2925,7 +2958,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -2982,7 +3015,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3039,7 +3072,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3162,7 +3195,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3261,7 +3294,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3326,7 +3359,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3391,7 +3424,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3456,7 +3489,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3528,7 +3561,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3600,7 +3633,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3657,7 +3690,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3769,7 +3802,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3870,7 +3903,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -3982,7 +4015,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4015,7 +4048,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4063,7 +4096,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4096,7 +4129,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4139,7 +4172,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4185,7 +4218,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4253,7 +4286,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4286,7 +4319,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4366,6 +4399,11 @@
                 "relationship": "inherited",
                 "owner": "input",
                 "reason": "SidebarInput renders the installed Input control, whose own measured box stays its owner; Sidebar adds no second size writer to the field."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "tooltip",
+                "reason": "SidebarMenuButton's optional hint renders the installed Tooltip, whose measured hint shell is its own size owner; Sidebar adds no second writer to that popup."
               }
             ],
             "data.transition/one-shot": [
@@ -4392,7 +4430,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4472,7 +4510,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4557,7 +4595,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4612,7 +4650,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4655,7 +4693,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4707,7 +4745,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4754,7 +4792,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4801,7 +4839,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4848,7 +4886,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     },
     {
@@ -4895,7 +4933,7 @@
             ]
           }
         },
-        "sourceSha": "01257d4e"
+        "sourceSha": "36c0752b"
       }
     }
   ]
