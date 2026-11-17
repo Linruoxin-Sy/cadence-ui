@@ -379,11 +379,14 @@ it("hover-card preserves callbacks, render, refs, native events, controlled upda
     view.rerender(example({ mode }));
     expect(document.querySelector('[data-slot="hover-card-content"]')).toBe(node);
     expect(node).toHaveAttribute("data-motion", mode);
-    if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
-    if (mode === "none") {
-      expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
+    // The preview's own anchored-presence executor replaces a CSS transition family;
+    // the local colour clock still carries the effective mode duration.
+    expect(node.className).not.toMatch(/transition-(?:opacity|\[)/);
+    expect(node.style.getPropertyValue("--motion-duration-fast")).toBe(
+      mode === "none" ? "0s" : mode === "reduced" ? "0.192s" : "0.32s",
+    );
+    if (mode === "none")
       expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
-    }
   }
   view.rerender(example({ open: false, mode: "none" }));
   expect(screen.queryByText("Content")).not.toBeInTheDocument();

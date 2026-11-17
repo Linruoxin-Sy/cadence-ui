@@ -185,6 +185,7 @@ describe("current registry inventory and real part references", () => {
       "alert-dialog",
       "popover",
       "tooltip",
+      "hover-card",
       "select",
       "combobox",
       "accordion",
