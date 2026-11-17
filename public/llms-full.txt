@@ -20061,6 +20061,11 @@ npm install clsx tailwind-merge motion @base-ui/react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -20083,6 +20088,19 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | drawer | `@components/cadence/drawer/index.tsx` | [JSON files[].content](https://cadence.dev/r/drawer.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -20090,6 +20108,16 @@ npm install clsx tailwind-merge motion @base-ui/react
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: drawer](https://cadence.dev/r/drawer.json)
 
@@ -20246,21 +20274,23 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine files in the target list, including every shared `lib/` file.
+Copy every file in the target list, including every shared `lib/` file.
 Keep the mirrored `cadence/` tree, relative imports and `"use client"` directives
-intact. The popup and backdrop use CSS transitions, but the provider imports
+intact. The popup, backdrop, title and description are driven by the shared
+presence, geometry, text, number and colour controllers, but the provider imports
 still require `motion`. The provider files are required; wrapping your
 application in `CadenceProvider` is optional.
 
 Complete the base theme setup linked above, including Cadence's easing tokens,
 and ensure Tailwind scans the copied files. There is no additional
-Drawer-specific CSS or asset in these payloads. Each portalled popup and
-backdrop resolves its own motion clock, including provider `timeScale`: full
-slides and fades the popup, reduced keeps the fade and drops the closed-state
-slide, and none removes authored transitions and hidden entry/exit opacity
-from the first frame. Direct finger tracking remains in all three modes.
-Without a wrapper, Drawer follows the system motion preference; a nested full
-scope still respects the system reduced-motion preference.
+Drawer-specific CSS or asset in these payloads. Each portalled popup, backdrop
+and owned display resolves its own motion clock, including provider `timeScale`:
+full plays the popup edge flight, the backdrop opacity, the measured content
+height, the changed title/description runs and the scoped paint; reduced keeps
+short opacity and colour feedback only; and none settles every target on the
+first frame. Direct finger tracking remains in all three modes. Without a
+wrapper, Drawer follows the system motion preference; a nested full scope still
+respects the system reduced-motion preference.
 
 Usage, the top Move conversation specimen and every body example additionally
 use [Button](/components/button). Controlled draft also needs
@@ -20703,32 +20733,51 @@ export function DrawerMotionScopes() {
 | --- | --- | --- |
 | `Drawer` | `open`, `defaultOpen`, `onOpenChange`, `modal`, `snapPoints`, `swipeDirection`, `showSwipeHandle` | `showSwipeHandle` is additive; `swipeDirection` defaults to `"down"` and `modal` to `true`. |
 | `DrawerTrigger` | native button props, `render` | Opens the drawer. |
-| `DrawerContent` | `render`, `className` | Renders portal, overlay (when modal), viewport, popup, and content. |
-| `DrawerOverlay` | `className` | Only needed when replacing `DrawerContent`. |
+| `DrawerContent` | `overlayClassName`, `overlayStyle`, `render`, `className`, `style` | Renders portal, overlay (when modal), viewport, popup, and content. The overlay props hook paint only the backdrop. |
+| `DrawerOverlay` | `className`, `style` | Only needed when replacing `DrawerContent`. |
 | `DrawerSwipeHandle` | `className` | The handle; rendered for you when `showSwipeHandle` is set. |
 | `DrawerClose` | native button props, `render` | Closes the drawer. |
 | `DrawerHeader` / `DrawerFooter` | `className` | Stacking and spacing only. |
-| `DrawerTitle` | `className` | Required accessible name. |
-| `DrawerDescription` | `className` | Supporting text. |
+| `DrawerTitle` | `className`, `style` | Required accessible name. A direct string changes by grapheme and a direct number rolls its digits. |
+| `DrawerDescription` | `className`, `style` | Supporting text. Accepts the same direct string and quantity display behavior as the title. |
 
 ## Motion contract
 
-Authored intensity is **medium**: Drawer opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Drawer owns its popup edge flight, the independently owned backdrop opacity, the
+popup's measured content height, scoped paint and owned title/description display while Base UI keeps the swipe, snap
+and release gesture.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to
+the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live
+reduced drops the edge flight, the measured height and the text/number replacement and keeps a short opacity/colour
+feedback; none settles every target on the first frame and cancels the running writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.slow` / `duration.fast` | yes |
-| drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | Base UI gesture (no authored recipe) | yes (it is the gesture) |
-| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade/css-transition` · `duration.slow` / `duration.fast` | yes |
-| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so the sheet is in place on the first frame | – | – |
+| enter | popup `opacity 0 → 1` plus a `transform` translation from its own edge extent | `popup.anchored/one-shot` · `duration.slow` | yes, a reversal continues from the current paint |
+| backdrop enter | backdrop `opacity 0 → 1` on its own host, sharing the native swipe-progress channel | `data.transition/one-shot` · `duration.base` | yes, a direct swipe takes over the same channel |
+| exit | popup `opacity → 0` and `transform` back off its edge; backdrop `opacity → 0` | `exit.fade/one-shot` · popup `duration.base` / backdrop `duration.fast` | yes (reopen mid-exit) |
+| content revision | clamped measured popup block size while open and no snap height is active | `geometry.resize/measured` · `spring.sizePanel` | yes, retargets from the current size |
+| title / description text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title / description quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| backdrop / title / description paint | scoped surface or foreground colour; focus or an unprovable palette is immediate | `state.color/css-transition` | yes, latest committed colour |
+| swipe, snap, release and configure | Base UI's own inline transform, snap offsets and release trajectory | Base UI engine (no authored recipe) | yes, it is the gesture |
 
-The drag keeps tracking the finger under `reduced`: that movement is the user's own, not authored motion,
-and a sheet that ignored the drag would be worse than one that follows it. The release animation uses the
-token duration rather than a velocity-scaled one — the swipe physics decide *where* the sheet settles,
-the token decides how long the settle takes.
+The travel distance is the popup's own rendered height or width, expressed as a percentage of that box, so each edge
+enters from exactly off its edge without a distance token per direction. Placement is the native snap offset on
+`translate`; the drag and the authored entrance share `transform` but never at the same time, because pointer input
+settles the authored envelope first. A live `swipeDirection` change settles the obsolete envelope and places the new
+edge immediately instead of flying across the viewport. Only the block axis is measured, and only while the drawer is
+open and its height is not the native snap transaction's; a snap-point drawer settles an explicit height change
+natively rather than writing a second one.
+
+The popup's supplied paint settles immediately: its single CSS transition family is Base UI's own swipe and release
+channel, and an authored colour clock there would have to displace that native release. The backdrop, title and
+description keep their own colour owners.
+
+Focus, pointer or key activation inside an entering popup settles that popup immediately while the independently owned
+backdrop may continue. Base UI retains focus, portal, modality and completion ownership, including
+`preventUnmountOnClose`.
 
 ## Keyboard interactions
 
@@ -20757,10 +20806,14 @@ geometry.
 
 ## Performance
 
-- The drag writes CSS variables and a `transform`; it never touches layout or React state per frame.
-- The backdrop opacity is a `calc()` on the same variable, so the page behind dims as the sheet moves
+- The drag writes CSS variables and Base UI's own inline `transform`; it never touches layout or React state per
+  frame, and the authored entrance has settled before the gesture starts.
+- The backdrop opacity is a `calc()` on the same swipe-progress variable, so the page behind dims as the drawer moves
   without a second animation.
-- Entry and exit animate `transform` and `opacity` only. Nothing is measured during render.
+- Entry and exit animate `transform` and `opacity` only. The measured content revision is one clamped block-size
+  transaction at a committed content revision, and changed text and numeric reels are bounded to the changed runs.
+- Nothing is measured during render. The measured owner reads the natural height after releasing its own size
+  overlay, so a child's interpolated box is never reused as a fresh target.
 
 ## Notes for AI
 
