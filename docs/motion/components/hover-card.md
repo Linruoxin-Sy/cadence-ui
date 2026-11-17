@@ -1,8 +1,11 @@
 # Hover Card motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
-A preview arrives as a coherent surface anchored to its trigger. Its richer contents can change size without replaying every avatar, line or action. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
+A preview arrives as a coherent surface anchored to its trigger. Its richer contents can change size without
+replaying every avatar, line or action. This contract inherits the [common contract](../README.md) and
+[presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
 ## Contract references
 
@@ -10,27 +13,45 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "content": ["hover-card#HoverCardContent"],
     "text": ["hover-card#HoverCardContent"],
     "surface": ["hover-card#HoverCardContent"],
     "position": ["hover-card#HoverCardContent"],
     "quantity": ["hover-card#HoverCardContent"]
-  }
+  },
+  "regions": {
+    "content": ["hover-card-content"],
+    "text": ["hover-card-text"],
+    "surface": ["hover-card-content"],
+    "position": ["hover-card-positioner"],
+    "quantity": ["hover-card-number"]
+  },
+  "axes": { "content": ["width", "height"] }
 }
 ```
+
+`hover-card-positioner` and the two display regions are internal host markers of `HoverCardContent`; they add no
+export, prop or public `data-slot`. Base UI's positioner is the placement owner, and the display regions are the
+actual spans that carry a primitive preview string or a directly supplied numeric quantity.
 
 ## Capability ownership
 
 | Capability      | Application and owner                                                                                                                                                                                                                                                  | References                                                     |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Appearance      | Default: `hover-card-content` owns surface presence; arbitrary initial child content inherits it.                                                                                                                                                                      | default: `hover-card.content.enter`, `hover-card.content.exit` |
-| Size            | Default: content shell owns intentional natural width/height changes within the positioner's available space.                                                                                                                                                          | default: `hover-card.content.resize`                           |
+| Appearance      | Default: `hover-card-content` owns surface presence; arbitrary initial child content inherits it. Base UI still owns mounting, hover/focus intent and the actual unmount completion.                                                                                   | default: `hover-card.content.enter`, `hover-card.content.exit` |
+| Size            | Default: content shell owns intentional natural width/height changes within the positioner's available space. Placement itself stays native.                                                                                                                           | default: `hover-card.content.resize`                           |
 | Surface colour  | Default: content owns background/border tokens; nested components retain their own surface owners.                                                                                                                                                                     | default: `hover-card.surface.colour`                           |
 | Text colour     | Default: the content popup's foreground token transitions and inherits to plain content; the logical root is not a new painted surface and explicitly styled children retain ownership.                                                                                | default: `hover-card.surface.colour`                           |
-| Changed text    | Default only for a primitive content string; rich preview children are composed with their own display owners. Hover Card has no title/description part to invent.                                                                                                     | default: `hover-card.text.change`; composed: `@text`           |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich preview quantities inside rich children/render functions. | default: `hover-card.quantity.change`; composed: `@quantity`   |
+| Changed text    | Default only for a primitive content string; rich preview children are composed with their own display owners. Hover Card has no title/description part to invent.                                                                                                     | default: `hover-card.text.change`; composed: `@content`        |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich preview quantities inside rich children/render functions. | default: `hover-card.quantity.change`; composed: `@content`    |
+
+One panel is one declared palette: the same scoped writer covers its background, borders and the foreground that
+plain preview content inherits, so a token change cannot leave an inner paragraph on the old foreground. Actual DOM
+focus/focus-within inside the panel, or an unprovable caller palette, cancels that clock and settles the whole
+declared palette immediately in every mode; focus on the outside trigger alone does not activate this rule. Nested
+independently styled parts keep their own owners instead of gaining a second writer here.
 
 ## Choreography and modes
 
@@ -40,11 +61,18 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 | Preview close / content                                                                   | Opacity exit only; all children leave as one surface.                                                                         | Short opacity only.                                          | Closed target immediately.  | `hover-card.content.exit` → `presence.exit` → `exit.fade/opacity`                                                               |
 | Intentional preview content change / shell                                                | Clamp and animate measured natural dimensions; no bounce.                                                                     | Final geometry immediately.                                  | Final geometry immediately. | `hover-card.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                   |
 | Primitive content replacement / text owner                                                | Changed-run replacement with `stagger: none`. Rich previews defer to their composed text owners.                              | Changed-run opacity only.                                    | Final text immediately.     | `hover-card.text.change` → `text.replace` → `text.change/changed-runs`                                                          |
-| Supplied tokens / content                                                                 | Scoped background/border/foreground colour transition. Colour eligibility and immediate-owner priority follow the rule below. | Short colour feedback. Colour obeys the same owner priority. | Final colours immediately.  | `hover-card.surface.colour` → `state.color` → `state.color/surface-foreground`                                                  |
+| Supplied tokens / content                                                                 | Scoped background/border/foreground colour transition. Colour eligibility and immediate-owner priority follow the rule above. | Short colour feedback. Colour obeys the same owner priority. | Final colours immediately.  | `hover-card.surface.colour` → `state.color` → `state.color/surface-foreground`                                                  |
 | Anchor/collision change / positioner                                                      | Correct native placement immediately and cancel obsolete approach direction.                                                  | Same placement.                                              | Same placement.             | `hover-card.position.place` → `engine.native` → `native/base-ui-preview-card` (Base UI PreviewCard positioning (no new recipe)) |
 | Direct numeric Content revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                             | Final number immediately.                                    | Final number immediately.   | `hover-card.quantity.change` → `number.compact` → `number.roll/reels`                                                           |
 
-`surface.colour` owns the content popup's declared paint. Actual DOM focus/focus-within or that owner's invalid state cancels its colour clock and settles the entire declared palette immediately in every mode. Focus on the outside trigger alone does not activate this rule. Other colour interpolation requires a verified readable palette; nested independently styled parts retain their own owners.
+`surface.colour` owns the content popup's declared paint. Actual DOM focus/focus-within or that owner's invalid
+state cancels its colour clock and settles the entire declared palette immediately in every mode. Focus on the
+outside trigger alone does not activate this rule. Other colour interpolation requires a verified readable palette;
+nested independently styled parts retain their own owners.
+
+The panel's own visual layer writes opacity and one short transform; Base UI's positioner keeps its x/y coordinates
+and the available width/height it measures. `sideOffset`/`alignOffset` are never interpolated, so no Cadence action
+competes with native placement, and a descendant portal is not clipped by the measured shell.
 
 ## Interruption and lifecycle
 
@@ -54,7 +82,15 @@ decoration. Use existing trigger/payload identity or the composition's keys, nev
 object allocation. A same-record edit stays eligible; a collision correction for the same anchor
 does not invent a new record. Unknown correspondence uses immediate content without a new public API.
 
-Hover/focus on the trigger is outside the preview's content envelope, so it does not by itself cancel preview entry or cause autofocus into the card. If a supported interaction actually reaches a descendant during entry, settle its affecting envelope before presenting that focus/activation. Native preview traversal and intent delays remain unchanged.
+The record identity is the root's existing `triggerId` when the caller drives the open, and the mounted
+composition otherwise; the display owners key their transaction on it. Reusing one Content node for another record
+therefore starts an exact baseline instead of replacing the previous preview's characters, and no trigger registry,
+extra prop or remount is added to enforce it.
+
+Hover/focus on the trigger is outside the preview's content envelope, so it does not by itself cancel preview entry
+or cause autofocus into the card. If a supported interaction actually reaches a descendant during entry, settle its
+affecting envelope before presenting that focus/activation. Native preview traversal and intent delays remain
+unchanged.
 
 - Preserve Preview Card open/close delay, trigger/popup traversal and focus semantics. Animation does not introduce another hover timer or force focus into the preview.
 - Return before close completion reverses the existing surface. Updating a preview never remounts it merely to replay presence.
@@ -62,7 +98,10 @@ Hover/focus on the trigger is outside the preview's content envelope, so it does
 - Live reduced cancels approach and resizing; none/zero clock cancels presentation clocks and completes the current Base UI exit protocol with no added timer hold. Unmount disconnects measurement and composed-owner registrations. Existing trigger/popup pointer and focus operation stays available in every mode.
 - Async preview content received while closed updates the next view without reopening or starting hidden size work. Reopen and collision/anchor changes invalidate stale exit/direction/size completions; a caller-controlled open value remains authoritative.
 
-Dispatch a direct Content string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
+Dispatch a direct Content string to the text owner and a supported direct numeric quantity to the numeric owner;
+changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and
+screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and
+aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -78,18 +117,23 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 - Observe a natural-content region distinct from the sizing host and clamp each rendered dimension to valid non-negative intrinsic/closed/available bounds. Nested content and the panel choose one owner for the same size cause; the panel never observes a child's interpolated box as a fresh target.
 - A destination-layout size animation must not newly crop required text, an active descendant or a focused control. Use existing legal scroll/overflow to keep them immediately reachable; otherwise settle that axis before paint. Do not add temporary truncation or hide required content to make the shell animate.
 
+The natural box is the floor and Base UI's measured `--available-width`/`--available-height` the ceiling, so a
+preview never animates below its own laid-out text or past the space the positioner reports. The revision key is a
+committed content signature, so an unrelated render is not a size revision and passive reflow settles.
+
 A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
 
 ## Acceptance scenarios
 
-- Pending: reuse one open preview for another known record, then edit that record and deliver an old
-  completion. No cross-record count trend, stale description or unwanted reopen is allowed. Include
-  named form controls and stateful media/custom content: measurement and replacement introduce no
-  second registration, DOM id, form entry, resource instance or component-effect lifecycle.
+Unit evidence covers these against real mounted parts in all three modes; the browser matrix, live
+OS-preference switching in a real engine and the production build remain deferred under ADR-023.
 
-- Pending: move between trigger and preview while open/close transitions are active; existing interaction delays and focus behavior remain intact.
-- Pending: replace a plain hint and update a rich preview with an image/count; only explicit owners animate and layout remains bounded.
-- Pending: collision flips, anchor removal, all modes, live downgrade and zero-clock closure leave no orphan or stale measurement.
-- Pending: a required preview label grows while a nested child resizes or an action has focus; the panel preserves immediate readability and one geometry owner, including async content after close.
+- Reuse one open preview for another known record, then edit that record and deliver an old
+  completion. No cross-record count trend, stale description or unwanted reopen is allowed; a reused
+  display slot keeps the exact current text, and a same-record revision keeps the one slot node.
+- Move between trigger and preview while open/close transitions are active; existing interaction delays and focus behavior remain intact, and Escape returns focus to the trigger without autofocusing into the card.
+- Replace a plain hint and update a rich preview with an image/count; only explicit owners animate and layout remains bounded. A direct number and a numeric-looking string stay separate owners.
+- Collision flips, anchor removal, all modes, live downgrade and zero-clock closure leave no orphan or stale measurement.
+- A required preview label grows while a nested child resizes or an action has focus; the panel preserves immediate readability and one geometry owner, including async content after close.
 
-- Pending: update a direct numeric Content value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
+- Update a direct numeric Content value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
