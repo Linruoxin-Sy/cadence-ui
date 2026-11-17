@@ -2,15 +2,15 @@
 title: Drawer
 description: Quick tasks on touch screens, such as share or move.
 category: overlay
-motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
+motion: [{"recipe":"popup.anchored","form":"one-shot"},{"recipe":"data.transition","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"}]
 intensity: medium
-motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Drawer opens and closes its existing popup surface; content and native focus retain their current owners."}
-motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"drawer","reason":"Drawer integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"drawer","reason":"Drawer integrates popup closing at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Drawer owns its popup edge flight, the independently owned backdrop opacity, the popup's measured content height, scoped paint and owned title/description display while Base UI keeps the swipe, snap and release gesture."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/one-shot":[{"relationship":"default","owner":"drawer","reason":"The popup owns one edge flight whose distance is its own rendered extent while Base UI keeps the swipe and snap transform."}],"data.transition/one-shot":[{"relationship":"default","owner":"drawer","reason":"The backdrop owns one opacity entrance on its own rendered host, sharing the native swipe-progress channel instead of adding a second one."}],"exit.fade/one-shot":[{"relationship":"default","owner":"drawer","reason":"A closing backdrop fades on that same channel while the popup returns to its own edge and Base UI keeps the native unmount protocol."}],"geometry.resize/measured":[{"relationship":"default","owner":"drawer","reason":"The popup shell owns one clamped measured block-size transaction over its natural content while no native snap height is active."}],"state.color/css-transition":[{"relationship":"default","owner":"drawer","reason":"Backdrop, title and description each own their declared scoped paint on their own physical region, with focus and unverified palettes immediate; the popup settles its supplied paint immediately because its single transition family is Base UI's swipe and release channel."}],"text.change/changed-runs":[{"relationship":"default","owner":"drawer","reason":"A directly supplied plain Title or Description string replaces only its changed graphemes; arbitrary rich children keep their native identity."}],"number.roll/reels":[{"relationship":"default","owner":"drawer","reason":"A directly supplied supported numeric quantity in Title or Description rolls only its changed places; strings and identifiers remain text."}]}}
 complexity: L
 tier: T2
 since: 0.3.0
 deps: ["@base-ui/react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+registryDeps: ["@cadence/cadence-motion","@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text","@cadence/cadence-number","@cadence/cadence-modal-presence"]
 ---
 
 ## Installation
@@ -28,21 +28,23 @@ Install those items when copying their corresponding examples.
 
 [Manual installation files](https://cadence.dev/r/drawer.json)
 
-Copy all nine files in the target list, including every shared `lib/` file.
+Copy every file in the target list, including every shared `lib/` file.
 Keep the mirrored `cadence/` tree, relative imports and `"use client"` directives
-intact. The popup and backdrop use CSS transitions, but the provider imports
+intact. The popup, backdrop, title and description are driven by the shared
+presence, geometry, text, number and colour controllers, but the provider imports
 still require `motion`. The provider files are required; wrapping your
 application in `CadenceProvider` is optional.
 
 Complete the base theme setup linked above, including Cadence's easing tokens,
 and ensure Tailwind scans the copied files. There is no additional
-Drawer-specific CSS or asset in these payloads. Each portalled popup and
-backdrop resolves its own motion clock, including provider `timeScale`: full
-slides and fades the popup, reduced keeps the fade and drops the closed-state
-slide, and none removes authored transitions and hidden entry/exit opacity
-from the first frame. Direct finger tracking remains in all three modes.
-Without a wrapper, Drawer follows the system motion preference; a nested full
-scope still respects the system reduced-motion preference.
+Drawer-specific CSS or asset in these payloads. Each portalled popup, backdrop
+and owned display resolves its own motion clock, including provider `timeScale`:
+full plays the popup edge flight, the backdrop opacity, the measured content
+height, the changed title/description runs and the scoped paint; reduced keeps
+short opacity and colour feedback only; and none settles every target on the
+first frame. Direct finger tracking remains in all three modes. Without a
+wrapper, Drawer follows the system motion preference; a nested full scope still
+respects the system reduced-motion preference.
 
 Usage, the top Move conversation specimen and every body example additionally
 use [Button](/components/button). Controlled draft also needs
@@ -485,32 +487,51 @@ export function DrawerMotionScopes() {
 | --- | --- | --- |
 | `Drawer` | `open`, `defaultOpen`, `onOpenChange`, `modal`, `snapPoints`, `swipeDirection`, `showSwipeHandle` | `showSwipeHandle` is additive; `swipeDirection` defaults to `"down"` and `modal` to `true`. |
 | `DrawerTrigger` | native button props, `render` | Opens the drawer. |
-| `DrawerContent` | `render`, `className` | Renders portal, overlay (when modal), viewport, popup, and content. |
-| `DrawerOverlay` | `className` | Only needed when replacing `DrawerContent`. |
+| `DrawerContent` | `overlayClassName`, `overlayStyle`, `render`, `className`, `style` | Renders portal, overlay (when modal), viewport, popup, and content. The overlay props hook paint only the backdrop. |
+| `DrawerOverlay` | `className`, `style` | Only needed when replacing `DrawerContent`. |
 | `DrawerSwipeHandle` | `className` | The handle; rendered for you when `showSwipeHandle` is set. |
 | `DrawerClose` | native button props, `render` | Closes the drawer. |
 | `DrawerHeader` / `DrawerFooter` | `className` | Stacking and spacing only. |
-| `DrawerTitle` | `className` | Required accessible name. |
-| `DrawerDescription` | `className` | Supporting text. |
+| `DrawerTitle` | `className`, `style` | Required accessible name. A direct string changes by grapheme and a direct number rolls its digits. |
+| `DrawerDescription` | `className`, `style` | Supporting text. Accepts the same direct string and quantity display behavior as the title. |
 
 ## Motion contract
 
-Authored intensity is **medium**: Drawer opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Drawer owns its popup edge flight, the independently owned backdrop opacity, the
+popup's measured content height, scoped paint and owned title/description display while Base UI keeps the swipe, snap
+and release gesture.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to
+the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live
+reduced drops the edge flight, the measured height and the text/number replacement and keeps a short opacity/colour
+feedback; none settles every target on the first frame and cancels the running writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.slow` / `duration.fast` | yes |
-| drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | Base UI gesture (no authored recipe) | yes (it is the gesture) |
-| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade/css-transition` · `duration.slow` / `duration.fast` | yes |
-| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so the sheet is in place on the first frame | – | – |
+| enter | popup `opacity 0 → 1` plus a `transform` translation from its own edge extent | `popup.anchored/one-shot` · `duration.slow` | yes, a reversal continues from the current paint |
+| backdrop enter | backdrop `opacity 0 → 1` on its own host, sharing the native swipe-progress channel | `data.transition/one-shot` · `duration.base` | yes, a direct swipe takes over the same channel |
+| exit | popup `opacity → 0` and `transform` back off its edge; backdrop `opacity → 0` | `exit.fade/one-shot` · popup `duration.base` / backdrop `duration.fast` | yes (reopen mid-exit) |
+| content revision | clamped measured popup block size while open and no snap height is active | `geometry.resize/measured` · `spring.sizePanel` | yes, retargets from the current size |
+| title / description text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title / description quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| backdrop / title / description paint | scoped surface or foreground colour; focus or an unprovable palette is immediate | `state.color/css-transition` | yes, latest committed colour |
+| swipe, snap, release and configure | Base UI's own inline transform, snap offsets and release trajectory | Base UI engine (no authored recipe) | yes, it is the gesture |
 
-The drag keeps tracking the finger under `reduced`: that movement is the user's own, not authored motion,
-and a sheet that ignored the drag would be worse than one that follows it. The release animation uses the
-token duration rather than a velocity-scaled one — the swipe physics decide *where* the sheet settles,
-the token decides how long the settle takes.
+The travel distance is the popup's own rendered height or width, expressed as a percentage of that box, so each edge
+enters from exactly off its edge without a distance token per direction. Placement is the native snap offset on
+`translate`; the drag and the authored entrance share `transform` but never at the same time, because pointer input
+settles the authored envelope first. A live `swipeDirection` change settles the obsolete envelope and places the new
+edge immediately instead of flying across the viewport. Only the block axis is measured, and only while the drawer is
+open and its height is not the native snap transaction's; a snap-point drawer settles an explicit height change
+natively rather than writing a second one.
+
+The popup's supplied paint settles immediately: its single CSS transition family is Base UI's own swipe and release
+channel, and an authored colour clock there would have to displace that native release. The backdrop, title and
+description keep their own colour owners.
+
+Focus, pointer or key activation inside an entering popup settles that popup immediately while the independently owned
+backdrop may continue. Base UI retains focus, portal, modality and completion ownership, including
+`preventUnmountOnClose`.
 
 ## Keyboard interactions
 
@@ -539,10 +560,14 @@ geometry.
 
 ## Performance
 
-- The drag writes CSS variables and a `transform`; it never touches layout or React state per frame.
-- The backdrop opacity is a `calc()` on the same variable, so the page behind dims as the sheet moves
+- The drag writes CSS variables and Base UI's own inline `transform`; it never touches layout or React state per
+  frame, and the authored entrance has settled before the gesture starts.
+- The backdrop opacity is a `calc()` on the same swipe-progress variable, so the page behind dims as the drawer moves
   without a second animation.
-- Entry and exit animate `transform` and `opacity` only. Nothing is measured during render.
+- Entry and exit animate `transform` and `opacity` only. The measured content revision is one clamped block-size
+  transaction at a committed content revision, and changed text and numeric reels are bounded to the changed runs.
+- Nothing is measured during render. The measured owner reads the natural height after releasing its own size
+  overlay, so a child's interpolated box is never reused as a fresh target.
 
 ## Notes for AI
 

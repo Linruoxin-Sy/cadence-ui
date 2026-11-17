@@ -87,6 +87,26 @@ export function disclosurePanelClasses(cm: CadenceMotion, base = "h-(--accordion
   );
 }
 
+/**
+ * Base UI's drawer keeps two native channels on the popup: its own inline
+ * `transform` while a pointer is down, and the `--drawer-snap-point-offset`
+ * placement that decides where a released drawer rests. Cadence authors neither,
+ * so the popup carries that placement on `translate` and leaves `transform` to the
+ * gesture and to the authored entrance. Only the release glide is a clock, and it
+ * is the primitive's own: it retargets the same two properties from their current
+ * paint, so a reversal or a new drag continues instead of restarting. Reduced and
+ * none remove the family entirely, so the accepted snap target is reached
+ * immediately while direct manipulation keeps working.
+ */
+export function drawerSwipeClasses(cm: CadenceMotion) {
+  return cn(
+    "[translate:0px_var(--drawer-snap-point-offset,0px)]",
+    cm.reduced || cm.disabled || cm.timeScale === 0
+      ? "transition-none"
+      : "transition-[transform,translate] duration-(--motion-duration-slow) ease-cadence-out",
+  );
+}
+
 /** Removing a native transition property cancels that running transition. */
 export function popupClasses<S>(
   cm: CadenceMotion,
