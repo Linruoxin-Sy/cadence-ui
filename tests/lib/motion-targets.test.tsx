@@ -190,6 +190,7 @@ describe("current registry inventory and real part references", () => {
       "drawer",
       "select",
       "combobox",
+      "dropdown-menu",
       "accordion",
       "collapsible",
       "tabs",

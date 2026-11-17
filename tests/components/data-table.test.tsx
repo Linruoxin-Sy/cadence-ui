@@ -92,7 +92,8 @@ describe("Data Table composition", () => {
       expect(menu).toHaveAttribute("data-motion", mode);
       if (mode !== "full") expect(menu.className).not.toContain("scale-(--motion-scale-in)");
       if (mode === "none") {
-        expect(menu.className).toContain("duration-0");
+        // The inherited dropdown-menu surface is managed: it declares no CSS pose now.
+        expect(menu.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
         expect(menu.className).not.toContain("opacity-0");
       }
       expectMotionContract(mode, { parts: [container.querySelector('[data-slot="data-table"]'), menu] });
