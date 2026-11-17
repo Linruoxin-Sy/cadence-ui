@@ -1,10 +1,30 @@
 "use client";
 
-import type { Transition } from "motion/react";
-import { bindMotionParameters, motionMilliseconds, presenceExit, presenceSurface } from "./motion";
+import {
+  bindMotionParameters,
+  motionMilliseconds,
+  presenceExit,
+  presenceSheet,
+  presenceSheetExit,
+  presenceSurface,
+} from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import { createMotionTransaction, type MotionLease } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
+
+export type ModalEdge = "top" | "right" | "bottom" | "left";
+
+/** The panel's own extent in the direction it leaves the viewport. Percentages
+ * resolve against the rendered border box, never a cached or viewport distance. */
+function edgeOffset(side: ModalEdge) {
+  return side === "right"
+    ? "translateX(100%)"
+    : side === "left"
+      ? "translateX(-100%)"
+      : side === "top"
+        ? "translateY(-100%)"
+        : "translateY(100%)";
+}
 
 export type ModalPresenceCommit = {
   /** Semantic open state owned by the native primitive. Never inferred from paint. */
@@ -16,11 +36,17 @@ export type ModalPresenceCommit = {
 
 /**
  * One modal surface paint owner. The panel and its backdrop use separate instances,
- * so opacity and the optional scale envelope each have exactly one writer. Base UI
+ * so opacity and the optional scale/edge envelope each have exactly one writer. Base UI
  * keeps mounting, modality, focus and the actual unmount completion.
+ *
+ * `edge` selects the panel's own edge flight instead of a scale envelope: the
+ * travel distance is the panel's current extent, so a side sheet needs no distance
+ * token and no per-side tuning. A caller transform keeps its own family and drops
+ * the travel rather than double-writing the property.
  */
-export function createModalPresence(node: HTMLElement, options: { spatial?: boolean } = {}) {
+export function createModalPresence(node: HTMLElement, options: { spatial?: boolean; edge?: () => ModalEdge } = {}) {
   const spatial = options.spatial === true;
+  const edge = options.edge;
   const transaction = createMotionTransaction();
   const owner = transaction.register(node);
   let current: ModalPresenceCommit | null = null;
@@ -70,35 +96,46 @@ export function createModalPresence(node: HTMLElement, options: { spatial?: bool
     );
   };
 
-  const clocks = (open: boolean, cm: CadenceMotion): Transition | null => {
+  const clocks = (open: boolean, cm: CadenceMotion) => {
     const parameters = cm.parameters(
-      open
-        ? bindMotionParameters(presenceSurface, spatial ? "enter.pop/surface" : "enter.pop/opacity")
-        : bindMotionParameters(presenceExit, "exit.fade/opacity"),
+      edge
+        ? bindMotionParameters(
+            open ? presenceSheet : presenceSheetExit,
+            open ? "popup.anchored/edge" : "popup.anchored/edge-exit",
+          )
+        : bindMotionParameters(
+            open ? presenceSurface : presenceExit,
+            open ? (spatial ? "enter.pop/surface" : "enter.pop/opacity") : "exit.fade/opacity",
+          ),
     );
-    return parameters.kind === "visual" ? parameters.opacity : null;
+    if (parameters.kind !== "visual") return null;
+    return {
+      opacity: parameters.opacity,
+      // One parameter resolution owns both properties; reduced/none resolve the
+      // spatial half to a zero clock instead of inventing a second recipe.
+      spatial: parameters.spatial,
+      scale: parameters.scale,
+    };
   };
 
-  const play = (fromOpacity: number | undefined) => {
+  const play = (fromOpacity: number | undefined, fromTransform: string | undefined) => {
     const input = current;
     if (!alive || !input) return;
     const clock = clocks(input.open, input.cm);
     const css = node.ownerDocument.defaultView?.getComputedStyle(node);
     if (!clock || !css || css.display === "none" || css.visibility === "hidden") return;
-    const immediate = blocked || input.cm.disabled || input.cm.timeScale === 0 || clock.duration === 0;
+    const immediate = blocked || input.cm.disabled || input.cm.timeScale === 0 || clock.opacity.duration === 0;
     if (typeof node.animate !== "function") return;
     if (callerOwnsPaint(css)) return;
     // Never delay or fade an actual focus target; a real entrance may settle while
     // the independently owned backdrop keeps its own clock.
     if (input.open && (immediate || node.contains(node.ownerDocument.activeElement))) return;
-    const parameters = input.cm.parameters(
-      bindMotionParameters(presenceSurface, spatial ? "enter.pop/surface" : "enter.pop/opacity"),
-    );
-    const spatialOpen =
-      input.open && !immediate && !input.cm.reduced && css.transform === "none" && css.scale === "none";
+    const side = edge?.();
+    // A caller transform keeps that family; the presence then writes only opacity.
+    const ownsTransform = css.transform === "none" || fromTransform !== undefined;
     const revision = transaction.revision("presence", input.open, node);
     const generation = ++epoch;
-    lease = owner.begin(revision, spatialOpen ? ["opacity", "transform"] : ["opacity"], {}, () => {
+    lease = owner.begin(revision, side && ownsTransform ? ["opacity", "transform"] : ["opacity"], {}, () => {
       for (const handle of handles) handle.cancel();
       handles = [];
     });
@@ -106,18 +143,40 @@ export function createModalPresence(node: HTMLElement, options: { spatial?: bool
     const owned = lease;
     const opacity = input.open ? Number.parseFloat(css.opacity) : 0;
     const start = fromOpacity ?? (input.open ? 0 : Number.parseFloat(css.opacity) || 1);
+    const ease = `cubic-bezier(${input.cm.scope.tokens.ease[input.open ? "out" : "in"].join(",")})`;
     handles = [
       node.animate([{ opacity: start }, { opacity }], {
-        duration: motionMilliseconds(Number(clock.duration)),
-        delay: motionMilliseconds(Number(clock.delay ?? 0)),
-        easing: `cubic-bezier(${input.cm.scope.tokens.ease[input.open ? "out" : "in"].join(",")})`,
+        duration: motionMilliseconds(Number(clock.opacity.duration)),
+        delay: motionMilliseconds(Number(clock.opacity.delay ?? 0)),
+        easing: ease,
         fill: "both",
       }),
     ];
-    if (spatialOpen && parameters.kind === "visual")
+    if (side && ownsTransform && !immediate && !input.cm.reduced && (clock.spatial.duration ?? 0) > 0) {
+      const offset = edgeOffset(side);
+      // A reversal continues from the paint that is actually on screen; a settled
+      // panel starts from its resting placement, never from a cached distance.
+      const from = fromTransform ?? (css.transform === "none" ? (input.open ? offset : "none") : css.transform);
       handles.push(
-        node.animate([{ transform: `scale(${parameters.scale})` }, { transform: "none" }], {
-          duration: motionMilliseconds(Number(parameters.spatial.duration)),
+        node.animate([{ transform: from }, { transform: input.open ? "none" : offset }], {
+          duration: motionMilliseconds(Number(clock.spatial.duration)),
+          delay: motionMilliseconds(Number(clock.spatial.delay ?? 0)),
+          easing: ease,
+          fill: "both",
+        }),
+      );
+    } else if (
+      !side &&
+      spatial &&
+      input.open &&
+      !immediate &&
+      !input.cm.reduced &&
+      css.transform === "none" &&
+      css.scale === "none"
+    )
+      handles.push(
+        node.animate([{ transform: `scale(${clock.scale})` }, { transform: "none" }], {
+          duration: motionMilliseconds(Number(clock.spatial.duration)),
           easing: `cubic-bezier(${input.cm.scope.tokens.ease.out.join(",")})`,
           fill: "both",
         }),
@@ -146,11 +205,12 @@ export function createModalPresence(node: HTMLElement, options: { spatial?: bool
       const downgraded = previous?.cm.mode === "full" && input.cm.reduced;
       const halted = input.cm.disabled || input.cm.timeScale === 0;
       if (!changed && !downgraded && !(halted && handles.length)) return;
-      const from = handles.length
-        ? Number.parseFloat(node.ownerDocument.defaultView?.getComputedStyle(node).opacity ?? "1")
-        : undefined;
+      const css = handles.length ? node.ownerDocument.defaultView?.getComputedStyle(node) : undefined;
+      const from = css ? Number.parseFloat(css.opacity) : undefined;
+      // Captured before the cancel: a reversal starts from the visible paint.
+      const fromTransform = css && css.transform !== "none" ? css.transform : undefined;
       cancel();
-      play(from);
+      play(from, fromTransform);
     },
     /** Release the entry envelope without touching the semantic state. */
     settle() {
