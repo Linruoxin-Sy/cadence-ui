@@ -1,6 +1,7 @@
 # Tooltip motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
 A tooltip reveals a short hint promptly, preserving the provider's existing delay semantics and the trigger's accessible relationship. It should not become a second animated reading surface. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
@@ -10,37 +11,49 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "content": ["tooltip#TooltipContent"],
     "text": ["tooltip#TooltipContent"],
     "surface": ["tooltip#TooltipContent"],
     "position": ["tooltip#TooltipContent"],
     "quantity": ["tooltip#TooltipContent"]
-  }
+  },
+  "regions": {
+    "content": ["tooltip-content"],
+    "surface": ["tooltip-content"],
+    "position": ["tooltip-positioner"],
+    "text": ["tooltip-text"],
+    "quantity": ["tooltip-number"]
+  },
+  "axes": { "content": ["width", "height"] }
 }
 ```
 
+`tooltip-positioner` and the two display regions are internal host markers of `TooltipContent`; they add no
+export, prop or public `data-slot`. Base UI's positioner is the placement owner, and the display regions are the
+actual spans that carry a primitive hint string or a directly supplied numeric quantity.
+
 ## Capability ownership
 
-| Capability      | Application and owner                                                                                                                                                                                                                                               | References                                                |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Appearance      | Default: `tooltip-content` owns one short presence effect, including its arrow. Provider/trigger are structural and keep their own appearance owner.                                                                                                                | default: `tooltip.content.enter`, `tooltip.content.exit`  |
-| Size            | Default: content shell owns changed hint width/height within its max width; placement remains with Base UI.                                                                                                                                                         | default: `tooltip.content.resize`                         |
-| Surface colour  | Default: popup and arrow share one background/fill token transition, preventing an unmatched arrow.                                                                                                                                                                 | default: `tooltip.surface.colour`                         |
-| Text colour     | Default: content foreground changes as one scoped token.                                                                                                                                                                                                            | default: `tooltip.surface.colour`                         |
-| Changed text    | Default for a primitive hint string: changed runs only, with immediate accessible description. Rich children require explicit composed ownership.                                                                                                                   | default: `tooltip.text.change`; composed: `@text`         |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich hint quantities inside rich children/render functions. | default: `tooltip.quantity.change`; composed: `@quantity` |
+| Capability      | Application and owner                                                                                                                                                                                                                                               | References                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Appearance      | Default: `tooltip-content` owns one opacity-only presence effect, and the arrow is its child so it fades with the same surface. Provider/trigger are structural and keep their own appearance owner.                                                                | default: `tooltip.content.enter`, `tooltip.content.exit` |
+| Size            | Default: content shell owns changed hint width/height within its max width; placement remains with Base UI.                                                                                                                                                         | default: `tooltip.content.resize`                        |
+| Surface colour  | Default: the hint surface owns one scoped background transition, and the arrow inherits that surface paint instead of running a second writer, so no token change can leave it unmatched.                                                                           | default: `tooltip.surface.colour`                        |
+| Text colour     | Default: content foreground changes as one scoped token.                                                                                                                                                                                                            | default: `tooltip.surface.colour`                        |
+| Changed text    | Default for a primitive hint string: changed runs only, with immediate accessible description. Rich children keep their own identity inside the content region, which runs no text writer of its own.                                                               | default: `tooltip.text.change`; composed: `@content`     |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich hint quantities inside rich children/render functions. | default: `tooltip.quantity.change`; composed: `@content` |
 
 ## Choreography and modes
 
 | Trigger / owner                                                                           | Full                                                                                              | Reduced                     | None                                                     | Binding → preset → recipe/form                                                                                      |
 | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Base UI opens after its configured delay / content                                        | Short opacity entrance; no travel or per-character entrance.                                      | Short opacity.              | Open presentation immediately when semantic open occurs. | `tooltip.content.enter` → `presence.tooltip` → `popup.anchored/opacity-enter`                                       |
-| Semantic close / content                                                                  | Same short opacity departure, using the ending phase of the tooltip's existing popup owner.       | Short opacity.              | Closed presentation immediately.                         | `tooltip.content.exit` → `presence.tooltip` → `popup.anchored/opacity-exit`                                         |
+| Semantic close / content                                                                  | Same short opacity departure on the same channel; no second ending recipe is borrowed.            | Short opacity.              | Closed presentation immediately.                         | `tooltip.content.exit` → `presence.tooltip` → `popup.anchored/opacity-exit`                                         |
 | Visible hint change / content shell                                                       | Bounded measured width/height transition; positioning correction remains immediate.               | Final geometry immediately. | Final geometry immediately.                              | `tooltip.content.resize` → `geometry.compact` → `geometry.resize/measured`                                          |
 | Primitive hint update / text presentation                                                 | Stable-grapheme replacement with `stagger: none`; no replay of unchanged words.                   | Changed-run opacity only.   | Final hint immediately.                                  | `tooltip.text.change` → `text.replace` → `text.change/changed-runs`                                                 |
-| Token change / popup, arrow, foreground                                                   | Coordinated scoped colour transition.                                                             | Short colour feedback.      | Final colours immediately.                               | `tooltip.surface.colour` → `state.color` → `state.color/surface-foreground`                                         |
+| Token change / hint surface and foreground                                                | Scoped colour transition on the hint surface; the arrow inherits that paint.                      | Short colour feedback.      | Final colours immediately.                               | `tooltip.surface.colour` → `state.color` → `state.color/surface-foreground`                                         |
 | Anchor/collision change / positioner and arrow                                            | Correct native placement immediately; no arrow/coordinate tween or cross-trigger flight.          | Same placement.             | Same placement.                                          | `tooltip.position.place` → `engine.native` → `native/base-ui-tooltip` (Base UI Tooltip positioning (no new recipe)) |
 | Direct numeric Content revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately.   | Final number immediately.                                | `tooltip.quantity.change` → `number.compact` → `number.roll/reels`                                                  |
 
@@ -49,8 +62,10 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 Each Tooltip presence owner keeps its native lifecycle even when another tooltip uses the same
 description and provider delay. Its exit cannot wait solely for `transitionend`: identical resolved
 opacity, a safe-owner fallback or cancellation before the first frame may leave no owned transition.
-Use the primitive's current completion path without forcing removal under a retained native policy;
-unrelated child events and an earlier open revision cannot complete the current tooltip.
+The hint writes opacity through the platform animation API, so the primitive's own completion path
+observes that animation and decides when the portal node leaves; Cadence never forces removal under a
+retained native policy, and unrelated child events and an earlier open revision cannot complete the
+current tooltip.
 
 When an existing shared/caller composition reuses Content for a different trigger or hint entity,
 retire the old text/reel transaction and establish the new exact display baseline in every mode.
@@ -81,19 +96,25 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 
 ## Acceptance scenarios
 
-- Pending: close before the first transition frame, use a caller override that makes the owned
-  opacity endpoints equal, and cancel during an exit. Check native visibility/completion with no
-  end event, then deliver an unrelated child event and an old exit completion. Configured intent
-  delay and retained mount policy remain unchanged, and no second tooltip's lifecycle is affected.
+Unit evidence covers these against real mounted parts in all three modes; the browser matrix, live
+OS-preference switching in a real engine and the production build remain deferred under ADR-023.
 
-- Pending: reuse an open Content node for two known trigger identities with equal, partially shared
-  and numeric hints. The second hint starts at its exact baseline; old completions cannot restore the
-  first hint. Then update the same hint and move its anchor separately: content retains ordinary
-  changed-only eligibility and placement stays native, without ref churn being treated as identity.
-
-- Pending: preserve configured provider delay, focus/pointer behavior and existing description linkage in every mode.
-- Pending: update part of a visible hint near a collision boundary; unchanged text remains stable and arrow/placement remain attached.
-- Pending: rapid open/close, live downgrade, zero clock, removed trigger and reduced-mode geometry cancellation leave no stale tooltip.
-- Pending: replace a short hint with a long required description inside constrained placement; it is readable immediately without new truncation, and a composed numeric quantity follows its own child contract without turning shortcut digits into a counter.
-
-- Pending: update a direct numeric Content value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
+- Close before the first animation frame, use a caller override that makes the owned opacity endpoints
+  equal, and cancel during an exit. Native visibility/completion with no end event still ends the hint;
+  an unrelated child event and an old exit completion cannot terminate a newer tooltip. Configured
+  intent delay and the retained mount policy are unchanged, and no second tooltip's lifecycle is affected.
+- Reuse an open Content node for two known trigger identities with equal, partially shared and numeric
+  hints. The second hint starts at its exact baseline; old completions cannot restore the first hint.
+  Then update the same hint and move its anchor separately: content retains ordinary changed-only
+  eligibility and placement stays native, without ref churn being treated as identity.
+- Preserve configured provider delay, focus/pointer behavior and the existing description linkage in every mode.
+- Update part of a visible hint near a collision boundary; unchanged text stays stable and the arrow
+  remains attached to the untouched placement.
+- Rapid open/close, live downgrade, zero clock, removed trigger and reduced-mode geometry cancellation
+  leave no stale tooltip.
+- Replace a short hint with a long required description inside constrained placement; it is readable
+  immediately without new truncation, and a composed numeric quantity follows its own child contract
+  without turning shortcut digits into a counter.
+- Update a direct numeric Content value, a numeric-looking string and rich quantity content separately;
+  switch string/number types while open and close mid-roll. One display owner keeps the accessible and
+  copyable output exact, with no inferred numeric origin.
