@@ -3744,7 +3744,15 @@
       "description": "Previews of links, profiles, and repositories.",
       "categories": ["overlay"],
       "dependencies": ["@base-ui/react", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-anchored-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/hover-card/index.tsx",
@@ -3759,11 +3767,27 @@
         "motion": [
           {
             "recipe": "popup.anchored",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -3777,23 +3801,51 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Hover Card opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Hover Card owns one anchored preview presence with a short anchor-side approach, clamped measured width and height, one scoped surface and inherited foreground palette, and the changed-run text and compact quantity owners a primitive preview string or direct number can supply; Base UI keeps positioning, hover/focus intent delays, traversal and unmount, and rich preview children keep their own composed owners."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "default",
                 "owner": "hover-card",
-                "reason": "Hover Card integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "The preview panel owns one opacity and anchor-side approach envelope on its own visual layer; the positioner keeps its native coordinates and initial preview children inherit the entrance."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "default",
                 "owner": "hover-card",
-                "reason": "Hover Card integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "The closing preview fades on its own opacity channel without moving its anchor, while Base UI retains its native completion protocol and unmount."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "hover-card",
+                "reason": "The preview shell owns one clamped measured width and height transaction over its natural content inside the positioned available space."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "hover-card",
+                "reason": "The panel owns its scoped background, border and foreground paint as one declared palette; plain preview content inherits the foreground, and native focus or an unprovable caller palette settles that region immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "hover-card",
+                "reason": "A directly supplied plain Content string replaces only its changed graphemes without stagger; rich preview children keep their native identity and are composed, not recursively split."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "hover-card",
+                "reason": "A directly supplied supported numeric Content quantity rolls only its changed places; strings, codes, dates and numeric identities remain text."
               }
             ]
           }
