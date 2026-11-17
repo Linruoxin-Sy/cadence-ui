@@ -1,6 +1,6 @@
 "use client";
 
-import { bindMotionParameters, motionMilliseconds, presenceExit, presencePopup } from "./motion";
+import { bindMotionParameters, motionMilliseconds, presenceExit, presenceMenu, presencePopup } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import { createMotionTransaction, type MotionLease } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
@@ -64,7 +64,7 @@ function callerOwnsPaint(node: HTMLElement, css: CSSStyleDeclaration, owned: rea
  * settles placement immediately instead of interpolating across the new side.
  * Base UI keeps mounting, positioning, focus and the actual unmount completion.
  */
-export function createAnchoredPresence(node: HTMLElement) {
+export function createAnchoredPresence(node: HTMLElement, menuPreset = false) {
   const transaction = createMotionTransaction();
   const owner = transaction.register(node);
   let current: AnchoredPresenceCommit | null = null;
@@ -104,7 +104,13 @@ export function createAnchoredPresence(node: HTMLElement) {
     commit(input: AnchoredPresenceCommit) {
       const previous = current;
       current = input;
-      const enter = input.cm.parameters(bindMotionParameters(presencePopup, "popup.anchored/presence"));
+      // One shared executor; a menu selects its own reviewed binding of the same
+      // recipe/form (`presence.menu`, no scale pose) instead of a second writer.
+      const enter = input.cm.parameters(
+        menuPreset
+          ? bindMotionParameters(presenceMenu, "popup.anchored/presence")
+          : bindMotionParameters(presencePopup, "popup.anchored/presence"),
+      );
       const exit = input.cm.parameters(bindMotionParameters(presenceExit, "exit.fade/opacity"));
       if (!alive || enter.kind !== "visual" || exit.kind !== "visual") return;
       const changed = previous ? previous.open !== input.open : input.enter === true;
