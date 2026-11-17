@@ -317,8 +317,13 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const result = spawnSync(
         process.execPath,
         [path.join(root, "node_modules/vitest/vitest.mjs"), "run", "--config", config],
-        // The nine migrated owners now require a larger cold source/action audit.
-        { cwd: root, encoding: "utf8", timeout: 120000 },
+        // The cold fixture spawns a full Vitest run plus the whole registry's v2
+        // source/action audit per launch. That cost grows with every migrated item
+        // (36 v2 items after C31), so the old 120 s cold-start ceiling became the
+        // failing assertion rather than the reporter's own diagnostics. This is still
+        // a hang guard, not an acceptance budget: the gate's expected failure and
+        // diagnostics assertions below are unchanged.
+        { cwd: root, encoding: "utf8", timeout: 240000 },
       );
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
@@ -485,5 +490,5 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
     } finally {
       if (!process.env.CADENCE_GATE_EVIDENCE) await rm(fixture, { recursive: true, force: true });
     }
-  }, 120_000); // Cold fixture spawns a full Vitest run; this is the hang guard, not a budget (BOARD R1).
+  }, 300_000); // Cold fixture spawns a full Vitest run; this is the hang guard, not a budget (BOARD R1).
 });
