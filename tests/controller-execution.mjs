@@ -226,22 +226,25 @@ export function observeCopiedController(controller, kind, args, source) {
   if (kind === "createModalPresence") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);
+    const edge = typeof args[1]?.edge === "function";
     controller.commit = (...input) => {
       const offset = parameterCalls.length;
       const result = withController(controller, () => commit(...input));
       const options = input[0];
       const spatial = args[1]?.spatial === true;
-      const enterForm = spatial ? "enter.pop/surface" : "enter.pop/opacity";
-      const form = options.open ? enterForm : "exit.fade/opacity";
+      const enterForm = edge ? "popup.anchored/edge" : spatial ? "enter.pop/surface" : "enter.pop/opacity";
+      const exitForm = edge ? "popup.anchored/edge-exit" : "exit.fade/opacity";
+      const form = options.open ? enterForm : exitForm;
       const policy = parameterCalls.slice(offset).find((call) => call.form === form);
       presentationSamples.set(controller, {
         controller,
         node: args[0],
         origin,
         form,
-        supportedForms: [enterForm, "exit.fade/opacity"],
+        supportedForms: [enterForm, exitForm],
         mode: options.cm.mode,
-        properties: options.open && spatial ? ["opacity", "transform"] : ["opacity"],
+        // An edge flight is a transform owner; its opacity shares the same clock.
+        properties: edge ? ["transform"] : options.open && spatial ? ["opacity", "transform"] : ["opacity"],
         preset: policy?.preset,
         zeroClock: parameterClockIsZero(policy?.result),
         clock: policy?.result,
