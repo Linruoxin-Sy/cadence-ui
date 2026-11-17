@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/tooltip`
 - Type: registry:ui
 - Since: 0.3.0
-- Motion recipes: popup.anchored, exit.fade
+- Motion recipes: popup.anchored, geometry.resize, state.color, text.change, number.roll
 
 ## Installation
 
@@ -36,6 +36,11 @@ npm install clsx tailwind-merge motion @base-ui/react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -58,6 +63,20 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | tooltip | `@components/cadence/tooltip/index.tsx` | [JSON files[].content](https://cadence.dev/r/tooltip.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -65,6 +84,16 @@ npm install clsx tailwind-merge motion @base-ui/react
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: tooltip](https://cadence.dev/r/tooltip.json)
 
@@ -221,19 +250,21 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, keeping `tooltip/index.tsx` and the shared `lib/`
-directory in the same `cadence/` tree. Preserve relative imports and the
-sources' `"use client"` directives. Copy every file in the motion, utilities
-and provider payloads, including helpers not imported by Tooltip directly.
+Copy all thirty-two target files, keeping `tooltip/index.tsx` and the shared
+`lib/` directory in the same `cadence/` tree. Preserve relative imports and the
+sources' `"use client"` directives. Copy every file in the motion, utilities,
+provider, geometry, text, number and anchored-presence payloads, including
+helpers not imported by Tooltip directly.
 The provider files and `motion` package are required imports even without
 the optional `CadenceProvider` wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the
 copied files. Include the Cadence easing and motion-scale tokens used by the
 popup classes. No additional item-specific CSS or external asset is required.
-Full fades and scales the label from its anchor; reduced keeps opacity only;
-none removes transitions and hidden entry/exit styles. The portalled popup
-resolves its own mode and token clock. Standalone components follow the system
+The hint fades in and out on one short opacity envelope, with no travel or
+scale; reduced keeps the same short opacity at the reduced clock, and none
+settles it on the first frame. The portalled popup resolves its own mode and
+token clock. Standalone components follow the system
 motion preference; an optional `CadenceProvider` controls a subtree, and nested
 full still respects system reduced motion.
 
@@ -323,7 +354,7 @@ export function BoldTooltip() {
 
 ## Positioned by side
 
-The four physical sides have separate fixed triggers. Base UI flips and shifts the label when space runs out. sideOffset changes the gap; the scale still grows from the anchor origin.
+The four physical sides have separate fixed triggers. Base UI flips and shifts the label when space runs out. sideOffset changes the gap; the hint only fades, so the resolved placement is the only position it ever occupies.
 
 <ComponentExample name="sides" />
 
@@ -571,24 +602,28 @@ export function TooltipMotionScopes() {
 | `TooltipProvider` | `delay` | Optional. One delay for every tooltip inside. |
 | `Tooltip` | `open`, `defaultOpen`, `onOpenChange`, `triggerId`, `disabled` | Base UI root; `triggerId` anchors external open updates. |
 | `TooltipTrigger` | native button props, `render`, `delay`, `closeDelay`, `disabled` | Hover/focus target; carries `aria-describedby`. Trigger `disabled` suppresses the hint; disable the rendered Button separately to block its action. |
-| `TooltipContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, popup, and arrow. `side` defaults to `top`, `sideOffset` to `4`. |
+| `TooltipContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, popup, and arrow. `side` defaults to `top`, `sideOffset` to `4`. A plain string child renders in the owned hint slot, so a changed hint replaces only its changed characters; a directly supplied number uses the compact quantity slot. Rich children render unchanged. |
 
 ## Motion contract
 
-Authored intensity is **medium**: Tooltip opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Tooltip owns one short opacity envelope on its own hint surface, a clamped measured width and height when the hint changes, scoped surface and foreground paint, and the changed-run text and compact quantity owners; Base UI keeps positioning, focus, intent delays and unmount, and rich children keep their own composed owners.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live reduced keeps the same short opacity on the reduced clock; none settles the hint on the first frame and cancels the running writer instead of post-dating the open/close event.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
-| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so the label appears on the first frame | – | – |
+| enter | hint `opacity 0 → 1`; no travel and no scale | `popup.anchored/one-shot` · `duration.instant` | yes, a reversal continues from the current opacity |
+| exit | hint `opacity → 0` on the same channel | `popup.anchored/one-shot` · `duration.instant` | yes (reopen mid-exit) |
+| hint revision | one measured hint width and height transaction, clamped to Base UI's available space | `geometry.resize/measured` · `spring.sizeCompact` | yes, retargets from the current size |
+| changed hint text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric hint quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| hint surface and foreground | scoped colour pair; an unprovable caller palette is immediate | `state.color/css-transition` | yes, latest committed colour |
 
-A tooltip is small enough that `duration.fast` is already at the edge of readable: nothing here waits
-for an exit to finish. The arrow is part of the popup and moves with it, so it is never animated
-separately.
+A tooltip is small enough that `duration.instant` is the whole envelope: nothing here waits for an exit
+to finish, and the hint never travels or scales like a menu. The arrow is a child of the same surface and
+inherits its paint, so it fades with the hint and cannot be left behind by a surface transition. Base UI's
+positioner keeps the coordinates, so a collision flip or an anchor move is native and immediate, and the
+provider's intent delays (`delay`, `closeDelay`) stay interaction timing rather than presentation timing.
 
 ## Keyboard interactions
 
@@ -621,8 +656,9 @@ running off screen. Base UI flips the side and shifts the alignment when the vie
 
 - The popup tree is mounted only while the label is open; a page can carry dozens of tooltips without
   paying for them all.
-- Animates `opacity` and `scale` only — no layout read, no measuring loop, no JavaScript animation.
-  Hover is not a state the component polls.
+- The hint writes one opacity animation; it only measures its natural width and height when the hint
+  actually changes, and never polls hover. A changed hint lays out at its final width once, then the
+  shell animates around that layout.
 
 ## Notes for AI
 

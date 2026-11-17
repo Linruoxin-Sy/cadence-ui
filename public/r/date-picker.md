@@ -86,6 +86,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
 | cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 | date-picker | `@components/cadence/date-picker/index.tsx` | [JSON files[].content](https://cadence.dev/r/date-picker.json) |
 
