@@ -2535,36 +2535,129 @@
       "title": "Pagination",
       "description": "Long result sets, tables, and search results.",
       "categories": ["navigation"],
-      "dependencies": ["lucide-react"],
-      "registryDependencies": ["@cadence/button", "@cadence/cadence-utils"],
+      "dependencies": ["lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-selection"
+      ],
       "files": [
         {
           "path": "registry/cadence/pagination/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/pagination/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/button-group-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/button-group-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/label-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/label-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
-        "intensity": "subtle",
-        "complexity": "S",
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          "layout.move",
+          {
+            "recipe": "layout.shared",
+            "form": "selection"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "M",
         "upstream": {
           "registry": "shadcn",
           "style": "base-ui",
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Pagination declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "collection",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Pagination keeps every destination identity while a visible range grows, shrinks or renames: inserted and removed links fade, retained destinations reflow, the content owns its content-driven height and one active decoration follows the current page only on a readable path."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "The content owns its own opacity entrance and every retained destination owns the opacity channel of its own host."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "A removed link keeps only an inert, aria-hidden visual at its last committed box until its native removal completes."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "Each surviving destination projects its own previous box; the content measures once and never writes a link transform."
+              }
+            ],
+            "layout.shared/selection": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "One decoration inside the content follows the single active link and stays inside that content coordinate space."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "The content owns its content-driven block height after a committed range or label revision; passive viewport or font reflow stays native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "The link owns its own surface paint, each plain label span owns its foreground clock and the active decoration owns its own surface; an unprovable caller palette settles that region immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "pagination",
+                "reason": "A direct plain link label, the Previous/Next text props and an ellipsis keep one native text host; only changed graphemes are replaced."
+              }
+            ]
+          }
         }
       }
     },
