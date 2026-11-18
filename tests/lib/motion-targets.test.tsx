@@ -192,6 +192,7 @@ describe("current registry inventory and real part references", () => {
       "combobox",
       "dropdown-menu",
       "context-menu",
+      "menubar",
       "accordion",
       "collapsible",
       "tabs",
