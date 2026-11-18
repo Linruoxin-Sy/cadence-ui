@@ -266,19 +266,16 @@ describe("explicit CSS policy adoption", () => {
 
 const navigation = readFileSync("registry/cadence/navigation-menu/index.tsx", "utf8");
 describe("shared navigation popup geometry manifest", () => {
-  it("requires the explicit measured CSS form", () => {
-    expect(implementedForm(navigation, "geometry.resize", "css-transition")).toBe("css-transition");
-    expect(implementedForm(navigation, "geometry.resize")).toBeNull();
+  it("requires the measured shell form", () => {
+    expect(implementedForm(navigation, "geometry.resize", "measured")).toBe("measured");
+    // The migrated source delegates width/height to its own controller, so the legacy
+    // shared-popup CSS recogniser can no longer certify it.
+    expect(implementedForm(navigation, "geometry.resize", "css-transition")).toBeNull();
   });
-  it.each([
-    "--popup-width",
-    "--popup-height",
-    "--available-width",
-    "--available-height",
-    "cm.reduced",
-    "--motion-duration-slow",
-    "transition-[opacity,scale,width,height]",
-  ])("rejects missing %s evidence", (evidence) => {
-    expect(implementedForm(navigation.replaceAll(evidence, "missing"), "geometry.resize", "css-transition")).toBeNull();
-  });
+  it.each(["createMeasuredGeometry(", ".register(", ".commit(", '"geometry.resize/measured"'])(
+    "rejects missing %s evidence",
+    (evidence) => {
+      expect(implementedForm(navigation.replaceAll(evidence, "missing"), "geometry.resize", "measured")).toBeNull();
+    },
+  );
 });

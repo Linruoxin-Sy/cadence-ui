@@ -34902,6 +34902,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -34924,6 +34930,21 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | navigation-menu | `@components/cadence/navigation-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/navigation-menu.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -34931,6 +34952,18 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: navigation-menu](https://cadence.dev/r/navigation-menu.json)
 
@@ -35087,10 +35120,10 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, including every shared helper, into the same
-`cadence/` tree. Preserve relative imports and shipped `"use client"`
-directives. Complete the base theme setup and ensure Tailwind CSS v4 scans
-the copied files. No additional Navigation Menu stylesheet is required.
+Copy all thirty-three target files, keeping `navigation-menu/index.tsx` and the shared `lib/`
+helpers in the same `cadence/` tree. Preserve relative imports and shipped `"use client"`
+directives. Complete the base theme setup and ensure Tailwind CSS v4 scans the copied files. No
+additional Navigation Menu stylesheet is required.
 
 For the action examples, also follow [Button manual installation](https://cadence.dev/components/button#installation),
 copying every target and installing its recursive dependencies. Retained
@@ -35554,7 +35587,7 @@ export function RtlExample() {
 
 ## Without motion
 
-This fixed local provider demonstrates `mode="none"` from the first popup insertion. Navigation, focus, links and measurements still work; opacity, scale and geometry transitions have zero duration. Every other example inherits the site header mode/speed and the system preference.
+This fixed local provider demonstrates `mode="none"` from the first popup insertion. Navigation, focus, links and measurements still work; presence, the content revision and the chevron reach their final state on the first frame, and the shared shell takes the measured destination immediately. Every other example inherits the site header mode/speed and the system preference.
 
 <ComponentExample name="without-motion" />
 
@@ -35596,9 +35629,9 @@ export function WithoutMotionExample() {
 | `NavigationMenu` | Base UI Root props, `align` | `align="start"`; `value`/`defaultValue`, `onValueChange`, `onOpenChangeComplete`, `actionsRef`, `delay`, `closeDelay`, `orientation`, `render`, ref and native nav props pass through. Automatically appends one positioner. |
 | `NavigationMenuList` | Base UI List props | List semantics and keyboard navigation. |
 | `NavigationMenuItem` | Base UI Item props | Stable `value` associates trigger and content. |
-| `NavigationMenuTrigger` | Base UI Trigger props | Native button, supports disabled, render, refs, callback classes/styles. |
-| `NavigationMenuContent` | Base UI Content props | Portaled content, `keepMounted=false`; caller classes/styles merge with primitive state. |
-| `NavigationMenuLink` | Base UI Link props | Native anchor; `active`, `closeOnClick`, render, refs supported. |
+| `NavigationMenuTrigger` | Base UI Trigger props | Native button, supports disabled, render, refs, callback classes/styles. Appends the owned chevron; a plain string or number child becomes the changed-run display slot. |
+| `NavigationMenuContent` | Base UI Content props | Portaled content, `keepMounted=false`; caller classes/styles merge with primitive state. A direct plain string or number child becomes the owned text or quantity slot; rich children pass through unchanged. |
+| `NavigationMenuLink` | Base UI Link props | Native anchor; `active`, `closeOnClick`, render, refs supported. Owns its state surface only and keeps the popup's inherited foreground. |
 | `NavigationMenuIndicator` | Base UI Icon props | Static arrow within a trigger; no extra animation. |
 | `NavigationMenuPositioner` | Base UI Positioner props | `side="bottom"`, `sideOffset=8`, `align="start"`, `alignOffset=0`; anchor, collision, render, refs and state callbacks pass through. |
 | `navigationMenuTriggerStyle` | CVA function | Trigger classes for standalone navigation links. |
@@ -35609,19 +35642,29 @@ viewport have additive `data-slot` hooks. Positioner props still follow upstream
 
 ## Motion contract
 
-Authored intensity is **medium**: Popup presence and the shared viewport size transition coordinate within the navigation surface.
+Authored intensity is **medium**: Navigation Menu owns one positioned surface: its popup presence, the measured shared viewport that follows the committed destination size, the entering content paint, the trigger chevron, the scoped trigger and surface palettes, and the trigger, link and content display slots, while Base UI keeps placement, hover intent, focus and unmount.
 
-| Phase | Properties | Recipe / tokens | Interruptible |
+The popup enters once and the shared surface follows the destination the primitive measured; only the entering content travels, and the chevron turns on its own region.
+
+| Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open | Popup opacity and anchor scale; content opacity | `popup.anchored/css-transition`, fast clock, scale.in | Native CSS reversal |
-| Close / outgoing content | Opacity to zero; popup returns to anchor scale | `exit.fade/css-transition`, fast clock | Base UI retains exit nodes until completion |
-| Switch / update | Shared popup width/height, clamped to available space | `geometry.resize/css-transition`, slow clock / ease.out | Base UI measures current size before retargeting |
-| Reduced | Opacity only; no scale or geometry transition | Fast clock at 0.6×; geometry instant | Live downgrade keeps nodes and focus |
-| None | All durations zero, geometry instant | Zeroed CSS tokens | Running transitions finish immediately |
+| popup enter | popup `opacity 0 → 1` with a `4px` approach from the resolved side | `popup.anchored/one-shot` · `duration.fast` | yes, a reversal continues from the current paint |
+| popup exit | popup `opacity → 0`; the positioner keeps its placement | `exit.fade/one-shot` · `duration.fast` | yes (reopen mid-exit) |
+| destination size revision | clamped shared shell width and height around the committed destination | `geometry.resize/measured` · `spring.sizePanel` | yes, retargets from the current size |
+| content revision | entering content `opacity` and `4px` directional travel | `data.transition/directional-content` · `duration.base` | yes, the newest direction replaces the old target |
+| trigger open state | chevron turns by `180deg` with no opacity or scale | `state.morph/one-shot` · `spring.snappy` | yes, retargets the current angle |
+| trigger and popup paint | scoped surface, foreground, border and shadow colour; focus or an unprovable palette is immediate | `state.color/css-transition` · `duration.fast` | yes, latest committed colour |
+| direct plain label | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric content quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
 
-Content switches cross-fade; they do not slide. The positioner follows the active trigger instantly.
-Sizing uses Base UI's measured popup variables, not render-time reads or a second animation engine. Trigger activation and in-panel content mutation retarget the resize clock; a value-only controlled switch can adopt the new natural geometry immediately.
-Popup and content own token-derived CSS clocks so explicit nested modes and the preview speed work across portals. Caller custom motion must obey the same mode contract.
+The popup's presence, the shared shell, the content paint and the chevron are four disjoint owners: the popup writes
+opacity and one short transform, the shell writes width and height around the destination Base UI supplies, the
+entering content writes its own opacity and travel inside the viewport, and the chevron writes its own angle. The
+positioner keeps its coordinates and `--transform-origin`, so `sideOffset`/`alignOffset` and collision flips stay
+native and immediate. Cadence retains no outgoing panel: an inactive `keepMounted` content stays Base UI's hidden,
+inert node and receives no Cadence paint. Closed content is current on the next open without replaying hidden
+updates. Portal surfaces resolve their own mode and token clock, so a nested full scope restores timing inside none;
+caller custom motion must obey the same mode contract.
 
 ## Keyboard interactions
 
@@ -35644,15 +35687,19 @@ focus guards and outside/Escape dismissal. Disabled triggers stay focusable but 
 
 Popup width and height are limited by Base UI's available viewport dimensions. Its viewport scrolls
 when content exceeds that space. Supply responsive widths/grids for your destinations; the component
-does not replace your information architecture with a mobile drawer. Resize updates anchor geometry
-immediately in all modes. Reduced and none never tween width/height.
+does not replace your information architecture with a mobile drawer. A passive viewport, font or
+scrollbar reflow settles the shell immediately in every mode; only a committed destination measured by
+the primitive is interpolated. Reduced and none never tween width or height.
 
 ## Performance
 
-T3: one shared popup, native CSS transitions, and Base UI's existing post-commit measurements and
-mutation/resize tracking. No additional geometry observer, timer, layout animation loop or persistent
-will-change. Two scoped child-list observers repair newly inserted focus sentinels; they disconnect on unmount. Geometry transitions are limited to the popup; nothing transitions top/left. Inactive
-content unmounts by default; keepMounted deliberately retains caller state and its DOM cost.
+T3: one shared popup, one measured shell writer and Base UI's own post-commit measurements and
+mutation/resize tracking. No timer, layout animation loop or persistent `will-change`; the chevron only
+marks will-change while full motion owns its angle. Two scoped child-list observers repair newly
+inserted focus sentinels; they disconnect on unmount. Geometry is limited to the popup's width and
+height; nothing interpolates `top`/`left`. Inactive content unmounts by default; `keepMounted`
+deliberately retains caller state and its DOM cost, without a Cadence writer. The numerical budgets
+stay advisory under ADR-023 until functional migration completes.
 
 ## Notes for AI
 

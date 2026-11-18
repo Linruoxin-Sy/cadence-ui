@@ -5680,7 +5680,16 @@
       "description": "Site navigation with shared popup content and interruptible sizing.",
       "categories": ["navigation"],
       "dependencies": ["@base-ui/react", "motion", "class-variance-authority", "lucide-react"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-content",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-anchored-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/navigation-menu/index.tsx",
@@ -5695,15 +5704,35 @@
         "motion": [
           {
             "recipe": "popup.anchored",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           {
             "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "directional-content"
+          },
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -5717,30 +5746,65 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "group",
-          "reason": "Popup presence and the shared viewport size transition coordinate within the navigation surface."
+          "reason": "Navigation Menu owns one positioned surface: its popup presence, the measured shared viewport that follows the committed destination size, the entering content paint, the trigger chevron, the scoped trigger and surface palettes, and the trigger, link and content display slots, while Base UI keeps placement, hover intent, focus and unmount."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "default",
                 "owner": "navigation-menu",
-                "reason": "Navigation Menu integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "The positioned popup owns one opacity and distance.xs approach on the shared surface; Base UI still owns mounting, placement, focus and unmount completion."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "default",
                 "owner": "navigation-menu",
-                "reason": "Navigation Menu integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "The same popup fades out on its own opacity channel while Base UI completes the native close protocol and releases the portal."
               }
             ],
-            "geometry.resize/css-transition": [
+            "geometry.resize/measured": [
               {
                 "relationship": "default",
                 "owner": "navigation-menu",
-                "reason": "Navigation Menu integrates owned size transitions at its own parts, using the reached installed executor."
+                "reason": "One shell owns width and height around the committed destination Base UI supplies; the positioner keeps its coordinates and collision results immediate."
+              }
+            ],
+            "data.transition/directional-content": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "Only the entering active content paints an opacity and directional travel revision inside the shared viewport; Cadence retains no outgoing menu content."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "The trigger chevron turns by rotation.halfTurn between closed and open without opacity, scale or a second selection marker."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "The trigger and link own disjoint background surfaces and the popup owns its background, border, shadow and foreground; focus or an unprovable caller palette settles that region immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "Direct plain trigger, link and content strings replace only their changed graphemes; rich menu content keeps its own owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "A directly supplied numeric content quantity rolls only its changed places; numeric-looking navigation labels, item values and route identifiers remain text."
               }
             ]
           }

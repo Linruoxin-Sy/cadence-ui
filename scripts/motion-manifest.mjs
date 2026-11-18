@@ -204,12 +204,14 @@ function detectImplementedForm(source, recipe, form) {
       source.includes("layout.shared/selection")
       ? form
       : null;
-  if (recipe === "data.transition" && form === "directional-content")
-    return imports("createContentTransition", "content-transition") &&
-      source.includes("paint.commit(") &&
-      source.includes("TabsPanelSurface")
+  if (recipe === "data.transition" && form === "directional-content") {
+    // Shared factory, but each adapter names the surface it actually paints: Tabs'
+    // panel layer and Navigation Menu's shared viewport content are distinct hosts.
+    const surface = source.includes("TabsPanelSurface") || source.includes('data-slot="navigation-menu-content"');
+    return imports("createContentTransition", "content-transition") && source.includes("paint.commit(") && surface
       ? form
       : null;
+  }
   if (recipe === "data.transition" && form === "month-grid")
     return imports("createContentTransition", "content-transition") &&
       source.includes("createContentTransition(") &&
