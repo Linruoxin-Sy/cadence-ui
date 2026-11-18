@@ -2,15 +2,15 @@
 title: Breadcrumb
 description: Hierarchy navigation, from the root to the current page.
 category: navigation
-motion: []
-intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motion: ["data.transition","exit.fade","layout.move",{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"}]
+intensity: medium
+motionProfile: {"scope":"collection","travel":"compact","coordination":"group","reason":"Breadcrumb keeps destination identity while the trail grows, shrinks or renames: changed crumbs and separators fade, retained ancestors reflow toward the final path, the list owns its content-driven block size, and plain labels replace only their changed graphemes under one scoped foreground owner."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"breadcrumb","reason":"The list owns its own opacity entrance and every crumb owns the opacity channel of its retained host; nothing is repainted by a wrapper."}],"exit.fade/one-shot":[{"relationship":"default","owner":"breadcrumb","reason":"A removed crumb keeps only an inert, aria-hidden visual at its last committed box until its native removal completes."}],"layout.move/one-shot":[{"relationship":"default","owner":"breadcrumb","reason":"Each surviving crumb projects its own previous box; the list measures once and never writes a crumb transform."}],"geometry.resize/measured":[{"relationship":"default","owner":"breadcrumb","reason":"The list owns its content-driven block height after a committed path revision; passive viewport or font wrapping stays native."}],"state.color/css-transition":[{"relationship":"default","owner":"breadcrumb","reason":"Link, page, separator and ellipsis each own their own foreground clock; an unprovable caller palette settles that region immediately."}],"text.change/changed-runs":[{"relationship":"default","owner":"breadcrumb","reason":"A direct plain link or page label replaces only its changed graphemes; rich children and render callbacks keep their own structure."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: ["@base-ui/react", "lucide-react"]
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["@base-ui/react", "lucide-react", "motion"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-geometry", "@cadence/cadence-text"]
 ---
 
 ## Installation
@@ -26,10 +26,12 @@ npx shadcn@latest add @cadence/breadcrumb
 [Manual installation files](https://cadence.dev/r/breadcrumb.json)
 
 Copy both files in the target list, keeping `breadcrumb/index.tsx` beside the
-shared `lib/` directory containing `cn.ts`. No motion runtime, provider or
-additional item-specific CSS is required beyond the base theme and Tailwind
-utilities. The trail stays static in full, reduced and none modes; the link's
-colour transition is hover feedback. `lucide-react` is a component dependency
+shared `lib/` directory containing `cn.ts` and the motion helpers the trail imports
+(`breadcrumb-layout.ts`, `button-group-layout.ts`, `label-layout.ts`,
+`inline-entrance.ts`). The trail needs the Cadence provider, motion, geometry and
+text registry items. All modes keep every destination reachable: full fades changed
+crumbs and projects retained positions, reduced keeps only short opacity and colour
+feedback, and none settles immediately. `lucide-react` is a component dependency
 for the default chevron and ellipsis, even when an example uses a custom separator.
 
 Keep the source's existing `"use client"` directive. In Next.js App Router, a
@@ -193,6 +195,54 @@ export function RouterTrail() {
 }
 ```
 
+## A path that changes
+
+The caller owns the path, so it also owns what a change means. Insert, remove or rename a real destination and the
+surviving ancestors keep their nodes, their `href` and their identity; only the new and changed crumbs fade, and
+retained positions reflow to the final path. Reusing one label for a different destination is a new identity, not a
+morph, so that revision keeps native layout. To let a removed ancestor fade out, keep it mounted for the exit - for
+example inside `AnimatePresence` - and give every crumb a stable key.
+
+<ComponentExample name="membership" />
+
+```tsx
+import { useState } from "react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/cadence/breadcrumb";
+
+export function ChangingTrail() {
+  const [deep, setDeep] = useState(false);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <button type="button" className="text-sm underline" onClick={() => setDeep(!deep)}>
+        {deep ? "Shorter path" : "Deeper path"}
+      </button>
+      <Breadcrumb aria-label="Changing trail">
+        <BreadcrumbList>
+          <BreadcrumbItem><BreadcrumbLink href="/">Home</BreadcrumbLink></BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem><BreadcrumbLink href="/components">Components</BreadcrumbLink></BreadcrumbItem>
+          {deep ? (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem><BreadcrumbLink href="/components/navigation">Navigation</BreadcrumbLink></BreadcrumbItem>
+            </>
+          ) : null}
+          <BreadcrumbSeparator />
+          <BreadcrumbItem><BreadcrumbPage>Breadcrumb</BreadcrumbPage></BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
+  );
+}
+```
+
 ## When to use
 
 - A hierarchy deeper than two levels, where the user needs to know where they are and
@@ -214,8 +264,8 @@ export function RouterTrail() {
 | Part                   | Props                 | Notes                                                         |
 | ---------------------- | --------------------- | ------------------------------------------------------------- |
 | `Breadcrumb`           | native nav props      | `aria-label="breadcrumb"`.                                    |
-| `BreadcrumbList`       | native ol props       | Flex row that wraps; muted, small text.                       |
-| `BreadcrumbItem`       | native li props       | Inline flex, one gap.                                         |
+| `BreadcrumbList`       | native ol props       | Flex row that wraps; owns the committed path revision.        |
+| `BreadcrumbItem`       | native li props       | Inline flex, one gap; keeps its own presence and position.     |
 | `BreadcrumbLink`       | `render`, anchor props| Anchor by default; `data-slot="breadcrumb-link"`.             |
 | `BreadcrumbPage`       | native span props     | The current page: `aria-current="page"`, not a link.          |
 | `BreadcrumbSeparator`  | native li props       | `role="presentation"`, `aria-hidden`; chevron by default.     |
@@ -223,19 +273,20 @@ export function RouterTrail() {
 
 ## Motion contract
 
-Authored intensity is **subtle**: Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: Breadcrumb keeps destination identity while the trail grows, shrinks or renames: changed crumbs and separators fade, retained ancestors reflow toward the final path, the list owns its content-driven block size, and plain labels replace only their changed graphemes under one scoped foreground owner. Initial SSR and hydration content stays readable and does not replay an entrance.
 
-No motion (T0). Nothing in a trail animates. A navigation landmark that fades or
-slides in is harder to find, and a trail that reflows on navigation makes the one
-stable thing on the page move.
+| Recipe | Owner / properties | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| `data.transition/one-shot` | List entrance, and a later inserted crumb; opacity | One short entrance | Short opacity | Immediate |
+| `exit.fade/one-shot` | Retained leaving crumb; opacity | Fade, then lifecycle removal | Short opacity | Immediate removal |
+| `geometry.resize/measured` | List block height, one owner per revision | Clamped height continuity | Immediate height | Immediate height |
+| `layout.move/one-shot` | Each surviving crumb's own position | Project to the final path | Immediate placement | Immediate placement |
+| `text.change/changed-runs` | Plain link and page labels; changed runs | Changed graphemes only, no stagger | Short changed opacity | Exact final text immediately |
+| `state.color/css-transition` | Link, page, separator and ellipsis foreground | Scoped colour feedback | Short colour feedback | Zero clock |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+A committed path revision is one cause: the list measures the final crumb boxes once, every retained crumb projects from its own previous box, and the list alone owns the block height. Unchanged ancestor labels do not replay. A wrapped path that moves a crumb between rows, a passive viewport or font reflow, a clipped or oversized path, or a retained node that now points at another destination keeps native layout. The caret, focus outline, link activation, `aria-current` and the current page's non-focusable state never wait for an animation, and this component never derives a trail from the URL or navigates on its own.
 
-`transition-colors` on the link is hover feedback on the text colour only.
+Removing a crumb requires the caller to keep it mounted for the exit - for example inside `AnimatePresence`. The leaving crumb keeps only an inert, `aria-hidden` visual at its last committed box; it never stays actionable, and a restored ancestor replaces a stale exit.
 
 ## Accessibility
 
@@ -253,14 +304,16 @@ stable thing on the page move.
 
 ## Responsiveness and performance
 
-The list wraps and increases its gap at sm. Collapsing a deep trail into an ellipsis is
-caller-owned; the component does not measure width or choose hidden ancestors.
+The list wraps and increases its gap at sm. A committed path revision owns the list's block height and each
+retained crumb's position; passive viewport, font or scrollbar reflow stays native and does not animate. Collapsing a
+deep trail into an ellipsis is caller-owned; the component does not measure width or choose hidden ancestors.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
-HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
-contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
-The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
-application bundles are measured separately.
+Motion work is bounded to the visible path: one measurement per committed revision, one projection per retained
+crumb and no hidden measurement copy or list-invalid wrapper. A decorative ellipsis nested inside its item follows
+that item instead of writing a second transform. Base UI behavior requires hydration; native HTML behavior remains
+browser-owned. Composed controls retain their own dependencies and motion contracts. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry's source-size comparison for this item is
+advisory under ADR-023; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 

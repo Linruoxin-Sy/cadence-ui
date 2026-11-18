@@ -93,7 +93,10 @@ jobs:
   runtime:
     needs: prepare
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Hang guard, not a performance budget (ADR-023): the suite prints its result and
+    # can linger on vitest workers afterwards, so the ceiling only has to outlast that
+    # teardown and it tracks the growing catalogue rather than a measured cost.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

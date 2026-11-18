@@ -1,6 +1,7 @@
 # Breadcrumb motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
 Breadcrumb retains ancestor identity while a route adds, removes or renames the current path segment. It does not add a router or automatic overflow menu. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
@@ -10,7 +11,7 @@ Breadcrumb retains ancestor identity while a route adds, removes or renames the 
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "list": ["breadcrumb#BreadcrumbList"],
     "item": ["breadcrumb#BreadcrumbItem", "breadcrumb#BreadcrumbSeparator", "breadcrumb#BreadcrumbEllipsis"],
@@ -21,7 +22,14 @@ Breadcrumb retains ancestor identity while a route adds, removes or renames the 
       "breadcrumb#BreadcrumbSeparator",
       "breadcrumb#BreadcrumbEllipsis"
     ]
-  }
+  },
+  "regions": {
+    "list": ["breadcrumb-list"],
+    "item": ["breadcrumb-item", "breadcrumb-separator", "breadcrumb-ellipsis"],
+    "label": ["breadcrumb-link-text", "breadcrumb-page-text"],
+    "text": ["breadcrumb-link", "breadcrumb-page", "breadcrumb-separator", "breadcrumb-ellipsis"]
+  },
+  "axes": { "list": ["height"] }
 }
 ```
 
@@ -60,8 +68,30 @@ At a known path revision, lay out labels at the final available width, then anim
 
 One committed layout pass owns path geometry; individual label helpers supply content, not independent widths. Keep final-visible crumb names and the currently focused link usable throughout. If a smaller host, wrapped-row movement or active pointer target cannot remain safe under existing overflow, commit that affected layout immediately. Oversized paths and unknown identities skip blanket FLIP/measurement and use immediate layout plus bounded changed-text feedback; do not render hidden measurement crumbs or add list-invalid wrapper elements.
 
+The shipped adapter follows that rule as follows: the list commits `geometry.resize/measured` on its own `height` once per committed revision; each retained crumb projects its own previous box through `layout.compact`, and the list never writes a crumb transform. A revision that moves a retained crumb between wrapped rows, a passive viewport/font reflow, a clipped or oversized path, or a retained node whose destination changed settles positions instead of interpolating. A decorative ellipsis nested inside its item follows that item and writes no second transform; only a crumb that is a direct child of the list projects.
+
 ## Acceptance scenarios
 
-Target acceptance; not executed: append/remove a destination; rename one crumb; rapid back/forward changes; wrapped paths and RTL; numeric identifiers; rich links; composed overflow menu; all modes and zero clock during navigation.
+Executed in the component suite (`tests/components/breadcrumb.test.tsx`), for full, reduced and none through one
+bounded scene with exactly one host per owned slot:
 
-Also pending: rename a focused ancestor while the current crumb changes from link to page, reuse a label for a different destination, and remove a wrapped path during exit; semantics and stable identity win over motion.
+- List insertion runs `breadcrumb.list.enter` only; a later crumb insertion or removal runs the item causes on
+  each retained host and keeps the existing DOM nodes.
+- A committed rename of a link and a page label runs `breadcrumb.item.move`, `breadcrumb.list.resize` and
+  `breadcrumb.label.replace` on the same instances, and the final accessible text is exact.
+- Each of the four text owners runs its own `breadcrumb.text.colour` clock; an unprovable caller palette
+  settles that region immediately.
+- A presence revision keeps the crumb's host and its native `ol`/`li` structure, marks the retained visual
+  `aria-hidden`/`inert` while leaving, and restores it on re-entry.
+- A live mode downgrade keeps one `data-motion` on every owned host, leaves no CSS size clock and starts no
+  animation.
+- The `Surface colour/@list` and `Changed numbers/@list` rows are verified as native boundaries; the
+  `Changed text/@label` boundary is verified on both breadcrumb exports.
+- A caller-owned path that inserts crumbs and then renames an ancestor keeps the surviving anchor nodes,
+  their `href` and their text identity.
+
+Deferred under ADR-023: the browser matrix (three modes × two OS preferences), a production build, real-device
+frame rate and CLS, RTL and wrapped-path screenshots, light/dark review, SSR/no-JS hydration in a browser and any
+performance acceptance. `geometry.resize/measured` and `layout.move/position` are proven here through their
+parameter form, revision and committed-target evidence; jsdom has no layout, so their rendered interpolation is
+browser work that remains unmeasured.
