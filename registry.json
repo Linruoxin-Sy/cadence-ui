@@ -4894,12 +4894,24 @@
         "batch": "B5",
         "motion": [
           {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
             "recipe": "enter.pop",
             "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
             "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
           }
         ],
         "intensity": "medium",
@@ -4911,30 +4923,66 @@
         },
         "motionProfile": {
           "scope": "surface",
-          "travel": "compact",
+          "travel": "none",
           "coordination": "independent",
-          "reason": "Command opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "The palette owns one root insertion and its own supplied surface paint, while the composed Dialog panel, its backdrop and title keep their migrated presence, paint and changed-run owners and the Input Group frame keeps its own insertion and paint."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "command",
+                "reason": "The inline root commits one later-insertion opacity when no presenting parent, hidden host or real focus target already owns its paint."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input-group",
+                "reason": "The composed Input Group frame keeps its own insertion opacity inside CommandInput instead of receiving a second command writer."
+              }
+            ],
             "enter.pop/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dialog",
-                "reason": "Command mounts DialogContent for its palette entrance; the migrated Dialog panel and backdrop remain the actual presence owners."
+                "reason": "CommandDialog mounts DialogContent, so the migrated Dialog panel and backdrop remain the actual palette entrance owners."
               }
             ],
             "exit.fade/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dialog",
-                "reason": "Command mounts DialogContent for its palette exit; the migrated Dialog keeps that opacity owner and the native completion."
+                "reason": "CommandDialog delegates the closing fade, modality release and focus restoration to the migrated Dialog owner."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "command",
+                "reason": "The root, empty state, input divider, separator, item and shortcut each own their declared scoped paint, with focus, invalid state and an unverified caller palette immediate."
               },
               {
                 "relationship": "inherited",
                 "owner": "input-group",
-                "reason": "A retained composed InputGroupAddon keeps its own insertion/exit opacity inside CommandInput rather than receiving a second palette writer."
+                "reason": "The composed Input Group frame keeps its own border, background and shadow owner inside CommandInput."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dialog",
+                "reason": "The composed Dialog panel and title keep their own migrated surface and foreground owners rather than receiving a second command writer."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "command",
+                "reason": "A plain item, shortcut or empty string replaces only its changed graphemes; rich children and the native query keep their own owners."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dialog",
+                "reason": "The screen-reader-only palette title keeps Dialog's own changed-run owner instead of a second command text writer."
               }
             ]
           }
