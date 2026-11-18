@@ -1,8 +1,12 @@
 # Command motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
-The search input responds natively while the current command set changes immediately. Motion helps the results viewport and committed display labels settle; it never postpones filtering or executing a command. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
+The search input responds natively while the current command set changes immediately. Motion helps the palette
+arrive and its supplied paint settle; it never postpones filtering, scoring, selection or executing a command.
+This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design
+references, not recipe IDs or public APIs.
 
 ## Contract references
 
@@ -10,114 +14,134 @@ The search input responds natively while the current command set changes immedia
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "root": ["command#Command"],
-    "dialog": ["command#CommandDialog", "dialog#DialogContent"],
+    "surface": ["command#Command", "command#CommandInput", "command#CommandSeparator"],
+    "empty-surface": ["command#CommandEmpty"],
+    "item": ["command#CommandItem", "command#CommandShortcut"],
+    "label": ["command#CommandItem", "command#CommandShortcut"],
+    "empty-label": ["command#CommandEmpty"],
     "input": ["command#CommandInput"],
     "list": ["command#CommandList"],
-    "item": ["command#CommandItem"],
-    "surface": [
-      "command#Command",
-      "command#CommandGroup",
-      "command#CommandEmpty",
-      "command#CommandShortcut",
-      "command#CommandInput",
-      "command#CommandSeparator"
-    ],
-    "label": ["command#CommandItem", "command#CommandGroup", "command#CommandEmpty", "command#CommandShortcut"],
-    "quantity": ["command#CommandItem", "command#CommandEmpty"],
     "empty": ["command#CommandEmpty"],
-    "input-frame": ["input-group#InputGroup"],
-    "input-control": ["command#CommandInput", "input-group#InputGroupInput"]
+    "dialog": ["dialog#DialogContent"],
+    "dialog-title": ["dialog#DialogTitle"],
+    "dialog-title-text": ["dialog#DialogTitle"],
+    "input-frame": ["input-group#InputGroup"]
+  },
+  "regions": {
+    "root": ["command"],
+    "surface": ["command", "command-input-wrapper", "command-separator"],
+    "empty-surface": ["command-empty"],
+    "item": ["command-item", "command-shortcut"],
+    "label": ["command-item-text", "command-shortcut-text"],
+    "empty-label": ["command-empty-text"],
+    "input": ["command-input"],
+    "list": ["command-list"],
+    "empty": ["command-empty"],
+    "dialog": ["dialog-content"],
+    "dialog-title": ["dialog-title"],
+    "dialog-title-text": ["dialog-title-text"],
+    "input-frame": ["input-group"]
   }
 }
 ```
 
 ## Capability ownership
 
-| Capability      | Application and owner                                                                                                                                                                                            | References                                                                                                |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Appearance      | Default: inline `command` can own one independent entrance. `CommandDialog` inherits Dialog presence, including its command children; no second popup entrance.                                                  | default: `command.root.enter`; inherited: `command.dialog.enter`, `command.dialog.exit`                   |
-| Size            | Default: `command-list` owns intentional result-height changes within its existing max height; CommandDialog delegates the same cause to that host instead of chasing it with another panel spring.              | default: `command.list.resize`                                                                            |
-| Surface colour  | Default: command/item surfaces, CommandInput's outer wrapper border and CommandSeparator's rule own their supplied paint; the composed Input Group frame retains its existing owner.                             | default: `command.item.colour`, `command.surface.colour`; inherited: `@input-frame`                       |
-| Text colour     | Default: item, group heading, empty state and shortcut foreground changes. The default input inherits InputGroupInput; an `asChild` replacement delegates foreground to its actual caller input owner.           | default: `command.item.colour`, `command.surface.colour`; inherited: `@input-control`; composed: `@input` |
-| Changed text    | Default for owned primitive item/heading/empty/shortcut strings. Native `CommandInput` edits stay immediate; rich labels use composed ownership. Screen-reader-only dialog title/description update immediately. | default: `command.label.change`; composed: `@label`                                                       |
-| Changed numbers | Default: eligible visible Empty revisions of supported direct numeric children. Composed: rich quantities; command names, shortcuts and query text remain identities. No count prop is added.                    | default: `command.empty.roll`; composed: `command.quantity.change`                                        |
+| Capability      | Application and owner                                                                                                                                                                                                                                                                                      | References                                                                                                                                                 |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: the inline `command` root owns one independent later-insertion opacity. `CommandDialog` inherits Dialog presence for the panel and backdrop, including its command children; Command adds no second popup entrance. The composed Input Group frame keeps its own insertion inside `CommandInput`. | default: `command.root.enter`; inherited: `command.dialog.enter`, `command.dialog.exit`, `command.input-frame.enter`                                       |
+| Size            | Not applicable locally: cmdk owns the list as the native scroll container, so the `max-height` clamp, the natural result height, active-item scrolling and final layout commit through native layout. No shell measures or interpolates that extent, and no per-row visual is registered.                  | inherited: `command.list.scroll`                                                                                                                           |
+| Surface colour  | Default: the root, the empty state, the input wrapper's divider and the separator rule each own their supplied background, border and scoped shadow paint. The composed Input Group frame and the Dialog panel keep their own migrated surface owners instead of receiving a second writer.                | default: `command.surface.colour`, `command.empty-surface.colour`, `command.item.colour`; inherited: `command.dialog.colour`, `command.input-frame.colour` |
+| Text colour     | Default: each item and shortcut owns its own foreground together with its surface, so the merged hover/selected/disabled palette has one writer. The Dialog title keeps its own foreground owner; the native editor's text is the browser's own paint.                                                     | default: `command.item.colour`; inherited: `command.dialog-title.colour`                                                                                   |
+| Changed text    | Default for owned primitive item/empty/shortcut strings: changed runs only, no stagger. The screen-reader-only Dialog title keeps Dialog's own changed-run owner; the native `CommandInput` value is never split or replaced.                                                                              | default: `command.label.replace`, `command.empty-label.replace`; inherited: `command.dialog-title-text.replace`; not-applicable: `@input`                  |
+| Changed numbers | Not applicable: command names, shortcut glyphs and the query are identities, `Command` renders no numeric display of its own and no count prop is added. Numeric-looking item, empty and shortcut strings stay text rather than gaining an invented reel.                                                  | not-applicable: `@input`, `@empty`                                                                                                                         |
+
+`item.colour` alone merges hover, selected, disabled and theme paint for each CommandItem and CommandShortcut.
+`surface.colour` owns the root chrome, the empty state background, the input wrapper's divider and the separator
+rule; it never claims a foreground, so no node receives two colour families. The composed Input Group frame keeps
+its own border, background and shadow owner and the Dialog panel keeps its own surface owner. In the default input
+branch the editor's foreground is the browser's native paint; a caller-provided `asChild` element keeps its own
+owners and Command injects none.
+
+Colour eligibility is per actual root, item or display region. DOM focus/focus-within or that region's own invalid
+state cancels its colour clock and settles all its declared paint immediately, while an independent region keeps
+its own clock; cmdk's `aria-activedescendant` highlight is not DOM focus. Other colour interpolation requires a
+verified readable palette, so an unknown caller palette settles at its target.
+
+The group heading is rendered by cmdk itself, so it keeps the primitive's static heading text and paint; Command
+installs no second text or colour writer inside `[cmdk-group-heading]`. `CommandItem`'s generated check glyph keeps
+immediate visibility from the caller-provided `data-checked` state and shortcut suppression; motion never infers a
+checked state from cmdk selection and adds no toggle action.
 
 ## Choreography and modes
 
-| Trigger / owner                                                        | Full                                                                                                                                                                                  | Reduced                                                                          | None                              | Binding → preset → recipe/form                                                                                                   |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Inline insertion / root                                                | Opacity entrance only when no parent owns it. Entry is subject to the actual-focus gate below.                                                                                        | Short opacity. Entry obeys the same focus gate.                                  | Final content immediately.        | `command.root.enter` → `presence.inline` → `data.transition/opacity`                                                             |
-| CommandDialog open/close / inherited Dialog owner                      | Dialog's surface presence once; Command adds no extra popup layer. Entry is subject to the actual-focus gate below.                                                                   | Inherited short opacity. Entry obeys the same focus gate.                        | Final semantic state immediately. | `command.dialog.enter` → `presence.surface` → `enter.pop/surface`; `command.dialog.exit` → `presence.exit` → `exit.fade/opacity` |
-| Editing/filtering/navigation / cmdk and native input                   | Query/results/current selection commit immediately; no per-result entrance stagger or delayed action.                                                                                 | Same immediate behavior.                                                         | Same immediate behavior.          | `command.input.edit` → `engine.native` → `native/cmdk` (cmdk/native input and selection (no new recipe))                         |
-| Result set/empty state change / list viewport                          | Measure latest result-region height; clamp to max height and preserve scroll/active item.                                                                                             | Final height immediately.                                                        | Final height immediately.         | `command.list.resize` → `geometry.compact` → `geometry.resize/measured`                                                          |
-| Pointer selection/state / item                                         | Scoped surface/foreground transition; keyboard selected highlight appears immediately. Colour eligibility and immediate-owner priority follow the rule below.                         | Short colour feedback; keyboard immediate. Colour obeys the same owner priority. | Final state immediately.          | `command.item.colour` → `state.color` → `state.color/surface-foreground`                                                         |
-| Supplied tokens/disabled state / root and non-item display-text owners | Scoped surface/border/foreground colour, respecting the inherited Input Group owner and immediate caret/focus. Colour eligibility and immediate-owner priority follow the rule below. | Short colour. Colour obeys the same owner priority.                              | Final colours immediately.        | `command.surface.colour` → `state.color` → `state.color/surface-foreground`                                                      |
-| Primitive display update / text owner                                  | Changed-run replacement with `stagger: none`; unchanged keyed rows stay still.                                                                                                        | Changed-run opacity only.                                                        | Final text immediately.           | `command.label.change` → `text.replace` → `text.change/changed-runs`                                                             |
-| Visible Empty numeric revision / owned display                         | Roll changed places only; no simultaneous text replacement on those digits. First display and query/filter-driven updates are immediate.                                              | Final number immediately.                                                        | Final number immediately.         | `command.empty.roll` → `number.compact` → `number.roll/reels`                                                                    |
-| Explicit composed quantity / quantity owner                            | Roll changed numeric places; never animate shortcut digits as a quantity.                                                                                                             | Final number immediately.                                                        | Final number immediately.         | `command.quantity.change` → `number.compact` → `number.roll/reels`                                                               |
-
-`item.colour` alone merges hover, selected, disabled and theme paint for each CommandItem.
-`surface.colour` owns root, group heading, empty state, shortcut and Separator rule regions, plus
-CommandInput's outer border wrapper; it does not run on the same item properties or native input.
-The inner Input Group frame stays with InputGroup. In the default input branch, native foreground
-inherits InputGroupInput's `control.colour`. When `asChild` replaces that input, foreground belongs
-to the actual caller input owner; Command does not inject another writer. A caller-provided
-InputGroupInput retains its normal inherited contract. The frame is not a second command-owned
-surface, and no text controller touches the native input value.
-CommandItem's generated check glyph keeps immediate visibility from the existing caller-provided
-`data-checked` state and Shortcut suppression; colour inherits the one item owner. Motion does not
-infer a checked state from cmdk selection or add a new toggle action.
-
-Colour eligibility is per actual root, item or display region. DOM focus/focus-within or that region's own invalid state cancels its colour clock and settles all its declared paint immediately. Thus input focus settles the containing Command root and inherited input-frame/control owners, not every result item's palette. cmdk selection/active-descendant is not DOM focus; the immediate keyboard highlight above is an explicit selection policy. Other colour interpolation requires a verified readable palette.
-
-An already visible CommandEmpty dispatches a direct string to `label.change` and a supported direct numeric child to `empty.roll`, preserving the existing output and cmdk visibility behavior. First display, a renderer-type change, and updates arriving while hidden establish the latest value immediately; they do not invent a numeric origin. Only a discrete non-query/filter revision while Empty remains visible may roll. Query/filter-driven updates or overlapping revisions settle its current number immediately without a queue or deferred replay, and hiding/closing cancels its visual work. Rich children keep composed ownership; command names, shortcuts and native query text remain identities. The Empty transaction uses the existing list size owner and shared aggregate text/reel budget.
+| Trigger / owner                                           | Full                                                                                                                                                                            | Reduced                                                                          | None                              | Binding → preset → recipe/form                                                                                                                    |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inline insertion / root                                   | Opacity entrance only when no parent owns it. Entry is subject to the actual-focus gate below.                                                                                  | Short opacity. Entry obeys the same focus gate.                                  | Final content immediately.        | `command.root.enter` → `presence.inline` → `data.transition/opacity`                                                                              |
+| CommandDialog open/close / inherited Dialog owner         | Dialog's surface presence once; Command adds no extra popup layer. Entry is subject to the actual-focus gate below.                                                             | Inherited short opacity. Entry obeys the same focus gate.                        | Final semantic state immediately. | `command.dialog.enter` → `presence.surface` → `enter.pop/surface`; `command.dialog.exit` → `presence.exit` → `exit.fade/opacity`                  |
+| Editing/filtering/navigation / cmdk and native input      | Query/results/current selection commit immediately; no per-result entrance stagger or delayed action.                                                                           | Same immediate behavior.                                                         | Same immediate behavior.          | `command.list.scroll` → `engine.native` → `native/cmdk` (cmdk native result scrolling (no new recipe))                                            |
+| Result set/empty state change / list viewport             | Latest result height, active item, scroll position and final layout commit immediately through cmdk's own scroller; no height tween.                                            | Final height immediately.                                                        | Final height immediately.         | `command.input.edit` → `engine.native` → `native/cmdk` (cmdk/native input and selection (no new recipe))                                          |
+| Pointer selection/state / item                            | Scoped surface/foreground transition; keyboard selected highlight appears immediately. Colour eligibility and immediate-owner priority follow the rule above.                   | Short colour feedback; keyboard immediate. Colour obeys the same owner priority. | Final state immediately.          | `command.item.colour` → `state.color` → `state.color/surface-foreground`                                                                          |
+| Supplied tokens/disabled state / root, divider and rule   | Scoped surface colour, respecting the inherited Dialog and Input Group owners and immediate caret/focus. Colour eligibility and immediate-owner priority follow the rule above. | Short colour. Colour obeys the same owner priority.                              | Final colours immediately.        | `command.surface.colour` → `state.color` → `state.color/surface`                                                                                  |
+| Empty state paint / empty state                           | The visible empty region labels its own supplied background; the primitive keeps cmdk's zero-result visibility.                                                                 | Short colour.                                                                    | Final colour immediately.         | `command.empty-surface.colour` → `state.color` → `state.color/surface`                                                                            |
+| Primitive display update / item and shortcut owner        | Changed-run replacement with `stagger: none`; unchanged keyed rows stay still.                                                                                                  | Changed-run opacity only.                                                        | Final text immediately.           | `command.label.replace` → `text.replace` → `text.change/changed-runs`                                                                             |
+| Empty message update / empty state                        | The visible empty message replaces only its changed runs; hiding it cancels the work.                                                                                           | Changed-run opacity only.                                                        | Final text immediately.           | `command.empty-label.replace` → `text.replace` → `text.change/changed-runs`                                                                       |
+| Composed Dialog chrome / inherited Dialog owners          | The panel keeps its own supplied surface paint and the title its own foreground; they settle under the same focus/invalid priority rather than receiving a command writer.      | Short colour under the same owner priority.                                      | Final colours immediately.        | `command.dialog.colour` → `state.color` → `state.color/surface`; `command.dialog-title.colour` → `state.color` → `state.color/foreground`         |
+| Composed Dialog title text / inherited Dialog owner       | The screen-reader-only title keeps Dialog's changed-run owner; the rename is a label, not a command result.                                                                     | Changed-run opacity only.                                                        | Final text immediately.           | `command.dialog-title-text.replace` → `text.replace` → `text.change/changed-runs`                                                                 |
+| Composed Input Group frame / inherited Input Group owners | The frame keeps its own insertion opacity and its own surface paint inside `CommandInput`; Command writes neither.                                                              | Short opacity and colour under the same owner priority.                          | Final frame immediately.          | `command.input-frame.enter` → `presence.inline` → `data.transition/opacity`; `command.input-frame.colour` → `state.color` → `state.color/surface` |
 
 ## Interruption and lifecycle
 
-Query-associated results and Empty counts remain query-driven when their accepted update arrives
-after typing stops. Do not use a quiet interval or current focus to turn that response into a discrete
-numeric animation. Known query-related or uncorrelated updates use immediate numeric display in all
-modes; an independently identified visible Empty revision retains `empty.roll` eligibility. Data
-ordering and asynchronous search remain caller-owned. Present what cmdk/caller actually accepts,
-without a motion-owned request queue, filter rerun or rejection of caller data.
+cmdk retains filtering, scoring, selection, loop/vim bindings and pointer-selection settings. Enter/click executes
+immediately; motion adds no business command or artificial loading phase. Async results delivered while the palette
+is closed become current data without a hidden interpolation or a replay of old filtering transitions.
 
-CommandDialog inherits Dialog's actual-focus gate as well as its preset. Its native initial focus commonly lands in CommandInput, so the panel entry may settle immediately while Dialog's separate backdrop still fades. Inline Command likewise settles a root entrance that would hide its focused editor. Do not delay autofocus, native editing or command execution to finish a palette entrance.
+CommandDialog inherits Dialog's actual-focus gate as well as its preset. Its native initial focus commonly lands in
+`CommandInput`, so the panel entry may settle immediately while Dialog's separate backdrop still fades. Inline
+Command likewise settles a root entrance that would hide its focused editor. Autofocus, native editing, caret,
+selection, IME composition and command execution are never delayed to finish an entrance.
 
-- cmdk retains filtering, scoring, selection, loop/vim bindings and pointer-selection settings. Enter/click executes immediately; motion adds no business command or artificial loading phase.
-- Fast input replaces the one pending height destination without debouncing query/results or waiting for typing to stop. Retarget when measurement and interaction remain safe; otherwise use immediate geometry under the shared bounds, not a private update-rate cutoff. Rows disappearing from filtering cease to be actionable immediately and cannot retain active descendant references through an exit.
-- Closing CommandDialog cancels list/text/number work; Dialog alone owns exit and focus restoration. Reopening shows current query/results without replaying old filtering transitions.
-- Live reduced cancels layout/reels; none/zero clock cancels remaining authored clocks and lets the inherited Dialog finish through Base UI's actual native completion protocol. Native editing, scrolling, selection and execution remain available. Unmount releases measurement and inherited dialog resources without duplicate cancellation wrappers.
-- Async result updates received while closed become current data without hidden interpolation or reopening. A new accepted query/open revision invalidates stale height/exit callbacks; returning to full does not replay filtered-out results. Preserve controlled query/selection semantics rather than optimistically accepting callbacks.
+- Fast input replaces the accepted query without debouncing results or waiting for typing to stop. Rows that
+  filtering removes cease to be actionable immediately; no exit keeps an active descendant alive.
+- Closing CommandDialog cancels remaining authored clocks; Dialog alone owns exit, modality and focus restoration.
+  Reopening shows the current query and results without replaying old transitions.
+- Live reduced keeps only permitted opacity and colour and settles geometry immediately. None or a zero recipe
+  clock settles the effective mode's target and cancels the running writer, so Base UI's own completion protocol
+  still releases modality and focus. Native editing, scrolling, selection and execution remain available.
+- Unmount releases the root entrance, the colour families and every text controller; the inherited Dialog and
+  Input Group resources are disposed by their own owners, without a duplicate cancellation wrapper.
+- A plain string item, empty or shortcut label goes to its own text owner; changing the renderer type or supplying
+  rich children establishes an immediate baseline and keeps the composed owners. The shortcut string is never
+  parsed as a quantity.
 
 ## Geometry and performance
 
-- Lay result text at final available width, then measure the natural result region and size one list viewport. Keep the existing max-height/scroll contract; passive font/viewport reflow is immediate.
-- In CommandDialog, list-height changes update the panel's natural layout; the panel does not separately animate or observe the same interpolated cause. Other explicit dialog changes still use the Dialog contract.
-- One natural result-region measurement, stable item identities, no observer or FLIP animation per filtered row. The automatic collection limit counts participating animation visuals, not every result under this single height host. Native filtering/scrolling and final layout remain available for large result sets; unsafe or unavailable natural measurement uses immediate height. Changed-text work retains its own aggregate limits.
-- Clip only the scroll/result region; preserve input caret/focus rings, group structure, cmdk semantics and descendant portals. No rolling or text splitting in the native editor.
-- Natural result content and its sizing viewport are separate regions; clamp the rendered height to valid non-negative bounds. Keep the active command immediately visible through the existing scroll contract, otherwise settle the viewport's height. Required command labels/shortcuts cannot gain temporary truncation or hidden focus targets for a geometry effect. Do not add a new virtualizer or search for offscreen rows to decorate.
+The result list is cmdk's own scroll container: its `max-height` clamp, natural result height, active-item scroll
+and final layout are native, committed in the same frame as the accepted query. Command registers no measured shell
+over the list, so a large result set introduces no per-row animation measurement, no FLIP animation and no
+observer per filtered row.
 
-List-height animation below the editor may continue only while that editor's content box, caret and scroll stay stable. The stock CommandDialog's fixed top placement can satisfy that condition; a caller's centering/wrapping layout that would move the editor must settle the affected dependent axis. Do not freeze native typing or replay the suppressed resize on blur.
+Only the root, the callable surfaces and the bounded changed-text set animate per palette; the composed Dialog panel
+and Input Group frame keep their own separate owners. Text work stays bounded by the shared aggregate limits, and
+required command labels, shortcut glyphs and focus rings are never temporarily truncated or hidden for an effect.
 
 ## Acceptance scenarios
 
-- Pending: rapidly filter a result set larger than the automatic collection limit while only its
-  single height shell participates. No per-row animation measurement or arbitrary row-count/Hz
-  cutoff is introduced. Change the actual measurement or focus constraints during the flight:
-  the affected shell settles immediately, without delaying execution or replaying on input idle.
+Executed in `tests/components/command.test.tsx`: the inline root entrance, the composed Dialog panel entrance and
+exit, the composed Input Group frame entrance, the composed Dialog title replacement, surface and foreground colour
+owners for the root, empty state, input divider, separator, item, shortcut and composed Dialog regions, and the
+item/empty/shortcut changed-run replacement. Each action runs in full, reduced and none with a zero clock, and the
+native editor and list are verified as non-animated boundaries.
 
-- Pending: a delayed query-associated Empty count, an unknown-cause count and an independent visible
-  quantity revision after typing stops. The first two stay immediate; only the last is eligible for
-  its normal reel. Caller-accepted data, cmdk selection and execution stay current in every mode,
-  including after a later response or close invalidates earlier visual callbacks.
+Also pending browser verification: 3 modes × 2 OS preferences, live same-target mode/clock cancellation in a real
+browser, nested palettes and portals, SSR/no-JS/hydration probes, keyboard focus and return focus, `asChild` editor
+composition, and light/dark × narrow/wide screenshot review.
 
-- Pending: fast typing/IME, scoring changes, empty results, disabled commands, keyboard/vim navigation and Enter selection remain immediate.
-- Pending: changing partial labels and explicit counts preserves stable rows; shortcut digits and screen-reader-only dialog names never roll.
-- Pending: inline versus CommandDialog composition, result-height changes while closing, all modes, live downgrade and zero clock have exactly one presence/geometry owner.
-- Pending: move active selection into newly added results while the viewport changes size, deliver async results after close and reject a controlled query update; native current state and readable commands win over stale animation targets.
-- Pending: Autofocus CommandInput as CommandDialog opens, then type while results resize; the input never waits for surface entry and geometry only animates while its caret/content box stays stable.
-
-- Pending: while CommandEmpty stays visible, revise a supported direct numeric child, then compare a numeric-looking string and rich quantity content. Verify exact output including zero, one renderer, immediate string/number baselines, and no new count API. Hide/reveal Empty, update during query filtering or overlapping revisions, close mid-roll and change modes/zero clock; the latest semantic value is immediate with no stale reel or delayed replay.
+Delegation gaps are recorded rather than hidden: cmdk owns filtering, selection, the native editor and the list's
+scroll container; Base UI Dialog owns mounting, modality, focus and the native unmount protocol; the composed Input
+Group frame and Dialog panel keep their own migrated owners instead of receiving a command writer; the group heading
+stays cmdk's own static text; and no performance, CLS, interaction-cost or real-device FPS measurement was taken
+(ADR-023 defers performance governance).

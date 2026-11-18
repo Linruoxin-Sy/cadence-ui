@@ -2,15 +2,15 @@
 title: Command
 description: Search and run actions from a keyboard-driven command palette.
 category: navigation
-motion: [{"recipe":"enter.pop","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"}]
-intensity: medium
-motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Command opens and closes its existing popup surface; content and native focus retain their current owners."}
-motionCoverage: {"schema":1,"effects":{"enter.pop/one-shot":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts DialogContent for its palette entrance; the migrated Dialog panel and backdrop remain the actual presence owners."}],"exit.fade/one-shot":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts DialogContent for its palette exit; the migrated Dialog keeps that opacity owner and the native completion."},{"relationship":"inherited","owner":"input-group","reason":"A retained composed InputGroupAddon keeps its own insertion/exit opacity inside CommandInput rather than receiving a second palette writer."}]}}
 complexity: M
 tier: T2
 since: 0.3.0
-deps: ["cmdk", "lucide-react"]
-registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/dialog", "@cadence/input-group"]
+deps: ["cmdk","lucide-react"]
+registryDeps: ["@cadence/cadence-utils","@cadence/cadence-provider","@cadence/dialog","@cadence/input-group"]
+motion: [{"recipe":"data.transition","form":"one-shot"},{"recipe":"enter.pop","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"}]
+intensity: medium
+motionProfile: {"scope":"surface","travel":"none","coordination":"independent","reason":"The palette owns one root insertion and its own supplied surface paint, while the composed Dialog panel, its backdrop and title keep their migrated presence, paint and changed-run owners and the Input Group frame keeps its own insertion and paint."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"command","reason":"The inline root commits one later-insertion opacity when no presenting parent, hidden host or real focus target already owns its paint."},{"relationship":"inherited","owner":"input-group","reason":"The composed Input Group frame keeps its own insertion opacity inside CommandInput instead of receiving a second command writer."}],"enter.pop/one-shot":[{"relationship":"inherited","owner":"dialog","reason":"CommandDialog mounts DialogContent, so the migrated Dialog panel and backdrop remain the actual palette entrance owners."}],"exit.fade/one-shot":[{"relationship":"inherited","owner":"dialog","reason":"CommandDialog delegates the closing fade, modality release and focus restoration to the migrated Dialog owner."}],"state.color/css-transition":[{"relationship":"default","owner":"command","reason":"The root, empty state, input divider, separator, item and shortcut each own their declared scoped paint, with focus, invalid state and an unverified caller palette immediate."},{"relationship":"inherited","owner":"input-group","reason":"The composed Input Group frame keeps its own border, background and shadow owner inside CommandInput."},{"relationship":"inherited","owner":"dialog","reason":"The composed Dialog panel and title keep their own migrated surface and foreground owners rather than receiving a second command writer."}],"text.change/changed-runs":[{"relationship":"default","owner":"command","reason":"A plain item, shortcut or empty string replaces only its changed graphemes; rich children and the native query keep their own owners."},{"relationship":"inherited","owner":"dialog","reason":"The screen-reader-only palette title keeps Dialog's own changed-run owner instead of a second command text writer."}]}}
 ---
 
 ## Installation
@@ -37,11 +37,13 @@ provider files and `motion` are required imports; wrapping your application in
 
 Complete the linked base theme setup, including Cadence's easing tokens, and
 ensure Tailwind scans the copied files. These payloads contain no additional
-Command-specific CSS or assets. Inline commands do not animate. CommandDialog
-inherits Dialog's scale and fade in full mode, opacity only in reduced, and
-zero-duration transitions in none. Filtering, highlighting and list height
-changes remain immediate. The system reduced-motion preference also applies
-without a provider and to an explicitly nested full provider.
+Command-specific CSS or assets. An inline command inserted after presentation
+fades in once; a first render, a presenting parent or a focused editor keeps the
+native paint. CommandDialog inherits Dialog's scale and fade in full mode,
+opacity only in reduced, and zero-duration transitions in none. Filtering,
+highlighting and list height changes remain immediate. The system
+reduced-motion preference also applies without a provider and to an explicitly
+nested full provider.
 
 Usage, the top palette and all eleven body examples use this dependency graph.
 Button is already included through Dialog and Input Group; `cmdk` also supplies
@@ -791,18 +793,23 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 
 ## Motion contract
 
-Authored intensity is **medium**: Command opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: The palette owns one root insertion and its own supplied surface paint, while the composed Dialog panel, its backdrop and title keep their migrated presence, paint and changed-run owners and the Input Group frame keeps its own insertion and paint.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
+| inline insertion | root opacity once, only when no presenting parent or focused editor owns it | `data.transition/one-shot` · `duration.fast` | yes, from the current paint |
 | open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `enter.pop/one-shot` via Dialog · `duration.base` / `duration.fast` | yes, from the current paint |
 | close | dialog and backdrop fade out only, no scale-out | `exit.fade/one-shot` via Dialog · `duration.fast` | yes (reopen mid-exit) |
-| filter / highlight | instant replacement and background feedback, no row motion | none | n/a |
-| reduced | opacity only; the scale envelope is absent | mode durations | yes |
-| none | dialog and backdrop targets settle immediately and the writer is cancelled | zero duration | n/a |
+| item / surface paint | scoped background, border, shadow and foreground feedback on the declaring region | `state.color/css-transition` · `duration.fast` | yes, settled immediately on focus or an unreadable palette |
+| changed label | changed runs replace in place, no stagger; digits and the query stay identities | `text.change/changed-runs` · enter `duration.fast`, exit `duration.instant` | retained identity survives |
+| filter / highlight / result height | instant replacement, native scrolling and native list height | cmdk/native engine | n/a |
+| reduced | opacity only; colour keeps the short clock; no spatial envelope | mode durations | yes |
+| none | every target settles immediately and the writer is cancelled | zero duration | n/a |
 
-The inline command has no animation. `CommandDialog` inherits Dialog's recipes and mode branches;
-it adds no transition of its own. Fixed centering translation is layout, not motion.
+The inline command fades in once when it is inserted after presentation; its own palette surfaces keep
+cmdk's native layout. `CommandDialog` inherits Dialog's recipes and mode branches and the composed Input
+Group frame keeps its own insertion and paint, so Command adds no transition of its own to either. Fixed
+centering translation is layout, not motion.
 
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
