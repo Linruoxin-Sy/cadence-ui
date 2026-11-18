@@ -25169,9 +25169,9 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
 - [@cadence/dropdown-menu](https://cadence.dev/r/dropdown-menu.json) — direct registry dependency.
 
@@ -25196,15 +25196,15 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
-| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
 | cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | dropdown-menu | `@components/cadence/dropdown-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/dropdown-menu.json) |
@@ -25216,11 +25216,11 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
 
-[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
-
 [Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
 
 [Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
@@ -25381,7 +25381,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten target files, including Dropdown Menu and every shared `lib/` file.
+Copy every listed target file, including Dropdown Menu and every shared `lib/` file.
 Keep the mirrored `cadence/` tree, relative imports and `"use client"` directives
 intact. The provider files and `motion` are required imports; wrapping your
 application in `CadenceProvider` is optional. Complete the base theme setup
@@ -25441,10 +25441,11 @@ interaction and locks desktop scrolling. Forward Tab leaves the bar and closes
 the panel. From a panel item, Shift+Tab returns to the trigger with the panel
 still open; another Shift+Tab leaves the bar and closes it. Escape closes and
 returns to the trigger. `modal={false}` allows outside interaction. Menubar
-reuses Dropdown Menu's popup and selection motion; the bar itself does not
-animate. Full mode fades and scales panels and marks, reduced keeps opacity
-without scale, and none removes transition time. Optional provider scopes
-control mode and speed, subject to the OS reduced-motion preference.
+reuses Dropdown Menu's popup and selection motion, and adds its own bar entrance
+plus scoped bar and trigger paint. Full mode fades and scales panels and marks,
+reduced keeps opacity without scale, and none removes transition time. Optional
+provider scopes control mode and speed, subject to the OS reduced-motion
+preference.
 
 ## Usage
 
@@ -25968,19 +25969,25 @@ export function MenuMotionScopes() {
 
 ## Motion contract
 
-Authored intensity is **medium**: Menubar opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Menubar owns the bar entrance plus the bar and trigger paint, while each open menu keeps dropdown-menu's anchored shell, row palettes and selection marks.
 
-| Phase         | Properties                                     | Token             | Interruptible |
-| ------------- | ---------------------------------------------- | ----------------- | ------------- |
-| open          | panel `opacity 0 → 1` with a short anchor-side approach | `popup.anchored/one-shot` · `duration.fast` | yes |
-| close         | panel `opacity → 0`; the anchor does not move            | `exit.fade/one-shot` · `duration.fast` | yes |
-| check / radio | mark `opacity` + the preset's `scale.in` pose            | `state.morph/one-shot`     | yes           |
-| reduced       | panel fades, no approach; the mark cross-fades at full size | `exit.fade/one-shot`       | yes           |
-| none          | every authored property settles at 0ms         | –                 | –             |
+| Phase                 | Properties                                                                                                                             | Token                                          | Interruptible |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------- |
+| bar presence          | bar `opacity 0 → 1` when it is inserted into an already-presented document; a page-load bar stays at rest, and removal fades through the enclosing presence | `data.transition/one-shot`                     | yes           |
+| bar / trigger paint   | scoped bar background, foreground and border; scoped trigger background and foreground                                                 | `state.color/css-transition`                   | yes           |
+| trigger label         | changed graphemes only; unchanged text keeps its identity and the strip reflows natively                                               | `text.change/changed-runs`                     | yes           |
+| open                  | panel `opacity 0 → 1` with a short anchor-side approach                                                                                | `popup.anchored/one-shot`                      | yes           |
+| close                 | panel `opacity → 0`; the anchor does not move                                                                                          | `exit.fade/one-shot`                           | yes           |
+| check / radio         | mark `opacity` + the preset's `scale.in` pose                                                                                          | `state.morph/one-shot`                         | yes           |
+| shell revision        | clamped measured panel width and height at the current anchor                                                                          | `geometry.resize/measured`                     | yes           |
 
-The bar itself does not animate. Switching from one open menu to the next replaces one panel
-with another; there is no shared element between them, and a highlight sliding along the bar
-would suggest a continuity the markup does not have.
+The bar strip and its trigger positions are native flex layout, not an animated owner: a trigger's
+width tween could crop a required label and a transformed trigger would move its own popup anchor.
+The bar's opacity envelope runs once on an independent insertion (a page-load bar stays at rest) and
+its removal fades through the enclosing presence; it never writes a resting opacity. Under reduced the
+entrance and panel keep a short opacity while travel,
+scale and measured geometry settle immediately; under none every authored property reaches its target
+without duration or delay.
 
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
@@ -25989,7 +25996,8 @@ first mounted frame. Ordinary specimens inherit the header mode and speed; only 
 motion-scopes example overrides them. Header pointer interaction may close a menu normally. The
 independent runtime fixture verifies live mode changes without an outside press. Base UI `className(state)` and `style(state)` callbacks are evaluated
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
-remain owned by the primitive.
+remain owned by the primitive, and an unverified caller palette settles the scoped paint
+immediately instead of tweening colours the library cannot verify.
 
 ## Keyboard interactions
 
@@ -26024,8 +26032,8 @@ trigger, or a `navigation-menu`; long-pressing a menu bar is not a gesture anyon
 ## Performance
 
 - One portal per open menu; a closed bar mounts only its triggers.
-- No motion on the bar itself, and the open panel is the same `opacity` + `scale` transition
-  as every other popup in the library.
+- The bar owns one opacity entrance and two small scoped paint families; the open panel keeps
+  the same anchored presence, measured shell and row palettes as `dropdown-menu`.
 - Budget: T2 (10 KB gzip). The item parts come from `dropdown-menu` through a
   `registryDependencies` entry, so the two install once and the menu behaviour is one file.
 
@@ -26035,6 +26043,8 @@ trigger, or a `navigation-menu`; long-pressing a menu bar is not a gesture anyon
   correct element and `navigation-menu` is the right component.
 - Wrap each top-level menu in `MenubarMenu`; a bare `MenubarTrigger` has no menu to open.
 - Keep the bar to a handful of menus. Each one is a click away from invisible content.
+- Leave the strip on native layout: the bar fades in/out and owns its paint, but its width,
+  trigger reflow and the menu surfaces stay with the layout engine and `dropdown-menu`.
 
 # Code block
 
