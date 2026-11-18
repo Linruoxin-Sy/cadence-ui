@@ -2411,21 +2411,63 @@
       "title": "Breadcrumb",
       "description": "Hierarchy navigation, from the root to the current page.",
       "categories": ["navigation"],
-      "dependencies": ["@base-ui/react", "lucide-react"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["@base-ui/react", "lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text"
+      ],
       "files": [
         {
           "path": "registry/cadence/breadcrumb/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/breadcrumb/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/breadcrumb-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/breadcrumb-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/button-group-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/button-group-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/label-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/label-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          "layout.move",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
+        "intensity": "medium",
         "complexity": "S",
         "upstream": {
           "registry": "shadcn",
@@ -2433,14 +2475,57 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "collection",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Breadcrumb keeps destination identity while the trail grows, shrinks or renames: changed crumbs and separators fade, retained ancestors reflow toward the final path, the list owns its content-driven block size, and plain labels replace only their changed graphemes under one scoped foreground owner."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "breadcrumb",
+                "reason": "The list owns its own opacity entrance and every crumb owns the opacity channel of its retained host; nothing is repainted by a wrapper."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "breadcrumb",
+                "reason": "A removed crumb keeps only an inert, aria-hidden visual at its last committed box until its native removal completes."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "breadcrumb",
+                "reason": "Each surviving crumb projects its own previous box; the list measures once and never writes a crumb transform."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "breadcrumb",
+                "reason": "The list owns its content-driven block height after a committed path revision; passive viewport or font wrapping stays native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "breadcrumb",
+                "reason": "Link, page, separator and ellipsis each own their own foreground clock; an unprovable caller palette settles that region immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "breadcrumb",
+                "reason": "A direct plain link or page label replaces only its changed graphemes; rich children and render callbacks keep their own structure."
+              }
+            ]
+          }
         }
       }
     },
