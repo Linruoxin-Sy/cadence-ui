@@ -98,7 +98,7 @@ const parts = {
     "checkbox/radio item > indicator ControlSpan (unslotted) | Motion controls | state.morph",
   ],
   "context-menu": [
-    "context-menu-content + context-menu-sub-content (same writer) | CSS transition | popup.anchored, exit.fade",
+    "context-menu-content + context-menu-sub-content (same writer) | Motion WAAPI + measured shell + scoped colour | popup.anchored, exit.fade, geometry.resize, state.color, text.change",
     "checkbox/radio item > indicator ControlSpan (unslotted) | Motion controls | state.morph",
   ],
   toast: [
