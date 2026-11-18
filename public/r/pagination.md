@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/pagination`
 - Type: registry:ui
 - Since: 0.2.0
-
+- Motion recipes: data.transition, exit.fade, layout.move, layout.shared, geometry.resize, state.color, text.change
 
 ## Installation
 
@@ -28,15 +28,16 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
-- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
-- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
 - [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-selection](https://cadence.dev/r/cadence-selection.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -72,7 +73,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-selection | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | pagination | `@components/cadence/pagination/index.tsx` | [JSON files[].content](https://cadence.dev/r/pagination.json) |
+| pagination | `@components/cadence/lib/button-group-layout.ts` | [JSON files[].content](https://cadence.dev/r/pagination.json) |
+| pagination | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/pagination.json) |
+| pagination | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/pagination.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -89,6 +95,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-selection](https://cadence.dev/r/cadence-selection.json)
 
 [Source files: pagination](https://cadence.dev/r/pagination.json)
 
@@ -245,14 +253,15 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten files in the target list, keeping `pagination/index.tsx` and
+Copy every file in the target list, keeping `pagination/index.tsx` and
 `button/index.tsx` beside the shared `lib/` directory. Pagination imports
 `buttonVariants` from the Button module for its anchor styles, so retain that
 module's complete motion/provider dependency tree even though no `Button` is
 rendered. The provider files are required imports; wrapping your application is
-optional. Pagination itself stays static in full, reduced and none modes, with
-only colour, border and shadow state feedback from the button styles. No
-additional item-specific CSS is needed beyond the base theme and Tailwind utilities.
+optional. Pagination animates only committed range, selection, text and state
+revisions: initial content stays readable, and reduced or none settles geometry
+immediately. Its own motion values come from the shared presets, so no
+item-specific CSS is needed beyond the base theme and Tailwind utilities.
 
 Keep the source's existing `"use client"` directives. In Next.js App Router,
 Usage, the collapsed range, custom labels, sizes and boundary examples can be
@@ -579,19 +588,29 @@ button without becoming one.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Pagination declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: Pagination keeps every destination identity while a visible range grows,
+shrinks or renames: inserted and removed links fade, retained destinations reflow, the content owns its
+content-driven height and one active decoration follows the current page only on a readable path. Only a
+caller-committed revision animates: initial render, hydration and passive reflow stay readable and do not
+replay an entrance.
 
-No motion (T0). A page change is a navigation: the content that changes is the list,
-not the control. Animating the pagination would animate the one thing that stays the
-same.
+| Recipe / form | Owner / properties | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| `data.transition/one-shot` | Content entrance, and each later inserted item; opacity | One short entrance | Short opacity | Immediate |
+| `exit.fade/one-shot` | Retained leaving link; opacity | Fade, then lifecycle removal | Short opacity | Immediate removal |
+| `layout.move/one-shot` | Each surviving destination's own position | Project to the final slot | Immediate placement | Immediate placement |
+| `layout.shared/selection` | The content's single active decoration | Travel to the current page | Immediate placement | Immediate placement |
+| `geometry.resize/measured` | Content block height, one owner per revision | Clamped height continuity | Immediate height | Immediate height |
+| `text.change/changed-runs` | Plain link label, Previous/Next text, ellipsis | Changed graphemes only | Short changed opacity | Exact final text immediately |
+| `state.color/css-transition` | Link surface/foreground and the active decoration | Scoped colour feedback | Short colour feedback | Zero clock |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
-
-If the new page's rows should arrive in sequence, that is `list.stagger` on the list.
+One committed range revision is one cause: the content measures the final link boxes once, every retained
+link projects from its own previous box, and the content alone owns the block height. Two paginations on one
+page keep independent scopes. A link that the caller paints itself — any `className` or `style` colour,
+background, shadow or filter — keeps the native active cascade and gets no shared decoration. An ambiguous
+or absent active page, a nested ellipsis, or a host over the visible-range budget settles placement
+immediately. Navigation, `aria-current`, focus and modified clicks never wait for an animation, and the
+component never derives pages from the URL or navigates on its own.
 
 ## Accessibility
 
@@ -611,11 +630,13 @@ Navigation fills its parent while the inner list remains a single row. The calle
 range and ellipses and may hide optional text on small screens; page counts are not computed by the
 component.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Composed controls retain their
-own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
-works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
-source; dependencies and application bundles are measured separately.
+The content measures mounted destinations once per committed revision and never per frame; an oversized
+visible range skips blanket measurement and settles placement immediately. A passive breakpoint or width
+change keeps native wrapping and does not start a flight. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code, and server-rendered markup does not
+imply that every interaction works without JavaScript. Composed controls retain their own dependencies and
+motion contracts. The registry enforces a 4 KiB gzip budget for this item's own shipped source;
+dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
