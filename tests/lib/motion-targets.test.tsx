@@ -191,6 +191,7 @@ describe("current registry inventory and real part references", () => {
       "select",
       "combobox",
       "dropdown-menu",
+      "context-menu",
       "accordion",
       "collapsible",
       "tabs",
@@ -198,7 +199,7 @@ describe("current registry inventory and real part references", () => {
     expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(
       true,
     );
-  }, 30000); // Cold source/installation audit covers pilots and migrated catalogue items; host throughput varies.
+  }, 120000); // Cold source/installation audit covers pilots and migrated catalogue items; a hang guard, not a performance budget (ADR-023): the audit grows with every migrated item and tracks host throughput.
   it("rejects real source/dependency/index drift and accepts an extended actual inventory", async () => {
     await mkdir(path.join(root, ".cache"), { recursive: true });
     const temp = await mkdtemp(path.join(root, ".cache", "motion-target-fixture-"));
