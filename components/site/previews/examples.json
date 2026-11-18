@@ -38,7 +38,7 @@
   "field": ["orientation", "responsive", "caller-error", "fieldset", "choice-card"],
   "button-group": ["vertical", "static-text", "separator", "changing"],
   "input-group": ["alignments", "button", "textarea", "invalid"],
-  "breadcrumb": ["collapsed", "separator", "router"],
+  "breadcrumb": ["collapsed", "separator", "router", "membership"],
   "pagination": ["collapsed", "labels", "local-state", "sizes", "boundary"],
   "spinner": ["button", "sizes", "label", "without-motion"],
   "checkbox": ["states", "controlled", "invalid", "settings", "disabled", "form-submission", "without-motion"],

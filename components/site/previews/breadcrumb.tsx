@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -107,6 +108,44 @@ function Specimen() {
   );
 }
 
+export function MembershipTrail() {
+  const [deep, setDeep] = useState(false);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <button
+        type="button"
+        className="rounded-sm text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+        onClick={() => setDeep(!deep)}
+      >
+        {deep ? "Shorter path" : "Deeper path"}
+      </button>
+      <Breadcrumb aria-label="Changing trail">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+          </BreadcrumbItem>
+          {deep ? (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/components/navigation">Navigation</BreadcrumbLink>
+              </BreadcrumbItem>
+            </>
+          ) : null}
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
+  );
+}
+
 export function BreadcrumbPreview({ example }: { example?: string }) {
   return (
     <PreviewStack>
@@ -116,6 +155,8 @@ export function BreadcrumbPreview({ example }: { example?: string }) {
         <CustomSeparator />
       ) : example === "router" ? (
         <RouterTrail />
+      ) : example === "membership" ? (
+        <MembershipTrail />
       ) : (
         <Specimen />
       )}
