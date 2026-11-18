@@ -183,12 +183,11 @@ it("context-menu preserves typed callbacks, render, refs, events, controlled upd
     view.rerender(example(mode));
     expect(document.querySelector('[data-slot="context-menu-content"]')).toBe(node);
     expect(node).toHaveAttribute("data-motion", mode);
-    if (mode === "none") {
-      expect(node.className).toContain("transition-none");
-      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
-      expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-    }
-    if (mode === "reduced") expect(node.className).toContain("transition-opacity");
+    // Presence and paint are executors now: no authored CSS pose may survive a downgrade.
+    expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
+    expect(node.className).not.toContain("scale-(--motion-scale-in)");
+    if (mode === "none") expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
+    if (mode === "reduced") expect(node.style.getPropertyValue("--motion-duration-fast")).not.toBe("0s");
   }
   view.rerender(example("none", false));
   view.unmount();
