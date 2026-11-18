@@ -4641,6 +4641,7 @@
       "registryDependencies": [
         "@cadence/cadence-motion",
         "@cadence/cadence-provider",
+        "@cadence/cadence-text",
         "@cadence/cadence-utils",
         "@cadence/dropdown-menu"
       ],
@@ -4657,6 +4658,10 @@
         "batch": "B5",
         "motion": [
           {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
             "recipe": "popup.anchored",
             "form": "one-shot"
           },
@@ -4664,7 +4669,19 @@
             "recipe": "exit.fade",
             "form": "one-shot"
           },
-          "state.morph"
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          "state.morph",
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
@@ -4677,11 +4694,18 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Menubar opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Menubar owns the bar entrance plus the bar and trigger paint, while each open menu keeps dropdown-menu's anchored shell, row palettes and selection marks."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "menubar",
+                "reason": "Menubar owns one independent bar insertion: a short opacity entrance on the bar root, with no travel, scale or resting opacity."
+              }
+            ],
             "popup.anchored/one-shot": [
               {
                 "relationship": "inherited",
@@ -4691,9 +4715,33 @@
             ],
             "exit.fade/one-shot": [
               {
+                "relationship": "default",
+                "owner": "menubar",
+                "reason": "Menubar owns the retained bar's own opacity exit, completed through the enclosing presence, with no inherited entrance delay."
+              },
+              {
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
                 "reason": "Menubar mounts dropdown-menu for popup closing; that installed component remains the integration owner."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Each open menu shell is dropdown-menu's measured popup; menubar adds no second strip or popup measurement."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "menubar",
+                "reason": "The bar root and every top-level trigger own one scoped paint family each, so open and highlight feedback stays local to the bar."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Menu rows, shells, labels, shortcuts and separator rules keep dropdown-menu's scoped colour owners exactly once per mounted surface."
               }
             ],
             "state.morph/one-shot": [
@@ -4701,6 +4749,18 @@
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
                 "reason": "Menubar mounts dropdown-menu for local state/glyph feedback; that installed component remains the integration owner."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "menubar",
+                "reason": "A plain top-level trigger label is menubar's own display slot, so only changed graphemes are replaced."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Menu item, checkbox, radio, submenu, label and shortcut strings keep dropdown-menu's own changed-run display slots."
               }
             ]
           }
