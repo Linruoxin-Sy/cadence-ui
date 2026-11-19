@@ -6,6 +6,7 @@ in `content/docs/` and `content/components/`; component inventory and install me
 
 | Read                                                            | Before                                                                               |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [Onboarding](onboarding.md)                                     | Setting up the repository, claiming an issue, or opening a first pull request        |
 | [Overall design](overall-design.md)                             | Changing architecture, install paths, shared code, APIs, themes or the build         |
 | [Animation system](animation-system.md)                         | Changing tokens, recipes, modes, engine integration or motion tests                  |
 | [Individual component motion](motion/README.md)                 | Designing or reviewing one component's parts, choreography and six capabilities      |
