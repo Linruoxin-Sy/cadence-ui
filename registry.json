@@ -1508,7 +1508,12 @@
       "description": "Placeholders while cards, tables, and lists load.",
       "categories": ["feedback", "data"],
       "dependencies": ["motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry"
+      ],
       "files": [
         {
           "path": "registry/cadence/skeleton/index.tsx",
@@ -1524,6 +1529,14 @@
           {
             "recipe": "data.transition",
             "form": "continuous"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
           }
         ],
         "intensity": "subtle",
@@ -1537,7 +1550,7 @@
           "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "The existing loading pulse changes local opacity without moving content."
+          "reason": "The padding pulse changes local opacity only; the placeholder's own box and surface paint are separate local owners."
         },
         "motionCoverage": {
           "schema": 1,
@@ -1546,7 +1559,21 @@
               {
                 "relationship": "default",
                 "owner": "skeleton",
-                "reason": "Skeleton integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "A visible busy placeholder owns the theme-clock opacity pulse on its own host; idle and downgraded modes carry no loop."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "skeleton",
+                "reason": "An explicit placeholder shape revision interpolates its own measured box; passive responsive sizing stays native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "skeleton",
+                "reason": "The placeholder surface owns its own background/border/shadow clock while the opacity pulse stays a separate property owner."
               }
             ]
           }
@@ -6134,6 +6161,11 @@
                 "relationship": "inherited",
                 "owner": "tooltip",
                 "reason": "SidebarMenuButton's optional hint renders the installed Tooltip, whose measured hint shell is its own size owner; Sidebar adds no second writer to that popup."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "skeleton",
+                "reason": "SidebarMenuSkeleton renders the installed Skeleton, which owns its own measured placeholder box; Sidebar adds no second size writer to the placeholder."
               },
               {
                 "relationship": "inherited",
