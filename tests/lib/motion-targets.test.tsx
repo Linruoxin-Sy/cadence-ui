@@ -175,6 +175,7 @@ describe("current registry inventory and real part references", () => {
       "button-group",
       "input-group",
       "breadcrumb",
+      "pagination",
       "dialog",
       "checkbox",
       "radio-group",

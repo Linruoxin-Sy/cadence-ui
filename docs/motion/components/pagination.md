@@ -1,6 +1,7 @@
 # Pagination motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under [ADR-023](../adr.md#adr-023--effects-first-migration-performance-governance-afterwards).
 
 Pagination makes the caller's current-page change visible while keeping every numbered link a stable destination. It does not implement paging, fetching or URL state. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names. Previous/Next use the actual pagination-link part with an internal text span, not separate data-slots.
 
@@ -10,20 +11,22 @@ Pagination makes the caller's current-page change visible while keeping every nu
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "content": ["pagination#PaginationContent"],
-    "active": ["pagination#PaginationContent", "pagination#PaginationLink"],
+    "active": ["pagination#PaginationContent"],
     "link": ["pagination#PaginationLink"],
     "item": ["pagination#PaginationItem", "pagination#PaginationEllipsis"],
-    "label": ["pagination#PaginationLink", "pagination#PaginationPrevious", "pagination#PaginationNext"],
-    "text": [
-      "pagination#PaginationLink",
-      "pagination#PaginationPrevious",
-      "pagination#PaginationNext",
-      "pagination#PaginationEllipsis"
-    ]
-  }
+    "label": ["pagination#PaginationLink", "pagination#PaginationPrevious", "pagination#PaginationNext"]
+  },
+  "regions": {
+    "content": ["pagination-content"],
+    "active": ["pagination-active-indicator"],
+    "link": ["pagination-link"],
+    "item": ["pagination-item", "pagination-ellipsis"],
+    "label": ["pagination-link-text"]
+  },
+  "axes": { "content": ["height"] }
 }
 ```
 
@@ -34,7 +37,7 @@ Pagination makes the caller's current-page change visible while keeping every nu
 | Appearance      | default: pagination-content owns independent insertion and later visible-range membership changes; inherited under a parent entrance.                        | default: `pagination.content.enter`, `pagination.item.enter`, `pagination.item.exit` |
 | Size            | default: content owns explicitly changed range/label geometry; individual link hit boxes retain their constraints; responsive hiding is immediate.           | default: `pagination.content.resize`                                                 |
 | Surface colour  | default: PaginationLink active/hover/background/border targets; a single active indicator may own the active fill exclusively within one scope.              | default: `pagination.link.colour`, `pagination.active.colour`                        |
-| Text colour     | default: link and Previous/Next label foreground; ellipsis inherits its context colour.                                                                      | default: `pagination.text.colour`                                                    |
+| Text colour     | default: the link owns one surface/foreground controller; Previous/Next labels inherit that foreground and the ellipsis inherits its context.                | default: `pagination.link.colour`                                                    |
 | Changed text    | default: plain textual link labels and the Previous/Next text props; rich link children use composition.                                                     | default: `pagination.label.replace`; composed: `@label`                              |
 | Changed numbers | not applicable to page labels: each number identifies a destination and keeps that identity; a separate current/total quantity summary requires composition. | not-applicable: `@content`; composed: `@content`                                     |
 
@@ -45,12 +48,12 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | Trigger / owner                                                            | full                                                                                                                                                                                                                                               | reduced                                                                                  | none                        | Binding → preset → recipe/form                                                                                                                                                                                                                                                             |
 | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Independent insertion / pagination-content                                 | One opacity entrance.                                                                                                                                                                                                                              | Short opacity.                                                                           | Immediate.                  | `pagination.content.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                                                 |
-| isActive changes / active visual within content                            | Move a single active visual between known mounted links only on a readable path; otherwise place it immediately or use the declared local colour fallback.                                                                                         | Final active geometry immediately, short colour.                                         | Immediate.                  | `pagination.active.move` → `layout.selection` → `layout.shared/selection`; `pagination.link.colour` → `state.color` → `state.color/surface`                                                                                                                                                |
+| isActive changes / active visual within content                            | Move a single active visual between known mounted links only on a readable path; otherwise place it immediately or use the declared local colour fallback.                                                                                         | Final active geometry immediately, short colour.                                         | Immediate.                  | `pagination.active.move` → `layout.selection` → `layout.shared/selection`; `pagination.link.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                     |
 | Active decoration theme/semantic paint / persistent marker                 | Verified background/border colour on the active decoration only; link active fill remains suppressed. Geometry keeps its separate selection owner.                                                                                                 | Short colour on the independent decoration; final geometry immediately.                  | Final paint immediately.    | `pagination.active.colour` → `state.color` → `state.color/surface`                                                                                                                                                                                                                         |
 | Visible range changes / stable links and content                           | Fade changed links/ellipsis; reflow retained destinations and bounded content size.                                                                                                                                                                | Geometry immediate; short opacity.                                                       | Immediate.                  | `pagination.item.enter` → `presence.inline` → `data.transition/opacity`; `pagination.item.exit` → `presence.exit` → `exit.fade/opacity`; `pagination.item.move` → `layout.compact` → `layout.move/position`; `pagination.content.resize` → `geometry.compact` → `geometry.resize/measured` |
 | Previous/Next or textual label changes / label                             | Changed-only replacement, stagger:none.                                                                                                                                                                                                            | Short changed-text opacity only.                                                         | Final label immediately.    | `pagination.label.replace` → `text.replace` → `text.change/changed-runs`                                                                                                                                                                                                                   |
 | Label/size variant changes visible link boxes / content layout coordinator | Resolve final constrained link boxes and animate owned content geometry once; no label helper width spring.                                                                                                                                        | Final geometry immediately.                                                              | Final geometry immediately. | `pagination.content.resize` → `geometry.compact` → `geometry.resize/measured`; `pagination.item.move` → `layout.compact` → `layout.move/position`                                                                                                                                          |
-| Hover/focus/theme or local active fallback / link foreground and surface   | Verified hover/theme/local-active colours follow the preset. DOM focus within a link or its own invalid state cancels that link owner's colour clock and settles its entire declared paint immediately; the native outline also remains immediate. | Focus/invalid-gated link paint is immediate; other verified colour feedback stays short. | Final colours immediately.  | `pagination.link.colour` → `state.color` → `state.color/surface`; `pagination.text.colour` → `state.color` → `state.color/foreground`                                                                                                                                                      |
+| Hover/focus/theme or local active fallback / link foreground and surface   | Verified hover/theme/local-active colours follow the preset. DOM focus within a link or its own invalid state cancels that link owner's colour clock and settles its entire declared paint immediately; the native outline also remains immediate. | Focus/invalid-gated link paint is immediate; other verified colour feedback stays short. | Final colours immediately.  | `pagination.link.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                                                                                                |
 
 ## Interruption and lifecycle
 
@@ -63,7 +66,7 @@ Latest isActive and href values commit immediately, including rapid navigation; 
 
 The shared active decoration owns active fill/border through `active.colour` exclusively while enabled; the link's local active fill is suppressed for that same cause, while focus and foreground retain their own property owners. If the target leaves the mounted range, becomes ambiguous or changes destination identity, cancel the shared flight and obsolete marker colour work before enabling local state. Navigation, modified clicks and URL changes remain native. Root removal releases measurement and active-indicator registrations.
 
-The `link.colour` and `text.colour` bindings name disjoint properties of one actual CSS colour controller when they share a PaginationLink node. Previous/Next spans and glyphs inherit that link's foreground; they do not start another colour tween. The separate `active.colour` owner runs only on the active decoration, mutually exclusive with the link's local active fill/border for that cause.
+The `link.colour` binding names one CSS colour controller on the PaginationLink anchor, owning surface and foreground properties as disjoint property owners inside that clock. Previous/Next labels inherit that foreground; their anchors carry the caller palette and start no second colour tween. The separate `active.colour` owner runs only on the active decoration, mutually exclusive with the link's local active fill/border for that cause.
 
 ## Geometry and performance
 
@@ -91,27 +94,18 @@ First active-marker placement and restoration after an absent/ambiguous active t
 
 ## Acceptance scenarios
 
-Also pending: render top and bottom pagination with identical destinations, navigate both through
-shared caller state, then remove one mid-flight. Each marker stays in its own content space and old
-cleanup cannot affect the surviving links, focus or marker; modified-click semantics remain native.
+Executed in `tests/components/pagination.test.tsx` with explicit native layout fixtures, in full, reduced
+and none: committed range insertion and later membership changes; a retain-and-remove destination; label
+replacement on the link and on both Previous/Next text props; a single active-page change inside a stable
+range with an independently owned decoration; active-target absence and an ambiguous pair; colour, focus
+and theme paint on the link, label and decoration owners; zero-clock mode separation; two content scopes
+with identical destinations and different active pages; and the native boundaries for numbers.
 
-Also pending: change the visible range in a scrollable caller layout during focus-reveal scrolling
-and an active-marker flight. Verify current href/aria-current, one coordinate conversion, unchanged
-native scroll control and no second scrollbar or navigation when retained decoration is removed.
+A caller-painted link (`className`/`style` colour, background, shadow or filter) keeps its rendered
+palette: the content refuses the shared decoration for that scope and the link carries its own active
+fill. A nested ellipsis follows its item instead of writing a second transform; only a direct child
+projects. Navigation, modified clicks and URL changes stay native.
 
-Also pending: focus/activate a link while marker fill and foreground use different effective clocks,
-including a theme change during travel. The label remains readable over every crossed background,
-or placement/paint falls back immediately; there is no duplicated destination, second active fill
-or delayed navigation. Verify the same palette with immediate reduced/none marker placement.
-
-Target acceptance; not executed: active page changes inside a stable range; ellipsis/range replacement; active target absent or multiple; keyboard anchor navigation; localized Previous/Next labels; breakpoint change; rapid updates, all modes and zero clock.
-
-Also pending: resize localized Previous/Next text while the active target leaves the range, interrupt a shared-indicator flight with multiple active links, and modified-click a focused link; there is one active fill owner and immediate correct navigation.
-
-Also pending: initialize or restore the active page after an empty/ambiguous range, and reflow labels without changing the page; no marker travels from an origin rectangle or treats passive layout as navigation.
-
-Also pending: retain the same active page while Previous/Next text changes or visible links reorder, then navigate during reflow. The active decoration remains attached at intermediate frames, with one composed projection or a coordinated immediate fallback.
-
-Also pending: focus a link during hover/theme feedback and update its active state while focused. Its entire declared paint is immediate; an independently owned active decoration retains its own permitted behaviour. A hover highlight without actual DOM focus does not become a focus gate.
-
-Also pending: change theme and active decoration border/fill during selection, then make the active set ambiguous. Marker paint and local active fallback remain mutually exclusive, obsolete marker work stops, and Previous/Next label spans inherit one link colour clock without duplicate interpolation.
+Deferred under ADR-023: a real browser matrix (first paint, per-frame cancellation, actual rendered colour
+sampling, scrollable caller range), a production build and performance governance. `record.host` / action
+evidence is Unit-level; no browser or real-device performance claim is made here.
