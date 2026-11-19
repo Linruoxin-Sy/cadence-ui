@@ -206,6 +206,7 @@ describe("current registry inventory and real part references", () => {
         "context-menu",
         "menubar",
         "command",
+        "toast",
         "accordion",
         "collapsible",
         "tabs",
