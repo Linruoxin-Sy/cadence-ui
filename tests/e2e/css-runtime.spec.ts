@@ -258,7 +258,10 @@ for (const id of ["skeleton", "spinner", "progress", "attachment"])
       .getByRole("button", { name: "reduced", exact: true })
       .click();
     await expect(part).toHaveAttribute("data-motion", "reduced");
-    expect(await part.evaluate((n) => n.getAnimations().some((a) => a instanceof CSSAnimation))).toBe(true);
+    // Migrated v2 status loops release the animation family under reduced
+    // motion; the legacy progress/attachment adapters still carry their CSS loop.
+    const keepsReducedLoop = id === "progress" || id === "attachment";
+    expect(await part.evaluate((n) => n.getAnimations().some((a) => a instanceof CSSAnimation))).toBe(keepsReducedLoop);
 
     await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
     await expect(part).toHaveAttribute("data-motion", "none");

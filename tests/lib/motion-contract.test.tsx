@@ -300,17 +300,29 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         path.join(fixture, "registry/cadence/skeleton/index.tsx"),
         'import {useContinuousMotion} from "../lib/css-motion";function Part(){const loop=useContinuousMotion(ref,cm,"pulse");return <div {...loop} data-slot="skeleton"/>}',
       );
+      // Spinner has since migrated to v2 in the catalogue. This fixture keeps its
+      // pre-migration source and contract on purpose, so its missing executors are
+      // still reported instead of borrowing the migrated implementation.
+      const spinnerItem = stagedRegistry.items.find((item: { name: string }) => item.name === "spinner");
+      if (!spinnerItem) throw new Error("spinner fixture missing");
+      spinnerItem.files = [{ path: "registry/cadence/spinner/index.tsx" }];
+      await mkdir(path.join(fixture, "registry/cadence/spinner"), { recursive: true });
+      await writeFile(
+        path.join(fixture, "registry/cadence/spinner/index.tsx"),
+        await readFile(path.join(root, "tests/fixtures/motion-contract-spinner/legacy-source.txt")),
+      );
       await writeFile(path.join(fixture, "registry.json"), JSON.stringify(stagedRegistry));
       for (const id of Object.keys(cases)) {
         // The static fixture contract lives with the fixture, not in the catalogue.
         if (id === "static-fixture") continue;
         let contract = await readFile(path.join(root, `docs/motion/components/${id}.md`), "utf8");
-        if (["spinner", "label"].includes(id))
-          contract = contract.replace('"migration": "legacy"', '"migration": "v2"');
+        if (id === "label") contract = contract.replace('"migration": "legacy"', '"migration": "v2"');
         // Skeleton has since migrated to v2 in the catalogue. This fixture keeps a
         // legacy loop source on purpose, so it pins the pre-migration contract.
         if (id === "skeleton")
           contract = await readFile(path.join(root, "tests/fixtures/motion-contract-skeleton-contract.md"), "utf8");
+        if (id === "spinner")
+          contract = await readFile(path.join(root, "tests/fixtures/motion-contract-spinner/contract.md"), "utf8");
         await writeFile(path.join(fixture, `docs/motion/components/${id}.md`), contract);
       }
       const config = path.join(fixture, "vitest.config.mjs");
