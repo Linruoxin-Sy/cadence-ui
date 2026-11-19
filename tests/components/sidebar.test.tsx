@@ -184,6 +184,23 @@ describe("Sidebar", () => {
       Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
     }
   });
+  it.each(["full", "reduced", "none"] as const)("renders the loading placeholder in %s", (mode) => {
+    // SidebarMenuSkeleton composes the installed Skeleton, whose measured box and
+    // pulse are that component's own owners; Sidebar names it as inherited.
+    render(
+      <CadenceProvider mode={mode}>
+        <SidebarProvider>
+          <Sidebar>
+            <SidebarMenuSkeleton showIcon />
+          </Sidebar>
+        </SidebarProvider>
+      </CadenceProvider>,
+    );
+    const placeholder = document.querySelector('[data-slot="skeleton"]');
+    expect(placeholder).toHaveAttribute("data-motion", mode);
+    expect(placeholder?.closest('[data-slot="sidebar-menu-skeleton"]')).not.toBeNull();
+    expectMotionContract(mode);
+  });
   it("forwards native events/styles/render refs and ref cleanup", () => {
     const ref = createRef<HTMLDivElement>();
     const cleanup = vi.fn();

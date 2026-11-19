@@ -307,6 +307,10 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         let contract = await readFile(path.join(root, `docs/motion/components/${id}.md`), "utf8");
         if (["spinner", "label"].includes(id))
           contract = contract.replace('"migration": "legacy"', '"migration": "v2"');
+        // Skeleton has since migrated to v2 in the catalogue. This fixture keeps a
+        // legacy loop source on purpose, so it pins the pre-migration contract.
+        if (id === "skeleton")
+          contract = await readFile(path.join(root, "tests/fixtures/motion-contract-skeleton-contract.md"), "utf8");
         await writeFile(path.join(fixture, `docs/motion/components/${id}.md`), contract);
       }
       const config = path.join(fixture, "vitest.config.mjs");
