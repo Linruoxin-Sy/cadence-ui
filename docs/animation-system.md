@@ -865,6 +865,11 @@ Continuous status effects use CSS animate-* utilities and framework --animate-* 
 have an active condition and pause when offscreen or the document is hidden. Provider timeScale
 retains its existing meaning: it scales recipe/portal clocks, not continuous theme clocks.
 
+The owner's own inactive condition (`active = false`) releases the animation family instead of
+pinning `animation: none`, so the host is free for another phase's writer; an offscreen, hidden or
+downgraded owner keeps the family and writes the static equivalent. A released owner supplies no
+policy or action evidence, so a loop receipt always means a live executing owner (ADR-024).
+
 The **v2 target** stops autonomous loops in both reduced and none, including Spinner rotation and
 Skeleton opacity pulses. A static glyph/text still communicates loading. Full permits local opacity
 status feedback and the single-glyph Spinner rotation; it does not authorize moving marquees,

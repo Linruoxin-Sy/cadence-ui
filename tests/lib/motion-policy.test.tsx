@@ -21,10 +21,10 @@ function Color({ changed = false, invalid = false }) {
     </button>
   );
 }
-function Loop() {
+function Loop({ active = true }: { active?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const cm = useCadenceMotion(ref);
-  const loop = useContinuousMotion(ref, cm, "pulse");
+  const loop = useContinuousMotion(ref, cm, "pulse", active);
   return (
     <div {...loop} data-slot="policy-loop" role="status">
       Loading
@@ -180,6 +180,28 @@ describe("shared executed colour/loop policy", () => {
     node.style.transitionDuration = "0s";
     node.style.transitionProperty = "all";
     expect(() => expectMotionContract("none", { policy: ["color"] })).toThrow(/colour properties/);
+  });
+  it("releases the whole family while the owner is inactive, then reacquires it", () => {
+    const { rerender } = render(
+      <CadenceProvider mode="full">
+        <Loop active={false} />
+      </CadenceProvider>,
+    );
+    const node = document.querySelector("[data-cadence-loop]") as HTMLElement;
+    // No pinned `animation: none`: the host must stay free for the phase's own
+    // opacity writer, and an inactive owner must not certify a loop policy.
+    expect(node.style.animation).toBe("");
+    expect(node.style.getPropertyValue("animation-name")).toBe("");
+    expect(() => expectMotionContract("full", { policy: ["loop"] })).toThrow(/actual loop owner/);
+    rerender(
+      <CadenceProvider mode="full">
+        <Loop active />
+      </CadenceProvider>,
+    );
+    // jsdom has no viewport, so the reacquired owner is the static equivalent;
+    // ownership (and the policy receipt) is what this assertion proves.
+    expect(node.style.animation).toBe("none");
+    expectMotionContract("full", { policy: ["loop"] });
   });
   it("rejects a legacy loop under the staged v2 policy", () => {
     render(
