@@ -668,8 +668,11 @@ export function observeCopiedController(controller, kind, args, source) {
   return controller;
 }
 
-export function observePolicyBinding(result, ownership) {
+export function observePolicyBinding(result, ownership, source) {
   policyScopes.set(result.controller, ownership);
+  // The module that contains the CSS policy factory is the creation receipt for
+  // the owner it hands back, so a stopped loop still proves where it came from.
+  if (source) controllerSources.set(ownership, source);
   return result;
 }
 

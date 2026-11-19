@@ -252,7 +252,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -347,7 +347,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -439,7 +439,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -512,7 +512,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -599,7 +599,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -664,7 +664,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -729,7 +729,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -824,7 +824,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -897,7 +897,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -992,7 +992,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1012,6 +1012,14 @@
           {
             "recipe": "data.transition",
             "form": "continuous"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
           }
         ],
         "intensity": "subtle",
@@ -1025,7 +1033,7 @@
           "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "The existing loading pulse changes local opacity without moving content."
+          "reason": "The padding pulse changes local opacity only; the placeholder's own box and surface paint are separate local owners."
         },
         "motionCoverage": {
           "schema": 1,
@@ -1034,12 +1042,26 @@
               {
                 "relationship": "default",
                 "owner": "skeleton",
-                "reason": "Skeleton integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "A visible busy placeholder owns the theme-clock opacity pulse on its own host; idle and downgraded modes carry no loop."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "skeleton",
+                "reason": "An explicit placeholder shape revision interpolates its own measured box; passive responsive sizing stays native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "skeleton",
+                "reason": "The placeholder surface owns its own background/border/shadow clock while the opacity pulse stays a separate property owner."
               }
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1142,7 +1164,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1246,7 +1268,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1342,7 +1364,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1457,7 +1479,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1581,7 +1603,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1758,7 +1780,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1850,7 +1872,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1953,7 +1975,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -1999,7 +2021,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2100,7 +2122,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2165,7 +2187,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2230,7 +2252,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2306,7 +2328,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2371,7 +2393,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2463,7 +2485,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2594,7 +2616,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2659,7 +2681,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2702,7 +2724,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2839,7 +2861,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -2940,7 +2962,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3030,7 +3052,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3131,7 +3153,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3279,7 +3301,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3391,7 +3413,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3514,7 +3536,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3613,7 +3635,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3714,7 +3736,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3815,7 +3837,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -3939,7 +3961,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4011,7 +4033,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4131,7 +4153,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4188,7 +4210,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4300,7 +4322,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4401,7 +4423,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4513,7 +4535,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4546,7 +4568,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4594,7 +4616,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4627,7 +4649,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4670,7 +4692,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4716,7 +4738,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4839,7 +4861,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4872,7 +4894,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -4960,6 +4982,11 @@
               },
               {
                 "relationship": "inherited",
+                "owner": "skeleton",
+                "reason": "SidebarMenuSkeleton renders the installed Skeleton, which owns its own measured placeholder box; Sidebar adds no second size writer to the placeholder."
+              },
+              {
+                "relationship": "inherited",
                 "owner": "sheet",
                 "reason": "Sidebar's mobile composition renders the installed Sheet, whose panel shell owns its own measured block size; Sidebar adds no second writer to that panel."
               }
@@ -4988,7 +5015,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5073,7 +5100,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5158,7 +5185,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5213,7 +5240,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5256,7 +5283,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5308,7 +5335,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5355,7 +5382,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5402,7 +5429,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5449,7 +5476,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     },
     {
@@ -5496,7 +5523,7 @@
             ]
           }
         },
-        "sourceSha": "5c1141f1"
+        "sourceSha": "a69508a6"
       }
     }
   ]

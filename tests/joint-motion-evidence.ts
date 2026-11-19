@@ -37,7 +37,7 @@ export type JointMotionRecord = {
   mode: Mode;
   connection: "local" | "registered-scope";
   evidence: "executed-policy" | "registered-target" | "executed-commit";
-  activity?: "running" | "static";
+  activity?: "running" | "static" | "released";
   preset?: string;
   target?: unknown;
   commits?: number;
@@ -77,6 +77,9 @@ const foreground = new Set(["color", "fill", "stroke", "text-decoration-color", 
 const ids = new WeakMap<object, number>();
 const observedScopes = new WeakMap<ParentNode, Map<string, WeakSet<object>>>();
 let serial = 0;
+/** A released loop keeps the controller identity it held, so its stop remains
+ * an observable transition on the same live owner rather than a silent absence. */
+const lastPolicyControllers = new WeakMap<object, object>();
 const identify = (object: object) => {
   if (!ids.has(object)) ids.set(object, ++serial);
   return ids.get(object) as number;
@@ -208,14 +211,39 @@ export function expectJointMotionEvidence(
       for (const value of scalarValues.get(controller) ?? [])
         expect(value.isAnimating(), "downgrade must cancel the actual scalar writer").toBe(false);
   }
-  for (const sample of cssPolicySamples.values()) {
+  for (const [key, sample] of cssPolicySamples) {
     const node = sample.ref.current;
     if (!node || !contains(node) || !selected(sample.origin, node)) continue;
     const controller = sample.controller();
     // A released owner holds no property at all, leaving the host free for
     // another phase's writer. Only a connected-but-conflicted controller is a
     // yielded/caller-CSS failure.
-    if (!controller) continue;
+    if (!controller) {
+      // A loop that stops keeps the identity it had while it ran: stopping is
+      // itself the change this owner executes (ADR-025), so it still yields one
+      // record on the same live host instead of vanishing from the evidence.
+      const released = sample.kind === "loop" ? lastPolicyControllers.get(key) : undefined;
+      if (!released) continue;
+      expect(sample.mode, "joint released policy current mode").toBe(mode);
+      expect(node.style.animation, "a released loop must leave no pinned family").toBe("");
+      expect(getComputedStyle(node).animationName, "a released loop must not compute an animation").toBe("none");
+      records.push({
+        ...record(
+          sample.origin,
+          sample.origin,
+          node,
+          released,
+          mode,
+          "data.transition/continuous",
+          [sample.properties[0] === "spin" ? "transform" : "opacity"],
+          "local",
+        ),
+        activity: "released",
+      });
+      continue;
+    }
+    const identity = policyScopes.get(sample.controller) ?? controller;
+    lastPolicyControllers.set(key, identity);
     expect(controller.node, "joint policy actual connection").toBe(node);
     expect(controller.allowed, "joint policy must execute; yielded/caller CSS is not adoption").toBe(true);
     expect(sample.mode, "joint policy current mode").toBe(mode);
@@ -259,7 +287,7 @@ export function expectJointMotionEvidence(
       sample.origin,
       sample.origin,
       node,
-      policyScopes.get(sample.controller) ?? controller,
+      identity,
       mode,
       form,
       sample.kind === "color" ? sample.properties : [sample.properties[0] === "spin" ? "transform" : "opacity"],

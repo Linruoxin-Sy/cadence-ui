@@ -262,9 +262,10 @@ export async function expectV2MotionAction(
     if (record.source) exactSource(record.source.module, record.source.digest, "actual controller");
     expect(record.properties).toEqual(action.properties);
     if (action.targetForm === "data.transition/continuous")
-      expect(record.activity, "a full loop action needs an actually enabled owner; downgraded loops stay static").toBe(
-        mode === "full" ? "running" : "static",
-      );
+      expect(
+        ["released", mode === "full" ? "running" : "static"],
+        "a full loop action needs an actually enabled owner; downgraded loops stay static and a stopped loop reports its release",
+      ).toContain(record.activity);
     if (record.controlExecuted) {
       expect(record.policyMode, "actual parameter mode must match the owned host").toBe(mode);
       const visual = engine.visualElementStore.get(node);

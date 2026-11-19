@@ -126,6 +126,7 @@ export function componentExecutionPlugin(additionalItems = []) {
                 f.createCallExpression(f.createIdentifier("observePolicyBinding"), undefined, [
                   node.expression,
                   f.createIdentifier("ownership"),
+                  sourceReceipt(),
                 ]),
               );
             if (ts.isFunctionDeclaration(node) && node.name?.text === "resolveMotionParameters") {

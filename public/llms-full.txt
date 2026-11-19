@@ -4935,6 +4935,7 @@ npm install clsx tailwind-merge motion
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -4957,6 +4958,10 @@ npm install clsx tailwind-merge motion
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -4964,6 +4969,8 @@ npm install clsx tailwind-merge motion
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: skeleton](https://cadence.dev/r/skeleton.json)
 
@@ -5298,22 +5305,26 @@ always set.
 
 ## Motion contract
 
-Authored intensity is **subtle**: The existing loading pulse changes local opacity without moving content.
+Authored intensity is **subtle**: The padding pulse changes local opacity only; the placeholder's own box and surface paint are separate local owners.
 
-Recipe: `data.transition/continuous`, a continuous opacity loop. It is implemented in CSS
-(`animate-pulse`) rather than in Motion, because a page can render dozens of
-placeholders and each Motion loop costs a frame callback; the pulse only touches
-`opacity`, so it can never trigger layout.
+The placeholder owns three things and nothing else. It pulses while the region is busy, it interpolates its
+own measured box when you explicitly change its shape, and it transitions its own surface paint. It never
+fades in or out: the parent owns whether the placeholder exists, so a handoff is a native removal rather than
+a second writer competing with the pulse.
 
-| Phase   | Properties                | Token                          | Interruptible |
-| ------- | ------------------------- | ------------------------------ | ------------- |
-| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition/continuous` / `animate-pulse` (theme timing) | yes (CSS)     |
-| reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
-| none    | no animation; full opacity | `animate-none`                 | –             |
+| Owner              | full                                          | reduced                             | none                                | Recipe / form                              |
+| ------------------ | --------------------------------------------- | ----------------------------------- | ----------------------------------- | ------------------------------------------ |
+| Opacity pulse      | theme-clock opacity loop while busy            | static final opacity, no loop       | static final opacity, no loop       | `data.transition/continuous`               |
+| Owned box          | one measured width/height writer               | immediate                           | immediate                           | `geometry.resize/measured`                 |
+| Surface paint      | background/border/shadow clock                | short colour                        | immediate                           | `state.color/css-transition`               |
 
-Reduced keeps the pulse on purpose: M5 removes travel and scale, not opacity, and a
-static grey block is easier to mistake for content that already loaded. `none`
-stops it completely, which is what a screenshot test or a print stylesheet needs.
+The pulse is CSS-backed (`--animate-pulse` on the theme clock, driven by `useContinuousMotion`) rather than a
+Motion loop, because a page can render dozens of placeholders. Only `opacity` changes, so the pulse can never
+trigger layout, and `busy={false}` releases the animation family instead of pinning a static animation.
+
+Reduced and none both carry the same informative grey block; reduced additionally keeps short colour feedback.
+A static block is easier to mistake for loaded content than a dim one, so the shape, not the loop, carries the
+meaning. `none` reaches the resting paint immediately, including colour.
 
 ## Keyboard interactions
 
