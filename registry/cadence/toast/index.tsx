@@ -167,7 +167,7 @@ function Toast({ className, style, ref: callerRef, ...props }: ToastPrimitive.Ro
           ),
           className,
         )}
-        style={{ ...(paint.style ?? {}), ...(popupStyle(cm, style) as CSSProperties) }}
+        style={mergeStyle(paint.style, popupStyle(cm, style))}
       />
     </ToastSurfaceContext.Provider>,
   );
