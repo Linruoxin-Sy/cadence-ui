@@ -2695,7 +2695,13 @@
       "description": "Short waits such as saving, sending, or publishing.",
       "categories": ["feedback"],
       "dependencies": ["lucide-react", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/spinner/index.tsx",
@@ -2708,9 +2714,19 @@
         "tier": "T4",
         "batch": "B2",
         "motion": [
+          "enter.pop",
+          "exit.fade",
           {
             "recipe": "data.transition",
             "form": "continuous"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
           }
         ],
         "intensity": "subtle",
@@ -2724,16 +2740,44 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "The status glyph rotates in place; the legacy reduced rotation remains pending migration."
+          "reason": "One SVG owns four disjoint properties: the opacity envelope of its own insertion/removal, the rotation that is its busy state, an explicit caller icon-size revision and its currentColor foreground clock."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "spinner",
+                "reason": "A later insertion fades in on the glyph's own retained host; the status name and role are committed immediately."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "spinner",
+                "reason": "A retained removal stops rotation first, then fades the same host; the caller's removal is what ends the lifecycle."
+              }
+            ],
             "data.transition/continuous": [
               {
                 "relationship": "default",
                 "owner": "spinner",
-                "reason": "Spinner integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "The visible glyph owns the theme-clock rotation; hidden, offscreen, retained and downgraded states release it instead of pinning a static animation."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "spinner",
+                "reason": "An explicit caller icon-size revision interpolates the reserved SVG box; rotation and passive responsive sizing never write that box."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "spinner",
+                "reason": "The glyph's currentColor foreground owns its own colour clock; a containing badge or button keeps its surface contract."
               }
             ]
           }
