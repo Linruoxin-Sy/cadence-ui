@@ -12,8 +12,12 @@ export type SurfacePresenceCommit = {
   complete?: () => void;
 };
 
+/** An opacity envelope is not HTML-specific: a status glyph owns the same
+ * retained host and the same Web Animations opacity channel as a block host. */
+type PresenceHost = HTMLElement | SVGElement;
+
 /** Opacity only, on the original retained host. Never writes a resting opacity. */
-export function createSurfacePresence(node: HTMLElement) {
+export function createSurfacePresence(node: PresenceHost) {
   const transaction = createMotionTransaction();
   const owner = transaction.register(node);
   let current: SurfacePresenceCommit | null = null;

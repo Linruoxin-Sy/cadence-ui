@@ -14,6 +14,9 @@ import {
 } from "./motion-transaction";
 
 type Axis = "width" | "height";
+/** A measured box is a layout fact, not an HTML-only one: an owned SVG icon
+ * size is read and written through the same CSS geometry properties. */
+type LayoutElement = HTMLElement | SVGElement;
 /** Internal compound adapter boundary. The parent commits after children have
  * committed natural content; participating descendants share that transaction. */
 export const GeometryScope = createContext<{
@@ -77,8 +80,8 @@ function verifyPixels(checks: PixelCheck[]) {
   }
 }
 type Adapter = {
-  host: MotionHostRef<HTMLElement>;
-  content: HTMLElement;
+  host: MotionHostRef<LayoutElement>;
+  content: LayoutElement;
   axes: readonly Axis[];
   /** Native sizing adapter work is distinct from decorative participation. */
   maintained?: boolean;
@@ -101,7 +104,7 @@ type Adapter = {
 };
 
 /** Layout dimensions, never transformed viewport rectangles. Unknown layout is not zero. */
-function measurable(element: HTMLElement) {
+function measurable(element: LayoutElement) {
   if (
     !element.isConnected ||
     (element.checkVisibility && !element.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true })) ||
@@ -111,7 +114,7 @@ function measurable(element: HTMLElement) {
   return true;
 }
 
-export function naturalGeometry(element: HTMLElement): { width: number; height: number } | null {
+export function naturalGeometry(element: LayoutElement): { width: number; height: number } | null {
   if (!measurable(element)) return null;
   const css = element.ownerDocument.defaultView?.getComputedStyle(element);
   if (!css) return null;
@@ -159,7 +162,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     let constraints = "";
     const constraintSignature = () =>
       JSON.stringify([
-        node.className,
+        // An SVG host's `className` is an animated object, not its class text.
+        typeof node.className === "string" ? node.className : (node.getAttribute("class") ?? ""),
         ...[
           "width",
           "height",
@@ -247,8 +251,14 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           return null;
         }
         const result = adapter.measure(reason);
-        naturalWidth = content.offsetWidth;
-        naturalHeight = content.offsetHeight;
+        // `offsetWidth` is an HTML layout shortcut. An SVG host reports the same
+        // border box through its resolved geometry properties instead.
+        const intrinsic =
+          content instanceof HTMLElement
+            ? { width: content.offsetWidth, height: content.offsetHeight }
+            : (naturalGeometry(content) ?? { width: 0, height: 0 });
+        naturalWidth = intrinsic.width;
+        naturalHeight = intrinsic.height;
         if (adapter.observeChildren) {
           const children = Array.from(content.children)
             .filter((child) => child !== adapter.decoration)
@@ -270,8 +280,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         writingMode = content.ownerDocument.defaultView?.getComputedStyle(content).writingMode ?? "";
         const vertical = /^(vertical|sideways)/.test(writingMode);
         stamp = vertical
-          ? `${content.offsetHeight}/${content.offsetWidth}`
-          : `${content.offsetWidth}/${content.offsetHeight}`;
+          ? `${Math.round(intrinsic.height)}/${Math.round(intrinsic.width)}`
+          : `${Math.round(intrinsic.width)}/${Math.round(intrinsic.height)}`;
         return result;
       },
       release,
@@ -475,7 +485,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         (other) =>
           other !== owner &&
           other.emitting(axis) &&
-          (target === other.node || (!adapter.axes.includes(axis) && adapter.nativeEcho?.(other.node, target, axis))),
+          (target === other.node ||
+            (!adapter.axes.includes(axis) && adapter.nativeEcho?.(other.node as HTMLElement, target, axis))),
       );
     const observer = new ResizeObserver((entries) => {
       if (delegated()) return;
