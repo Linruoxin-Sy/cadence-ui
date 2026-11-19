@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/spinner`
 - Type: registry:ui
 - Since: 0.2.0
-- Motion recipes: data.transition
+- Motion recipes: enter.pop, exit.fade, data.transition, geometry.resize, state.color
 
 ## Installation
 
@@ -32,6 +32,8 @@ npm install clsx tailwind-merge motion lucide-react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -54,6 +56,11 @@ npm install clsx tailwind-merge motion lucide-react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | spinner | `@components/cadence/spinner/index.tsx` | [JSON files[].content](https://cadence.dev/r/spinner.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -61,6 +68,10 @@ npm install clsx tailwind-merge motion lucide-react
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json)
 
 [Source files: spinner](https://cadence.dev/r/spinner.json)
 
@@ -217,21 +228,22 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine files in the target list, keeping `spinner/index.tsx` beside the
-shared `lib/` directory and preserving relative imports and `"use client"`
-directives. The glyph uses a CSS loop, but its `useCadenceMotion` import still
-requires the provider files and their `motion` dependency. Copy every file from
-the motion, utilities and provider payloads; wrapping the application in
-`CadenceProvider` is optional. Without a wrapper, Spinner follows the system
-motion preference.
+Keep `spinner/index.tsx` and all shared `lib/` files at the listed relative paths,
+including every file in the motion, geometry and provider items. Preserve the
+`"use client"` directives. The glyph's loop is a theme token, but its
+`useCadenceMotion`, retained-presence and measured-box helpers still require those
+shared files and their `motion` dependency. Wrapping the application in
+`CadenceProvider` is optional; without it, Spinner follows the system motion
+preference.
 
-Full and reduced both keep the single-glyph `animate-spin` rotation, the
-animation system's specific reduced-motion exception. None uses `animate-none`
-and leaves the named icon visible and still. Tailwind's `--animate-spin` theme
-token owns the loop clock; provider `timeScale`, including zero, does not change
-it. Use `mode="none"` on the included provider to stop the loop, as the explicit
-`data-motion="none"` example does from its first render. No additional item-specific
-CSS is required beyond the base theme and Tailwind utilities.
+Full mode rotates the single glyph on Tailwind's `--animate-spin` theme clock;
+reduced and none both leave the same named glyph still. Provider `timeScale`,
+including zero, does not change the loop clock. Use `mode="none"` (or the OS
+reduced-motion preference) to stop it, as the explicit `data-motion="none"`
+example does from its first render. The same element owns a short opacity
+entrance, its foreground colour clock and an explicit caller icon-size revision;
+none of those touch the rotation. No additional item-specific CSS is required
+beyond the base theme and Tailwind utilities.
 
 Inside a button also uses [Button](/components/button). Install it when copying
 that example:
@@ -339,8 +351,8 @@ export function SavingInvoice() {
 
 This example explicitly fixes its provider to `none` from the first render, independently of the
 header. The spinner stays visible and named, with no rotation or running animation; it is not a
-post-mount mode switch. Other examples inherit the header. Both full and reduced keep Spinner’s
-single-glyph rotation, the animation system’s specific reduced-motion exception.
+post-mount mode switch. Other examples inherit the header. Full rotates; reduced and none both keep
+the same still, named glyph, because the rotation is the busy signal rather than travel.
 
 <ComponentExample name="without-motion" />
 
@@ -385,28 +397,32 @@ export function StaticSpinner() {
 | `className` | `string` | –           | Merged last — size and colour live here (`size-3`, `text-…`).   |
 | `aria-label`| `string` | `"Loading"` | The accessible name; pass a specific one when it helps.         |
 
-All native `svg` props are forwarded. `data-slot="spinner"` and `data-motion` are
-always set, and `role="status"` with the label is the announcement.
+All native `svg` props are forwarded, including `ref` and any `width`/`height` the caller sets.
+`data-slot="spinner"` and `data-motion` are always set, and `role="status"` with the label is the
+announcement.
 
 ## Motion contract
 
-Authored intensity is **subtle**: The status glyph rotates in place; the legacy reduced rotation remains pending migration.
+Authored intensity is **subtle**: One SVG owns four disjoint properties: the opacity envelope of its own insertion/removal, the rotation that is its busy state, an explicit caller icon-size revision and its currentColor foreground clock.
 
-Recipe: `data.transition/continuous`, continuous form. The loop is CSS (`animate-spin`) rather
-than Motion, for the same reason as `skeleton`: a spinner is by definition next to work
-the user is waiting on, and it must not add a frame callback to it. Only `transform`
-(rotation) changes, so the loop can never trigger layout.
+The loop is the theme's `--animate-spin` clock rather than a Motion loop, for the same reason as
+`skeleton`: a spinner sits next to the work the user is waiting on and must not add a frame
+callback to it. Only `transform` (rotation) changes, so the loop never triggers layout, and
+removal releases the loop before any retained fade rather than leaving a pinned animation.
 
-| Phase   | Properties          | Token                         | Interruptible |
-| ------- | ------------------- | ----------------------------- | ------------- |
-| spin    | `rotate 0 → 360deg` | `data.transition/continuous` / `animate-spin` (theme timing) | yes (CSS)     |
-| reduced | same rotation       | `animate-spin`                | yes (CSS)     |
-| none    | none; icon static   | `animate-none`                | –             |
+| Recipe | Owner / properties | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| `enter.pop/one-shot` | Glyph opacity on a later insertion | Short entrance; role and label are immediate | Short opacity | Immediate |
+| `exit.fade/one-shot` | Glyph opacity on a retained removal | Rotation stops, then the fade | Short opacity, still glyph | Immediate removal |
+| `data.transition/continuous` | Glyph `transform` (rotation) | Theme-clock rotation while current and visible | Still glyph, no rotation | Still glyph, no rotation |
+| `geometry.resize/measured` | Reserved icon box, `width` and `height` | Bounded box continuity on an explicit caller size revision | Immediate box | Immediate box |
+| `state.color/css-transition` | Glyph `color` / currentColor stroke | Scoped foreground clock | Short colour | Immediate |
 
-Reduced keeps the rotation on purpose: M5 removes travel and scale, and a rotation in
-place is neither. A spinner that freezes under reduced motion would read as a frozen
-app. `none` stops it completely, which is what a screenshot test or a print stylesheet
-needs.
+Reduced and none both leave the same named glyph still: the rotation is the busy signal, so a
+frozen glyph still says "waiting" only because its label says so. A containing button or badge owns
+its own surface and its own entrance; when it already fades the same insertion, Spinner's opacity
+envelope is consumed by that parent instead of racing it. Rotation and the entrance never write the
+icon box, and passive reflow or responsive sizing never animates it.
 
 ## Keyboard interactions
 
@@ -434,11 +450,15 @@ size, not by growing the icon.
 
 ## Performance
 
-- One CSS animation per element, on `transform` only; no JS loop, no layout read.
+- One CSS animation per element, on `transform` only; no JS loop, no per-frame layout read.
+- The reserved icon box is read once per committed caller revision, not per frame, and rotation
+  never writes it.
 - Compositor-friendly, but the animation-system budget still applies: fewer than
   twenty simultaneously animating elements. For a list of pending rows, render one
   spinner for the list, not one per row.
 - No `will-change`: the browser promotes a transform animation on its own.
+- A hidden, offscreen or downgraded spinner holds no animation family at all, so an idle page
+  pays nothing for a spinner that is still mounted.
 
 ## Notes for AI
 

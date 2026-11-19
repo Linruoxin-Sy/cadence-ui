@@ -61,7 +61,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           firstStatic.every((frame) => frame.mode === "none" && frame.transform === "none" && frame.animations === 0),
         ).toBe(true);
         expect(frames.every((s) => s.opacity === "1")).toBe(true);
-        if (actual === "none") expect(frames.every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
+        // Full mode rotates; reduced and none keep the same still, named glyph.
+        if (actual === "none" || actual === "reduced")
+          expect(frames.every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
         else {
           expect(new Set(frames.map((s) => s.transform)).size).toBeGreaterThan(3);
           expect(frames.every((s) => s.animations === 1)).toBe(true);
@@ -119,11 +121,13 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           .getByRole("group", { name: "Motion mode" })
           .getByRole("button", { name: "full", exact: true })
           .click();
-        await expect(spinner).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
-        expect(new Set((await sample()).map((s) => s.transform)).size).toBeGreaterThan(3);
+        const restored = effectiveMode("full", reducedMotion === "reduce");
+        await expect(spinner).toHaveAttribute("data-motion", restored);
+        if (restored === "full") expect(new Set((await sample()).map((s) => s.transform)).size).toBeGreaterThan(3);
+        else expect((await sample()).every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
         await page.emulateMedia({ reducedMotion: "reduce" });
         await expect(spinner).toHaveAttribute("data-motion", "reduced");
-        expect(new Set((await sample()).map((s) => s.transform)).size).toBeGreaterThan(3);
+        expect((await sample()).every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
         await expect(
           page.locator('[data-component-example="spinner/without-motion"] [data-slot="spinner"]'),
         ).toHaveAttribute("data-motion", "none");

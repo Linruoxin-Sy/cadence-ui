@@ -81,7 +81,7 @@ export const presentationSamples = new Map<
   {
     form: string;
     supportedForms?: string[];
-    node: HTMLElement;
+    node: HTMLElement | SVGElement;
     origin?: Execution;
     scopeOrigin?: Execution;
     mode: string;
