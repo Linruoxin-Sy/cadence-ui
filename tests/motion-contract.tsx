@@ -184,7 +184,12 @@ export function expectMotionContract(
   const policySlots = new Map<string, string[]>();
   for (const kind of options.policy ?? []) {
     const samples = [...cssPolicySamples.values()].filter(
-      (sample) => sample.kind === kind && sample.ref.current && nodes.includes(sample.ref.current),
+      (sample) =>
+        sample.kind === kind &&
+        sample.ref.current &&
+        nodes.includes(sample.ref.current) &&
+        // A released owner holds no property: it cannot certify this policy.
+        Boolean(sample.controller()),
     );
     expect(samples.length, `execute an actual ${kind} owner before claiming policy evidence`).toBeGreaterThan(0);
     policySlots.set(
@@ -194,6 +199,8 @@ export function expectMotionContract(
     const ownership = new Map<HTMLElement | SVGElement, Set<string>>();
     for (const sample of samples) {
       const node = sample.ref.current as HTMLElement | SVGElement;
+      // A released owner holds no property; the host is free for another phase.
+      if (!sample.controller()) continue;
       expect(sample.controller()?.node, `actual ${kind} connection`).toBe(node);
       expect(sample.controller()?.allowed, `active ${kind} owner; caller CSS cannot certify shared execution`).toBe(
         true,

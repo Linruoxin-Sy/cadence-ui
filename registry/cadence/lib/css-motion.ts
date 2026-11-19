@@ -545,6 +545,14 @@ export function useContinuousMotion<T extends MotionElement>(
     let themeOwned = false;
     const update = () => {
       if (!alive) return;
+      // An inactive owner has no autonomous work to show. Release the family
+      // instead of pinning `animation: none`: a phase-based host needs the
+      // property back for its own opacity owner (Skeleton's entrance/exit).
+      if (!active) {
+        releaseFamily(ownership.current);
+        ownership.current = null;
+        return;
+      }
       // Framework pulse keyframes assume resting opacity one. Keep semantic
       // caller dimming static rather than replacing it with a brighter loop.
       const classes = node.getAttribute("class");

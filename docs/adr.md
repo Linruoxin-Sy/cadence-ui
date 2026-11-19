@@ -252,3 +252,26 @@ adoption, provenance, native behavior, bounded engineering and correctness requi
 Historical measurement protocols remain available whenever explicitly run. A future explicit
 performance decision establishes redesigned budgets and enforcement; migration completion cannot
 silently restore old thresholds or certify prior exceedances.
+
+## ADR-024 · An inactive continuous owner releases the CSS family
+
+`useContinuousMotion` used to pin `animation: none` on the host while it was inactive
+(`active = false`) and still report an allowed ownership. That kept one property claimed by a
+writer that was not running, so a component whose status feedback is phase-based could not hand the
+same property to its own entrance/exit channel: the joint-evidence and v2 action gates correctly
+report two writers of `opacity` on one physical host even when only one of them ever paints.
+
+Decision: inactivity that comes from the owner's own intent (`active = false`) **releases** the
+animation family and leaves no ownership behind. The environment pauses stay as they are — an
+offscreen, hidden or downgraded owner still owns the family and writes the static equivalent
+(`animation: none`), so "pause, do not abandon" is unchanged. A released owner certifies nothing:
+joint and contract evidence skip it, so a loop receipt always means a live, executing owner.
+
+This is what lets a single host sequence its opacity work: an entrance/exit channel owns `opacity`
+while it runs, and the status loop takes the property only after the same owner releases it. It
+grants no component a v2 marker by itself; each migrated component still needs its own executed
+mode/action evidence.
+
+Supersedes the "inactive owner still owns `animation: none`" expectation in the shared runtime
+suite, the joint-evidence helper and the browser policy pilot; ADR-020's loop policy and ADR-021's
+ownership rules stay in force.
