@@ -44,9 +44,23 @@ export type ModalPresenceCommit = {
  * token and no per-side tuning. A caller transform keeps its own family and drops
  * the travel rather than double-writing the property.
  */
-export function createModalPresence(node: HTMLElement, options: { spatial?: boolean; edge?: () => ModalEdge } = {}) {
+export function createModalPresence(
+  node: HTMLElement,
+  options: {
+    spatial?: boolean;
+    edge?: () => ModalEdge;
+    /**
+     * The host already carries a primitive-owned `transform` family (a swipe
+     * gesture's inline displacement). The scale envelope then owns `transform`
+     * only for its own frames and yields to that gesture, rather than treating the
+     * family as a caller paint that would cancel the envelope altogether.
+     */
+    compose?: boolean;
+  } = {},
+) {
   const spatial = options.spatial === true;
   const edge = options.edge;
+  const compose = options.compose === true;
   const transaction = createMotionTransaction();
   const owner = transaction.register(node);
   let current: ModalPresenceCommit | null = null;
@@ -74,25 +88,21 @@ export function createModalPresence(node: HTMLElement, options: { spatial?: bool
     if (blocked || (environment.reduced && current?.cm.mode === "full")) cancel();
   });
 
-  /** An explicit caller clock/animation keeps its own family; the panel never doubles it. */
+  /** An explicit caller clock/animation keeps its own family; the panel never doubles it.
+   * A composed host leaves its primitive-owned gesture family to that gesture. */
   const callerOwnsPaint = (css: CSSStyleDeclaration) => {
     if (node.style.opacity) return true;
     const family = css.transitionProperty.split(",").map((property) => property.trim());
     const times = css.transitionDuration.split(",").map((time) => Number.parseFloat(time));
-    if (
-      family.some(
-        (property, index) =>
-          ["all", "opacity", "transform", "scale", "translate"].includes(property) &&
-          (times[index % times.length] ?? 0) > 0,
-      )
-    )
+    const families = compose ? ["all", "opacity"] : ["all", "opacity", "transform", "scale", "translate"];
+    if (family.some((property, index) => families.includes(property) && (times[index % times.length] ?? 0) > 0))
       return true;
     return (node.getAnimations?.() ?? []).some(
       (handle) =>
         !handles.includes(handle) &&
         (handle.effect as KeyframeEffect | null)
           ?.getKeyframes()
-          .some((frame) => "opacity" in frame || "transform" in frame),
+          .some((frame) => "opacity" in frame || (!compose && "transform" in frame)),
     );
   };
 
@@ -171,7 +181,7 @@ export function createModalPresence(node: HTMLElement, options: { spatial?: bool
       input.open &&
       !immediate &&
       !input.cm.reduced &&
-      css.transform === "none" &&
+      (compose || css.transform === "none") &&
       css.scale === "none"
     )
       handles.push(

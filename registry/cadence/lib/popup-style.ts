@@ -107,6 +107,24 @@ export function drawerSwipeClasses(cm: CadenceMotion) {
   );
 }
 
+/**
+ * Base UI's toast owns direct swipe movement through an inline `transform` and
+ * exposes the released displacement on `--toast-swipe-movement-*`. Cadence authors
+ * neither the gesture nor the stack: this helper only supplies the primitive's own
+ * release/cancel channel — the displacement as a resting transform plus one
+ * token-backed family, so a cancelled swipe glides back instead of snapping while
+ * a real dismissal keeps the direction it was released in. Reduced and none remove
+ * the family entirely; direct manipulation still works.
+ */
+export function toastSwipeClasses(cm: CadenceMotion) {
+  return cn(
+    "[transform:translate(var(--toast-swipe-movement-x,0px),var(--toast-swipe-movement-y,0px))]",
+    cm.reduced || cm.disabled || cm.timeScale === 0
+      ? "transition-none"
+      : "transition-transform duration-(--motion-duration-base) ease-cadence-out",
+  );
+}
+
 /** Removing a native transition property cancels that running transition. */
 export function popupClasses<S>(
   cm: CadenceMotion,
