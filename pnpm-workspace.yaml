@@ -1,0 +1,8 @@
+# pnpm 11+ project settings (migrated from package.json#pnpm and .npmrc)
+allowBuilds:
+  "@tailwindcss/oxide": true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+strictPeerDependencies: false
+autoInstallPeers: true

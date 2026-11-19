@@ -5,7 +5,7 @@
   "description": "Animation-first React components for shadcn. Base UI + Tailwind CSS v4 + Motion.",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@12.21.0",
   "scripts": {
     "prepare": "husky",
     "branch:check": "node scripts/branch-policy.mjs",
@@ -79,13 +79,5 @@
     "typescript": "5.9",
     "unified": "11.0.5",
     "vitest": "^3.2.7"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@tailwindcss/oxide",
-      "esbuild",
-      "sharp",
-      "unrs-resolver"
-    ]
   }
 }
