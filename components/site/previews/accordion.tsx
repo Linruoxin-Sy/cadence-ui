@@ -7,8 +7,6 @@ import { Label } from "@/registry/cadence/label";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { PreviewStack } from "./shell";
 
-// Temporary, reverted in the next commit: this comment only exists so the `browser`
-// job has a component in the diff to scope its spec selection to. It changes nothing.
 export function BasicExample() {
   return (
     <section className="grid w-full max-w-lg gap-2">
