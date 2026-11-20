@@ -302,6 +302,9 @@ describe("Toc", () => {
     const marker = measure();
     expect(marker).not.toHaveAttribute("hidden");
     expect(imperativeSamples).toHaveLength(0); // Initial placement never flies in.
+    // The first decode of the document position is placement; a flight starts once
+    // the reader has actually interacted with the page.
+    fireEvent.pointerDown(document);
     rerender(fixture("api"));
     expect(document.querySelector('[data-slot="toc-indicator"]')).toBe(marker);
     expect(screen.getByRole("link", { name: "API" })).toHaveAttribute("aria-current", "location");
@@ -333,6 +336,7 @@ describe("Toc", () => {
     );
     const { rerender } = render(fixture("full", "intro"));
     const marker = measure();
+    fireEvent.pointerDown(document);
     rerender(fixture("full", "api"));
     const values = imperativeSamples.slice(-4).map((call) => call[0] as { isAnimating(): boolean });
     expect(values).toHaveLength(4);
