@@ -35,15 +35,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           );
         }
         // The root's CSS clock is its scoped colour family; presence is a WAAPI
-        // envelope, so no authored height/bottom/all/travel property may appear here.
+        // envelope, so no authored height/bottom/opacity/all property may appear here.
         // (A substring match would trip on `border-bottom-color`, which is colour.)
         const properties = (await computed(page, '[data-slot="toast"]', "transition-property"))
           .split(",")
           .map((property) => property.trim());
         expect(properties).not.toContain("all");
-        expect(
-          properties.filter((property) => ["height", "bottom", "transform", "opacity"].includes(property)),
-        ).toEqual([]);
+        expect(properties.filter((property) => ["height", "bottom", "opacity"].includes(property))).toEqual([]);
+        // Base UI's own swipe-release family keeps `transform` in full and stops it in
+        // reduced/none; no Cadence travel writer is added.
+        if (mode !== "full") expect(properties).not.toContain("transform");
         await page.keyboard.press("F6");
         await expect(page.locator('[data-slot="toast-viewport"]').filter({ has: toast })).toBeFocused();
         await page.keyboard.press("Tab");
