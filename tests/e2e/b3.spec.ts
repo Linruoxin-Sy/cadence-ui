@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
-import { effectiveMode, MODES, openComponent } from "./helpers";
+import { awaitRangeStepper, effectiveMode, MODES, openComponent } from "./helpers";
 import { installInitialControlProbe } from "./initial-control-probe";
 
 const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
@@ -127,6 +127,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               expectedPart,
             ),
           ).toBe(true);
+          // The progress control is a native range wired to React state: a `fill()`
+          // that lands before hydration leaves the server value in place, so wait for
+          // the runtime that converts the native input event into a new value.
+          if (id === "progress")
+            await awaitRangeStepper(p.getByRole("slider", { name: "Upload progress" }), p.getByRole("progressbar"));
           if (id === "checkbox" || id === "radio-group") {
             expect(
               await page.evaluate(
@@ -195,6 +200,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               .locator('[data-preview="progress"]')
               .getByRole("progressbar", { name: "Preparing preview" })
               .locator('[data-slot="progress-indicator"]');
+            // The shared loop is visibility-gated: an off-screen marquee costs
+            // nothing, so bring the specimen into view before sampling it.
+            await pulse.evaluate((node) => node.scrollIntoView({ block: "center" }));
+            await page.waitForTimeout(400);
             const opacity = await pulse.evaluate(async (n) => {
               const values: string[] = [];
               const end = performance.now() + 400;
@@ -204,7 +213,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               }
               return values;
             });
-            expect(new Set(opacity).size > 1).toBe(actual !== "none");
+            // A migrated v2 status loop runs only in full mode; reduced and none
+            // keep the static indeterminate fill.
+            expect(new Set(opacity).size > 1).toBe(actual === "full");
           }
           // Cancel a running recipe on the same node, including a held press.
           await setMode(page, "full");

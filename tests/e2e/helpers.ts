@@ -57,6 +57,41 @@ export async function openComponent(
   await page.waitForLoadState("networkidle");
 }
 
+/**
+ * Waits until a native range's input events reach the component's state.
+ *
+ * `data-motion` is server-rendered, so in the `full` + no-preference cell it cannot tell
+ * "hydrated" from "not yet": React hydrates this long docs page progressively and
+ * `networkidle` can arrive first, leaving the range as a plain input whose value never
+ * reaches the owner. A keyboard nudge is the probe least likely to disturb the thing
+ * under test — pressing right must move the progressbar by one step and pressing left
+ * must restore it, which only happens once the controlling component is mounted. It
+ * does not touch the motion mode, so the animation that follows stays a first-party
+ * observation instead of a post-probe artifact.
+ */
+export async function awaitRangeStepper(range: Locator, progressbar: Locator) {
+  const start = await range.inputValue();
+  await range.focus();
+  await expect
+    .poll(
+      async () => {
+        await range.press("ArrowRight");
+        return progressbar.getAttribute("aria-valuenow");
+      },
+      { timeout: 20_000 },
+    )
+    .toBe(String(Number(start) + 1));
+  await expect
+    .poll(
+      async () => {
+        await range.press("ArrowLeft");
+        return progressbar.getAttribute("aria-valuenow");
+      },
+      { timeout: 20_000 },
+    )
+    .toBe(start);
+}
+
 /** One computed property, resolved by the engine rather than by jsdom's empty defaults. */
 export async function computed(page: Page, selector: string, property: string): Promise<string> {
   return page

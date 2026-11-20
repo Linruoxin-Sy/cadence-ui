@@ -676,6 +676,10 @@ phase defined in the [preset contract](motion/presets.md#3-default-preset-catalo
 percentages. If a retarget cannot preserve both that phase and valid reel direction, the readout
 shows the latest value immediately while the fill independently reaches its current target.
 Migrate validators, declarations, public docs and actual mode evidence for each new form together.
+A recipe that genuinely carries two installed forms declares both, one entry each — `data.transition`
+for a control's one-shot content change and its continuous status loop, for example. The
+declaration is keyed by recipe/form, so the same pair twice is still a defect, and a component
+never splits one form into two entries to look richer.
 
 The installed internal content executor uses one bounded finite scalar phase for opacity and
 permitted directional translation across actual committed participants. Tabs panel activation and

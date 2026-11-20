@@ -397,9 +397,13 @@ await expectV2NativeBoundaries('reveal-group',{root,container:view.container});s
   expect(fakeComposition).toContain("registered-scope");
 }
 
-it("conditionally enforces real source-bound policies and control actions", () => exerciseGate("controls"), 180000);
+// Each phase cold-starts the reporter in twenty-odd spawned Vitest runs. Measured
+// wall time passed 180 s on an ordinary developer machine before and after this
+// change; the ceiling is a hang guard, not an acceptance budget, and every expected
+// exit code and diagnostic assertion below is unchanged.
+it("conditionally enforces real source-bound policies and control actions", () => exerciseGate("controls"), 360000);
 it(
   "conditionally enforces real inherited, native and registered composition ownership",
   () => exerciseGate("ownership"),
-  180000,
+  360000,
 );
