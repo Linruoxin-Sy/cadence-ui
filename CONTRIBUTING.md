@@ -242,13 +242,14 @@ merge problem. The full rule, including how to resolve a payload conflict, is
 its wall clock is `cli-gates`, which cold-starts `check-registry.mjs` and installs real consumers into
 temporary projects. Choose the layer that can still fail:
 
-| Layer  | Command                                                           | When                                                                                         |
-| ------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Static | `pnpm check:static`                                               | After editing source, metadata or docs, before staging anything                              |
-| Scoped | `pnpm test:local tests/components/<id>.test.tsx`                  | While iterating on one component                                                             |
-| Shared | `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` hit | Once, when the component's own suite is green, to catch shared-gate assumptions              |
-| Gates  | `pnpm test:gate`                                                  | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts |
-| Full   | `pnpm test`                                                       | Once per change set, in the background, while the pull request description is written        |
+| Layer   | Command                                                           | When                                                                                                          |
+| ------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Static  | `pnpm check:static`                                               | After editing source, metadata or docs, before staging anything                                               |
+| Scoped  | `pnpm test:local tests/components/<id>.test.tsx`                  | While iterating on one component                                                                              |
+| Shared  | `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` hit | Once, when the component's own suite is green, to catch shared-gate assumptions                               |
+| Gates   | `pnpm test:gate`                                                  | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts                  |
+| Full    | `pnpm test`                                                       | Once per change set, in the background, while the pull request description is written                         |
+| Browser | `pnpm exec playwright test tests/e2e/<id>.spec.ts`                | When a component's motion changed; CI's `browser` job uploads the same run as the `browser-evidence` artifact |
 
 [`.github/workflows/check.yml`](.github/workflows/check.yml) runs the gate on `ubuntu-latest`. It fans
 the commands out into parallel jobs — typecheck, lint, parity, registry check, runtime tests and one
@@ -256,6 +257,15 @@ job per `cli-gates` file — plus `plan`, which checks the issue a pull request 
 references, and `branch-policy`, which checks the head branch name. It aggregates them into a single
 `check` job. Only `check` is a required status on `main`; it fails when any fan-out job fails, is
 cancelled or is skipped.
+
+A separate `browser` job produces evidence instead of a verdict, and is deliberately not a dependency of
+`check`: a `push` run skips it, a diff that names no component with a `tests/e2e/<id>.spec.ts` skips its
+install and its build, and a red engine run reports on its own check without blocking the merge. When it
+does run it builds the site once, replays only the specs of the components the pull request touched
+(`registry/cadence/<id>/**`, `content/components/<id>.mdx`, `components/site/previews/<id>.tsx`) and
+uploads `browser-evidence` for seven days: one screenshot per test in every mode the suite exercised,
+`playwright-report/` with the traces of retried tests, and the batch proof sheets under `.cache/`. Link
+that artifact in the pull request; do not describe screenshots from your own ignored `.cache/`.
 
 Rules that came out of timing two migration sessions on this repository:
 
