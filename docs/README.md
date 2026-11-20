@@ -1,8 +1,9 @@
 # Design and contributor documentation
 
-This directory contains current concepts, contracts and future work. User-facing documentation lives
-in `content/docs/` and `content/components/`; component inventory and install metadata live in
-`registry.json`. Git history is the record of completed work, measurements and handoffs.
+This directory contains current concepts and contracts. User-facing documentation lives in
+`content/docs/` and `content/components/`; component inventory and install metadata live in
+`registry.json`. The execution plan and its acceptance evidence live in the issue tracker; Git
+history is the record of completed work, measurements and handoffs.
 
 | Read                                                            | Before                                                                               |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -12,13 +13,13 @@ in `content/docs/` and `content/components/`; component inventory and install me
 | [Individual component motion](motion/README.md)                 | Designing or reviewing one component's parts, choreography and six capabilities      |
 | [Motion evidence recipes](motion/evidence-recipes.md)           | Writing source that the gates can certify, or diagnosing a record that will not join |
 | [Motion presets and bindings](motion/presets.md)                | Selecting component rhythm or changing shared parameter assignments                  |
-| [Animation system rollout](animation-system-plan.md)            | Choosing a v2 migration task, its dependencies or its acceptance evidence            |
+| [Where the rollout plan lives](animation-system-plan.md)        | Choosing a v2 migration task: the phase epics point at the issue for each one        |
 | [Site and distribution](documentation-site-and-distribution.md) | Changing MDX, previews, site controls, registry HTTP or snapshots                    |
 | [Architecture decisions](adr.md)                                | Revisiting a foundational decision                                                   |
 | [Scope and next work](parity-plan.md)                           | Choosing work, a tier or a batch, or checking unresolved requirements                |
 
 The animation system defines the accepted v2 target and identifies the existing implementation as
-the migration baseline. The rollout plan records remaining work; it is not a list of delivered APIs.
+the migration baseline. The tracker holds the remaining work; a task there is not a delivered API.
 Component source, registry metadata, public MDX and executable checks must continue to agree on what
 actually ships. Proposed recipes, shared primitives and capability metadata enter those outputs only
 with their implementation and evidence. ADR-020 records the partial supersession of older animation

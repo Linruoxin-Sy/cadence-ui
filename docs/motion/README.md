@@ -10,8 +10,9 @@ interruption, accessibility, compatibility and performance cannot be weakened by
 
 The [animation system](../animation-system.md) owns those common rules. This directory owns individual
 target choreography; [presets.md](presets.md) owns parameter assignments; the
-[rollout plan](../animation-system-plan.md) owns implementation dependencies. ADR-021 records this
-division. These files are current design specifications, not generated reports or proof of delivery.
+[acceptance contract](../animation-system-plan.md) owns what completion means, while the
+[issue tracker](https://github.com/Linruoxin-Sy/cadence-ui/issues?q=is%3Aissue%20label%3Amotion-v2)
+owns the schedule and dependencies. ADR-021 records this division. These files are current design specifications, not generated reports or proof of delivery.
 
 ## 1. Storage and authority
 
@@ -20,7 +21,7 @@ Use a central directory with separate files for separate components:
 ```text
 docs/
   animation-system.md          shared visual guidance and mandatory execution contract
-  animation-system-plan.md     pending migration and acceptance dependencies
+  animation-system-plan.md     acceptance contract; the schedule lives in issues
   motion/
     README.md                 conventions and complete catalogue index
     presets.md                shared parameter assignments and override rules
@@ -42,7 +43,7 @@ only and never become another animation tier.
 | `docs/animation-system.md`                | Shared execution rules, recipe contracts and visual guidance            | Every component must look identical                |
 | `docs/motion/presets.md`                  | Target token assignments, preset scope and override precedence          | New runtime exports already exist                  |
 | `docs/motion/components/<id>.md`          | Target parts, six capabilities, actions, modes, interruption and bounds | A planned effect is already installed              |
-| `docs/animation-system-plan.md`           | Implementation sequence and unresolved acceptance                       | Design approval is runtime completion              |
+| `docs/animation-system-plan.md`           | Acceptance contract; the schedule lives in issues                       | Design approval is runtime completion              |
 | `content/components/<id>.mdx`             | Actually shipped usage and Motion contract                              | Pending design as current user capability          |
 | `registry.json`, shipped source and tests | Implemented declarations and evidence                                   | A design binding is a new recipe or metadata field |
 
