@@ -565,11 +565,40 @@ Consequences a contributor has to honour:
   fixtures read the build output), because `registry:check` compares payloads against source and
   fails on stale or missing artifacts;
 - resolve a payload conflict by rebuilding on top of the merge result, never by picking a side;
+- resolve a `registry.json` conflict the same way — take both entries and rebuild (§3.4);
 - a full-local rebuild is expected only when the build itself changes. Ordinary component work
   touches that component's payload only.
 
 `public/r/snapshots/**` is outside this rule: ADR-017 freezes those bytes on purpose and they are
 never regenerated.
+
+### 3.4 `registry.json` is written in id order
+
+`registry.json` holds its `items` in registry id order (`name`, ascending by code unit — not
+locale-aware collation, so the bytes do not depend on the machine that built them). One definition
+owns that order (`scripts/registry-order.mjs`), and three things apply it: `pnpm registry:build`
+reorders the source file when the entries are out of order, `scripts/new-item.mjs` inserts a scaffold
+at that position instead of appending it, and `pnpm registry:check` fails when the committed file
+disagrees or repeats an id. Two branches that add different components therefore edit different
+regions, instead of both appending 40–50 lines at the end of the same array.
+
+A conflict in this file is mechanical, not a judgement call:
+
+1. take both sides — keep every entry the other branch added, in whatever order the conflict left
+   them, and resolve the rest of the file the same way;
+2. run `pnpm registry:build`, which rewrites `registry.json` in id order and regenerates the payloads,
+   the index, the catalog and the llms files;
+3. review the resulting diff and commit it. `pnpm registry:check` must be green before the pull
+   request leaves draft.
+
+Never hand-write a sorted `registry.json`, and never reorder entries to make a check pass: the build
+moves whole entries and leaves every other byte alone, so its diff is the conflict resolution itself.
+If both sides added the _same_ id, the duplicate is a real conflict — keep one entry; the build
+refuses to run on a duplicate rather than picking a winner silently.
+
+Order is also the reading order of the catalogue: component pages and the CLI list items in registry
+order, so within one batch the entries are now alphabetical. Install sections are not affected —
+manual installation steps follow `registryDependencies` (dependency-first), not the `items` array.
 
 ---
 
