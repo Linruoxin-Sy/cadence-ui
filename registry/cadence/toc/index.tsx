@@ -133,6 +133,8 @@ export function Toc({
   useEngineEnvironment(element, cancelIndicator.current);
   const navigationEnvironment = useEngineEnvironment(element, cancelFlight.current, false);
   const restoreFocus = useRef<(() => void) | null>(null);
+  // A scroll is reading progress; a resize or a late layout settle is placement.
+  const travel = useRef(true);
   const currentId = activeId ?? (items.some(({ id }) => id === trackedId) ? trackedId : items[0]?.id);
   const navigation = scrollNavigationClock(cm);
   const navigationClock = JSON.stringify(navigation);
@@ -291,7 +293,8 @@ export function Toc({
       const element = document.getElementById(id);
       return element ? [element] : [];
     });
-    const update = () => {
+    let last = items[0]?.id;
+    const update = (reason: "scroll" | "layout") => {
       let current = headings[0]?.id;
       for (const heading of headings) {
         // Native anchor alignment can round to a fractional CSS pixel.
@@ -302,18 +305,26 @@ export function Toc({
       if (window.scrollY > 0 && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 1) {
         current = headings.at(-1)?.id;
       }
+      // Only an actual selection change records why it happened; a later layout
+      // observer event with the same entry cannot turn a flight into placement.
+      if (current !== last) {
+        last = current;
+        travel.current = reason === "scroll";
+      }
       setTrackedId(current);
       setTrackingReady(true);
     };
 
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    const scrolled = () => update("scroll");
+    const settled = () => update("layout");
+    window.addEventListener("scroll", scrolled, { passive: true });
+    window.addEventListener("resize", settled);
     // The initial observer notification also handles deep links after layout.
-    const observer = new ResizeObserver(update);
+    const observer = new ResizeObserver(settled);
     observer.observe(document.documentElement);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", scrolled);
+      window.removeEventListener("resize", settled);
       observer.disconnect();
     };
   }, [items, activeId, scrollOffset]);
@@ -337,6 +348,7 @@ export function Toc({
         items={items}
         currentId={currentId}
         ready={activeId !== undefined || trackingReady}
+        travel={travel}
         settle={settleIndicator}
       />
     </nav>,
@@ -365,11 +377,13 @@ function TocTrack({
   items,
   currentId,
   ready,
+  travel,
   settle,
 }: {
   items: readonly TocEntry[];
   currentId: string | undefined;
   ready: boolean;
+  travel: { current: boolean };
   settle: { current: () => void };
 }) {
   const { node: indicatorNode, ref: indicatorRef } = useMotionHostRef<HTMLSpanElement>();
@@ -456,7 +470,7 @@ function TocTrack({
       revision,
       destination,
       selection,
-      indicatorCm.reduced || !destination || selection.duration === 0 || !placed.current,
+      indicatorCm.reduced || !destination || selection.duration === 0 || !placed.current || !travel.current,
     );
     if (destination) placed.current = true;
     settle.current = () => projection.cancel();
