@@ -49,6 +49,9 @@ function stubAnimations() {
     const finished = new Promise<void>((_, no) => {
       reject = no;
     });
+    // The library attaches its own handlers where it uses completion; an adapter that
+    // owns a cancel-only effect must not surface an unhandled rejection here.
+    finished.catch(() => {});
     return {
       finished,
       playState: "running",

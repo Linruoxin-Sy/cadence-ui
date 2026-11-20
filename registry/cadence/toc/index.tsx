@@ -384,8 +384,12 @@ function TocTrack({
     const transaction = createMotionTransaction();
     return { transaction, geometry: createMeasuredGeometry(transaction) };
   });
-  const holder = useRef<{ node: HTMLElement; controller: ReturnType<typeof createSelectionProjection> } | null>(null);
-  const registered = useRef<{ host: HTMLElement; release(): void } | null>(null);
+  const holder = useRef<{
+    node: HTMLElement;
+    identity?: object;
+    controller: ReturnType<typeof createSelectionProjection>;
+  } | null>(null);
+  const registered = useRef<{ host: HTMLElement; identity?: object; release(): void } | null>(null);
   const signature = JSON.stringify(items.map(({ id, title, depth = 2 }) => [id, title, depth]));
 
   committed(() => {
@@ -427,9 +431,15 @@ function TocTrack({
   committed(() => {
     const node = indicatorNode.current;
     if (!node) return;
-    if (holder.current?.node !== node) {
+    // A re-attached ref is a new committed owner: the projection keeps the identity it
+    // was created with, so a replaced host must get its own registration.
+    if (holder.current?.node !== node || holder.current.identity !== indicatorNode.identity) {
       holder.current?.controller.dispose();
-      holder.current = { node, controller: createSelectionProjection(indicatorNode, owned.transaction) };
+      holder.current = {
+        node,
+        identity: indicatorNode.identity,
+        controller: createSelectionProjection(indicatorNode, owned.transaction),
+      };
     }
     const projection = holder.current.controller;
     const revision = owned.transaction.revision(
@@ -459,10 +469,11 @@ function TocTrack({
   committed(() => {
     const host = listNode.current;
     if (!host) return;
-    if (registered.current?.host !== host) {
+    if (registered.current?.host !== host || registered.current.identity !== listNode.identity) {
       registered.current?.release();
       registered.current = {
         host,
+        identity: listNode.identity,
         release: owned.geometry.register({
           host: listNode,
           content: host,
