@@ -4891,19 +4891,53 @@
       "description": "Uploads, imports, and other work with a measurable end.",
       "categories": ["feedback"],
       "dependencies": ["@base-ui/react", "motion"],
-      "registryDependencies": ["@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/progress/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/progress/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.3.0",
         "tier": "T4",
         "batch": "B3",
-        "motion": ["data.transition"],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "M",
         "upstream": {
@@ -4915,7 +4949,7 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "A local progress fill follows the semantic value inside its fixed track."
+          "reason": "A local progress root owns its entrance, content-driven height and per-part paint; the fill retargets inside the caller's fixed track, the formatted readout settles when the fill still has to travel, and the status pulse is one theme-clock opacity owner."
         },
         "motionCoverage": {
           "schema": 1,
@@ -4924,7 +4958,42 @@
               {
                 "relationship": "default",
                 "owner": "progress",
-                "reason": "Progress integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "Progress owns one opacity entrance on its own root at the already-correct fill and value, plus the determinate fill retarget on its indicator; a presenting parent, a hidden host or an unusable control keeps native paint."
+              }
+            ],
+            "data.transition/continuous": [
+              {
+                "relationship": "default",
+                "owner": "progress",
+                "reason": "The indicator owns one theme-clock opacity pulse only while the primitive reports indeterminate and the host is visible; reduced and none release it and keep the static fill."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "progress",
+                "reason": "The track owns its background set and the label and value each own their foreground set; an unverified caller palette, focus or invalid paint settles that owner immediately."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "progress",
+                "reason": "The root shell owns one measured content height for the label/value flow; the track keeps the caller width and a caller-fixed or clipped box keeps native layout."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "progress",
+                "reason": "A plain ProgressLabel string replaces only changed runs; unchanged graphemes keep their identity and rich children pass through untouched."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "progress",
+                "reason": "The formatted determinate readout and a direct numeric label each roll their own changed places; a fill that still has to travel settles that revision's readout immediately."
               }
             ]
           }
