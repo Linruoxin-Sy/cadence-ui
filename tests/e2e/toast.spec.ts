@@ -17,14 +17,22 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(toast).toHaveAccessibleName("Changes saved");
         await expect(trigger).toBeFocused();
         await expect.poll(() => computed(page, '[data-slot="toast"]', "opacity")).toBe("1");
+        // Presence is a WAAPI envelope on this host (`createModalPresence`), so the CSS
+        // clock left on the root is its composed transport/colour family: the authored
+        // `base` clock in full, the `fast` (0.16 s) clock at the reduced 60% ratio, and
+        // zero under none.
         expect(await computed(page, '[data-slot="toast"]', "transition-duration")).toBe(
-          { full: "0.22s", reduced: "0.132s", none: "0s" }[mode],
+          { full: "0.22s", reduced: "0.096s", none: "0s" }[mode],
         );
         const samples = await recordedScale(page);
         if (mode === "full") expect(samples.min).toBeLessThan(0.99);
         else {
           expect(samples.min).toBe(1);
-          expect(await computed(page, '[data-slot="toast"]', "transform")).toBe("none");
+          // A settled Motion/WAAPI writer leaves an identity matrix where a CSS-only
+          // host reports `none`; both mean no scale or travel on the root.
+          expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(
+            await computed(page, '[data-slot="toast"]', "transform"),
+          );
         }
         expect(await computed(page, '[data-slot="toast"]', "transition-property")).not.toMatch(/height|bottom|all/);
         await page.keyboard.press("F6");
