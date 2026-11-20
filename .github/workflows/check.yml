@@ -162,6 +162,84 @@ jobs:
           path: public
       - run: pnpm test:gate ${{ matrix.file }}
 
+  browser:
+    # Evidence, not a gate. It builds the site and replays the specs of the components
+    # this pull request touches, so a reviewer downloads full/reduced/none screenshots
+    # instead of trusting a description of screenshots that live in an ignored
+    # `.cache/`. It is deliberately absent from `check`'s needs: a flaky engine run
+    # must not block a docs change, and `check` stays the only required status.
+    #
+    # The scope is computed before anything is installed, so a diff that names no
+    # component with a spec skips the install, the browser download and the build
+    # instead of paying for them and then skipping the test.
+    if: github.event_name == 'pull_request'
+    needs: prepare
+    runs-on: ubuntu-latest
+    # `pnpm build` alone approaches half of this, and the browser download and the
+    # suite have to fit beside it. The long ceiling is a hang guard, not a budget.
+    timeout-minutes: 25
+    env:
+      # `playwright.config.ts` only keeps a screenshot per test when asked; the
+      # artifact is the reason this run exists, so the run asks.
+      PLAYWRIGHT_SCREENSHOT: "on"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The scope is `origin/<base>...HEAD`, which needs the merge base: the
+          # default depth-1 checkout has neither the base ref nor the commit to
+          # diff it against.
+          fetch-depth: 0
+      - name: Select the affected specs
+        id: specs
+        run: |
+          set -euo pipefail
+          specs="$RUNNER_TEMP/browser-specs.txt"
+          node scripts/ci/affected-e2e-specs.mjs --base "origin/${{ github.base_ref }}" > "$specs"
+          list="$(tr '\n' ' ' < "$specs" | sed 's/ *$//')"
+          echo "list=$list" >> "$GITHUB_OUTPUT"
+          if [ -z "$list" ]; then
+            echo "count=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "count=$(wc -w <<< "$list" | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: pnpm/action-setup@v4
+        if: steps.specs.outputs.count != '0'
+      - uses: actions/setup-node@v4
+        if: steps.specs.outputs.count != '0'
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: actions/download-artifact@v4
+        if: steps.specs.outputs.count != '0'
+        with:
+          name: registry-payloads
+          path: public
+      - if: steps.specs.outputs.count != '0'
+        run: pnpm install --frozen-lockfile
+      - if: steps.specs.outputs.count != '0'
+        run: pnpm exec playwright install --with-deps chromium
+      # One build for this job. `playwright.config.ts` serves it with `next start`;
+      # the browser is not started again per spec file.
+      - if: steps.specs.outputs.count != '0'
+        run: pnpm build
+      - name: Run the affected specs
+        if: steps.specs.outputs.count != '0'
+        run: pnpm exec playwright test ${{ steps.specs.outputs.list }}
+      - uses: actions/upload-artifact@v4
+        # On failure too: a red run is exactly when someone opens the evidence.
+        if: always() && steps.specs.outputs.count != '0'
+        with:
+          name: browser-evidence
+          # `test-results` holds the screenshots (`PLAYWRIGHT_SCREENSHOT=on`) and any
+          # retry trace, `playwright-report` links them, and `.cache` holds the proof
+          # sheets the batch specs write under names reviewers already know.
+          path: |
+            playwright-report
+            test-results
+            .cache
+          retention-days: 7
+          if-no-files-found: ignore
+
   check:
     # The required status. It fails when any fan-out job failed, was cancelled or
     # was skipped; individual job names are diagnostics, not merge requirements.

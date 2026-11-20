@@ -97,8 +97,10 @@ not replace it.
   produced and never hand-edit them. `public/llms.txt` and `public/llms-full.txt` are written by the
   same command but are not tracked, so a fresh checkout has no copy until you build (ADR-025).
   Never include a Next build tree in a commit.
-- Browser evidence for full/reduced/none goes in the pull request: screenshots or a CI artifact link.
-  Anything kept locally belongs under the ignored `.cache/` and is not evidence anyone else can see.
+- Browser evidence for full/reduced/none goes in the pull request: the CI `browser` job uploads a
+  `browser-evidence` artifact for the components the pull request touched, so link that instead of
+  describing a local run. Anything kept locally belongs under the ignored `.cache/` and is not evidence
+  anyone else can see.
 - Report missing or failed measurements as missing or failed. ADR-023 makes numeric budgets advisory
   during functional migration; it does not make an unmeasured claim a pass.
 
