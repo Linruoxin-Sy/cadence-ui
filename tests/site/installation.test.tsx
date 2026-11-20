@@ -14,6 +14,7 @@ import {
   manualLink,
   validateInstallation,
 } from "@/scripts/installation.mjs";
+import { readBuiltFile } from "../fixtures/built-artifact";
 
 const registry = JSON.parse(await readFile("registry.json", "utf8"));
 // A dedicated static item, not a live component that may migrate later.
@@ -231,7 +232,7 @@ describe("installation authoring and AST", () => {
   });
 
   it("keeps expanded instructions identical in every distributed channel", async () => {
-    const full = await readFile("public/llms-full.txt", "utf8");
+    const full = await readBuiltFile(process.cwd(), "public/llms-full.txt");
     for (const item of registry.items.filter((item: { type: string }) =>
       ["registry:ui", "registry:block"].includes(item.type),
     )) {

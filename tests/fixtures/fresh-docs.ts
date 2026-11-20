@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import { expandInstallation } from "../../scripts/installation.mjs";
+import { readBuiltFileSync } from "./built-artifact";
 
 /** Keep positive checker fixtures fresh without mutating the real public tree. */
 export function freshDocs(root: string, id: string, source: string) {
@@ -15,5 +16,5 @@ export function freshDocs(root: string, id: string, source: string) {
   const md = path.join(root, "public/r", `${id}.md`);
   writeFileSync(md, readFileSync(md, "utf8").replace(previous, body));
   const full = path.join(root, "public/llms-full.txt");
-  writeFileSync(full, readFileSync(full, "utf8").replace(previous, body));
+  writeFileSync(full, readBuiltFileSync(root, "public/llms-full.txt").replace(previous, body));
 }
