@@ -175,7 +175,7 @@ pnpm dev              # docs site
 pnpm lint             # biome check: lint + formatting + import order
 pnpm lint:fix         # biome check --write
 pnpm format           # biome format --write
-pnpm registry:build   # rebuild public/r from registry.json + content
+pnpm registry:build   # rebuild public/r, the payload hashes and the untracked llms files
 pnpm registry:check   # targets, payload freshness, docs coverage, exports, advisory tier budgets, P11
 pnpm test             # unit tests
 pnpm check            # typecheck + lint + registry:check + tests
@@ -184,8 +184,12 @@ pnpm dlx shadcn@latest docs <id>   # read upstream docs without touching the pin
 ```
 
 Run `pnpm registry:build` before `pnpm check` whenever `registry.json`, `content/`, or shipped source changed —
-the check compares payloads against source and fails on stale artifacts. Every command above is pnpm's;
-see [the package-manager rule](#rules-that-are-easy-to-break) before reaching for `npx`.
+the check compares payloads against source and fails on stale artifacts. `public/r/**` is build output you
+commit and review; `public/llms.txt` and `public/llms-full.txt` are build output you do not commit at all,
+and a missing one makes `registry:check` fail instead of skipping. Never hand-edit any of them
+([ADR-025](docs/adr.md#adr-025--payloads-carry-their-own-content-hash-llms-output-is-not-committed)).
+Every command above is pnpm's; see [the package-manager rule](#rules-that-are-easy-to-break) before
+reaching for `npx`.
 
 ## Adding a component
 

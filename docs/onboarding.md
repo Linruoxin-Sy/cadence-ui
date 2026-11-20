@@ -93,8 +93,10 @@ not replace it.
 
 ## 6. Evidence and generated files
 
-- Generated payloads under `public/r/**` and `public/llms-full.txt` come from `pnpm registry:build`.
-  Never hand-edit them, and never include a Next build tree in a commit.
+- Generated payloads under `public/r/**` come from `pnpm registry:build`; commit the ones your change
+  produced and never hand-edit them. `public/llms.txt` and `public/llms-full.txt` are written by the
+  same command but are not tracked, so a fresh checkout has no copy until you build (ADR-025).
+  Never include a Next build tree in a commit.
 - Browser evidence for full/reduced/none goes in the pull request: screenshots or a CI artifact link.
   Anything kept locally belongs under the ignored `.cache/` and is not evidence anyone else can see.
 - Report missing or failed measurements as missing or failed. ADR-023 makes numeric budgets advisory
