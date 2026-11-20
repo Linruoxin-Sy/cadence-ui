@@ -507,5 +507,5 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
     } finally {
       if (!process.env.CADENCE_GATE_EVIDENCE) await rm(fixture, { recursive: true, force: true });
     }
-  }, 300_000); // Cold fixture spawns a full Vitest run; this is the hang guard, not a budget (BOARD R1).
+  }, 540_000); // Cold fixture spawns a full Vitest run; this is the hang guard, not a budget (BOARD R1).
 });

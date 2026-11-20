@@ -6438,8 +6438,16 @@
       "title": "Toast",
       "description": "Transient notifications with accessible actions and dismissal.",
       "categories": ["feedback"],
-      "dependencies": ["@base-ui/react", "lucide-react"],
-      "registryDependencies": ["@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/button"],
+      "dependencies": ["@base-ui/react", "lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-modal-presence",
+        "@cadence/button"
+      ],
       "files": [
         {
           "path": "registry/cadence/toast/index.tsx",
@@ -6453,12 +6461,32 @@
         "batch": "B5",
         "motion": [
           {
-            "recipe": "popup.anchored",
-            "form": "css-transition"
+            "recipe": "enter.pop",
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          {
+            "recipe": "feedback.press",
+            "form": "one-shot"
           }
         ],
         "intensity": "medium",
@@ -6472,26 +6500,89 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Toast opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Toast owns its own surface presence, its scoped surface and foreground paint, the title/description display slots and the built-in icon's loading clock; Base UI keeps the stack geometry, swipe, timers and dismissal, and Button-backed actions keep their button owners."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "enter.pop/one-shot": [
               {
                 "relationship": "default",
                 "owner": "toast",
-                "reason": "Toast integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "A later manager add fades and scales its own root in at the stack position Base UI placed it."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "default",
                 "owner": "toast",
-                "reason": "Toast integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "The root keeps one opacity envelope until Base UI's own completion removes the toast; no extra timer or hold is added."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "ToastAction and ToastClose render Button, which keeps its own retained exit, paint, label, quantity and press owners."
+              }
+            ],
+            "data.transition/continuous": [
+              {
+                "relationship": "default",
+                "owner": "toast",
+                "reason": "The loading glyph runs the theme-clock spin only while that type is current and visible."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toast",
+                "reason": "The root's supplied surface and border tokens transition as one scoped family, and title/description own their foreground region; an unprovable caller palette settles immediately."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "ToastAction and ToastClose render Button, which keeps its own retained exit, paint, label, quantity and press owners."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "toast",
+                "reason": "A primitive title or description string replaces only its changed runs on the same display slot."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "ToastAction and ToastClose render Button, which keeps its own retained exit, paint, label, quantity and press owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "toast",
+                "reason": "A directly supplied supported numeric title or description reels only its changed places."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "ToastAction and ToastClose render Button, which keeps its own retained exit, paint, label, quantity and press owners."
+              }
+            ],
+            "feedback.press/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "ToastAction and ToastClose render Button, which keeps its own press layer and native activation."
               }
             ]
           }
+        },
+        "parity": {
+          "props": [
+            {
+              "path": "ToastClose.render",
+              "reason": "The close control names the composed slot for the same reason: Button keeps its own owners and the toast never writes that region."
+            }
+          ]
         }
       }
     },

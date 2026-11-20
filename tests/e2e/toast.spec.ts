@@ -17,16 +17,34 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(toast).toHaveAccessibleName("Changes saved");
         await expect(trigger).toBeFocused();
         await expect.poll(() => computed(page, '[data-slot="toast"]', "opacity")).toBe("1");
+        // Presence is a WAAPI envelope on this host (`createModalPresence`), so the CSS
+        // clock left on the root is its composed transport/colour family: the authored
+        // `base` clock in full, the `fast` (0.16 s) clock at the reduced 60% ratio, and
+        // zero under none.
         expect(await computed(page, '[data-slot="toast"]', "transition-duration")).toBe(
-          { full: "0.22s", reduced: "0.132s", none: "0s" }[mode],
+          { full: "0.22s", reduced: "0.096s", none: "0s" }[mode],
         );
         const samples = await recordedScale(page);
         if (mode === "full") expect(samples.min).toBeLessThan(0.99);
         else {
           expect(samples.min).toBe(1);
-          expect(await computed(page, '[data-slot="toast"]', "transform")).toBe("none");
+          // A settled Motion/WAAPI writer leaves an identity matrix where a CSS-only
+          // host reports `none`; both mean no scale or travel on the root.
+          expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(
+            await computed(page, '[data-slot="toast"]', "transform"),
+          );
         }
-        expect(await computed(page, '[data-slot="toast"]', "transition-property")).not.toMatch(/height|bottom|all/);
+        // The root's CSS clock is its scoped colour family; presence is a WAAPI
+        // envelope, so no authored height/bottom/opacity/all property may appear here.
+        // (A substring match would trip on `border-bottom-color`, which is colour.)
+        const properties = (await computed(page, '[data-slot="toast"]', "transition-property"))
+          .split(",")
+          .map((property) => property.trim());
+        expect(properties).not.toContain("all");
+        expect(properties.filter((property) => ["height", "bottom", "opacity"].includes(property))).toEqual([]);
+        // Base UI's own swipe-release family keeps `transform` in full and stops it in
+        // reduced/none; no Cadence travel writer is added.
+        if (mode !== "full") expect(properties).not.toContain("transform");
         await page.keyboard.press("F6");
         await expect(page.locator('[data-slot="toast-viewport"]').filter({ has: toast })).toBeFocused();
         await page.keyboard.press("Tab");

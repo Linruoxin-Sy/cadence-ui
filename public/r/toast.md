@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/toast`
 - Type: registry:ui
 - Since: 0.3.0
-- Motion recipes: popup.anchored, exit.fade
+- Motion recipes: enter.pop, exit.fade, data.transition, state.color, text.change, number.roll, feedback.press
 
 ## Installation
 
@@ -32,13 +32,14 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
-- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -62,10 +63,6 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
-| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
 | cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
@@ -74,6 +71,11 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | toast | `@components/cadence/toast/index.tsx` | [JSON files[].content](https://cadence.dev/r/toast.json) |
 
@@ -83,13 +85,15 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
 
-[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
-
 [Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
 
 [Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
 
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
 
@@ -618,27 +622,31 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 ## Motion contract
 
-Authored intensity is **medium**: Toast opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Toast owns its own surface presence, its scoped surface and foreground paint, the title/description display slots and the built-in icon's loading clock; Base UI keeps the stack geometry, swipe, timers and dismissal, and Button-backed actions keep their button owners.
+
+Each portal surface resolves its own mode and token clock. A nested `full` scope restores timing inside `none`; the OS
+reduced-motion preference still wins. Base UI `className(state)` and `style(state)` callbacks are evaluated before
+merging, and caller utilities and styles win.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored/css-transition`, duration.base, ease.out | yes, CSS transition |
-| close / limited | opacity to 0; exit scale on close in full | `exit.fade/css-transition`, duration.base | yes |
-| swipe | Base UI pointer tracking in every mode; swipe-variable transform in full | primitive-owned gesture | yes |
-| stack / content updates | bottom and natural height update instantly | no layout transition | n/a |
-| reduced | opacity transitions only; no animated scale or swipe transform | duration.base × 0.6 | yes |
-| none | zero duration; native pointer tracking remains immediate | zero duration | n/a |
+| open | root `opacity 0 → 1` and `scale → 1` in full; no travel | `enter.pop/one-shot` · `duration.base` | yes, a reversal continues from the current paint |
+| close | root `opacity → 0` on the same host; a released swipe keeps its direction | `exit.fade/one-shot` · `duration.fast` | yes (reopen before Base UI removes it) |
+| changed title or description | changed graphemes only, no stagger, no remount | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title or description | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| root surface tokens | one scoped background/border/shadow family; an unprovable caller palette is immediate | `state.color/css-transition` | yes, latest committed colour |
+| loading type | theme-clock spin while the loading glyph is current and visible | `data.transition/continuous` | yes, released when the type or visibility changes |
+| action press and release | inherited Button press layer; no second executor | `feedback.press/one-shot` | yes, cancellation restores the resting pose |
 
-Notifications remain expanded in a vertical stack; there is no collapsed height or stack-scale animation.
-Base UI owns timeout pausing, lifecycle, swipe recognition and removal. No extra animation scheduler is added.
+Notifications remain in a vertical stack; there is no collapsed height or stack-scale animation. Base UI owns the
+natural height, stack offsets, swipe recognition, timeout pausing, lifecycle and removal, so Cadence adds no height
+spring, second transform or `bottom` tween. Title and description also own their own foreground family, and a
+Button-backed action keeps Button's paint, label, quantity, box and press owners instead of a duplicate writer.
 
-Each portal resolves token durations from its local provider, including `full` nested inside
-`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
-geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. Ordinary examples inherit the site header mode on the same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
-before merging; caller utilities and styles win. Native `render`, events and ref cleanup
-remain owned by the primitive.
-
+Each portal resolves token durations from its local provider, including `full` nested inside `none` (the OS
+reduced-motion preference still wins). Full → reduced cancels a running scale and keeps the opacity envelope; `none`
+settles the first mounted frame and cancels the running writer instead of post-dating the open/close event. Native
+`render`, state callbacks, input events and ref cleanup remain owned by the primitive.
 ## Keyboard interactions
 
 | Keys | Action |
