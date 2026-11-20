@@ -21,6 +21,14 @@ export default class MotionContractReporter {
     this.root = options.root ?? fileURLToPath(new URL("../", import.meta.url));
     this.contractRoot = options.root ?? fileURLToPath(new URL("../", import.meta.url));
     this.registry = options.root ? JSON.parse(readFileSync(path.join(this.root, "registry.json"), "utf8")) : registry;
+    // The registry-wide target plan is a pure function of the staged source and
+    // declarations. It was recomputed once per v2 module, which made this gate
+    // quadratic in the number of migrated items; resolve it once per run instead.
+    this.targetPlan = null;
+  }
+  async targetPlanFor() {
+    this.targetPlan ??= await checkMotionTargets(this.contractRoot, this.registry);
+    return this.targetPlan;
   }
   async onTestRunEnd(modules) {
     const registry = this.registry;
@@ -61,7 +69,7 @@ export default class MotionContractReporter {
           readFileSync(path.join(this.contractRoot, `docs/motion/components/${id}.md`), "utf8"),
         );
         if (target.metadata?.migration === "v2") {
-          const checked = await checkMotionTargets(this.contractRoot, registry);
+          const checked = await this.targetPlanFor();
           failures.push(...target.problems.map((problem) => `${id}: ${problem}`), ...checked.problems);
           if (!checked.v2) {
             failures.push(`${id}: v2 complete source/contract plan required`);

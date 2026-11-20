@@ -335,10 +335,11 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         [path.join(root, "node_modules/vitest/vitest.mjs"), "run", "--config", config],
         // The cold fixture spawns a full Vitest run plus the whole registry's v2
         // source/action audit per launch. That cost grows with every migrated item
-        // (36 v2 items after C31), so the old 120 s cold-start ceiling became the
-        // failing assertion rather than the reporter's own diagnostics. This is still
-        // a hang guard, not an acceptance budget: the gate's expected failure and
-        // diagnostics assertions below are unchanged.
+        // (37 v2 items after C49-progress), so the old 120 s cold-start ceiling became
+        // the failing assertion rather than the reporter's own diagnostics. The reporter
+        // now resolves the registry-wide target plan once per run instead of once per
+        // module, so this remains a hang guard, not an acceptance budget: the gate's
+        // expected failure and diagnostics assertions below are unchanged.
         { cwd: root, encoding: "utf8", timeout: 240000 },
       );
       const output = result.stdout + result.stderr;
