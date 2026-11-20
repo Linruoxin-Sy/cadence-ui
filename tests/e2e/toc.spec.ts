@@ -182,12 +182,19 @@ test("one indicator slides, resizes for wrapping, reverses and cancels before th
   const wrapped = toc.getByRole("link", { name: "Installation", exact: true });
   await wrapped.click();
   await page.getByRole("button", { name: "full", exact: true }).click();
-  // Resize the actual container so its first label wraps, away from the page-bottom rule.
+  // Resize the actual container narrow enough that the label must wrap in any font
+  // metric, away from the page-bottom rule. The single-line height is the reference so
+  // the assertion is about wrapping, not about the runner's font size.
+  const singleLine = await wrapped.evaluate((node) => (node as HTMLElement).offsetHeight);
   await toc.evaluate((node) => {
-    node.style.width = "6rem";
+    node.style.width = "4rem";
   });
+  // The wrap is a layout consequence of the new width: wait for it, then compare the
+  // indicator against the very height the label reached.
+  await expect
+    .poll(() => wrapped.evaluate((node) => (node as HTMLElement).offsetHeight), { timeout: 15_000 })
+    .toBeGreaterThan(singleLine * 1.5);
   const targetHeight = await wrapped.evaluate((node) => (node as HTMLElement).offsetHeight);
-  expect(targetHeight).toBeGreaterThan(30);
   await expect.poll(() => marker.evaluate((node) => node.getBoundingClientRect().height)).toBeCloseTo(targetHeight, 1);
 });
 

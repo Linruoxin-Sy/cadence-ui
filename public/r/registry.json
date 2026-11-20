@@ -5243,8 +5243,23 @@
         "tier": "T3",
         "batch": "B7",
         "motion": [
-          "layout.shared",
-          "scroll.navigate"
+          "data.transition",
+          {
+            "recipe": "layout.shared",
+            "form": "selection"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
         ],
         "intensity": "medium",
         "complexity": "M",
@@ -5258,23 +5273,44 @@
           "scope": "surface",
           "travel": "extended",
           "coordination": "independent",
-          "reason": "Native section navigation scrolls the page while a local indicator follows the active heading."
+          "reason": "Native section navigation scrolls the page while one persistent indicator follows the active heading and the shell owns only its own block size."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "layout.shared/one-shot": [
+            "data.transition/one-shot": [
               {
                 "relationship": "default",
                 "owner": "toc",
-                "reason": "Table of Contents integrates selected-indicator continuity at its own parts, using the reached installed executor."
+                "reason": "A later inserted navigation owns one opacity entrance on its own surface; the initial, already-visible navigation does not replay it."
               }
             ],
-            "scroll.navigate/one-shot": [
+            "layout.shared/selection": [
               {
                 "relationship": "default",
                 "owner": "toc",
-                "reason": "Table of Contents integrates native heading navigation at its own parts, using the reached installed executor."
+                "reason": "One persistent indicator follows the active entry inside the track coordinate space; passive reading only selects its clamped endpoint box."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "toc",
+                "reason": "The entry list owns its content-driven block height after a known entries or label revision; passive reading, indicator travel and document scroll never resize it."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toc",
+                "reason": "Each link owns its own foreground clock and the indicator owns its own rail paint; an unprovable caller palette settles that owner immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "toc",
+                "reason": "The title label and every plain entry label keep one native text host; only changed graphemes are replaced."
               }
             ]
           }
