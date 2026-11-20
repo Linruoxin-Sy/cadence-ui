@@ -22,6 +22,7 @@ import { checkMotionCoverage, motionMetadataProblems } from "./motion-coverage.m
 import { motionForms, motionRecipes } from "./motion-manifest.mjs";
 import { generateMotionTokens } from "./motion-token-source.mjs";
 import { componentSha, hashableMeta } from "./payload-hash.mjs";
+import { duplicateItemProblems, reorderItemsText, sortRegistryItems } from "./registry-order.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
@@ -33,7 +34,30 @@ const docsDir = path.join(root, "content", "components");
 /** Absolute base for every URL written into an artifact an agent may read alone. */
 const site = "https://cadence.dev";
 
-const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
+const registryPath = path.join(root, "registry.json");
+const registryText = await readFile(registryPath, "utf8");
+const registry = JSON.parse(registryText);
+
+// ADR-025: `registry.json` is written in registry id order, and the build is the only thing that
+// orders it. A merge that took both sides of a conflict leaves the entries out of order (or adds one
+// twice), so the rebuild rewrites the source here from the definition `check-registry` asserts. The
+// rewrite moves whole entries: `registry.json` is Biome-formatted, and re-serialising it would expand
+// every inline array and bury the conflict resolution in formatting noise.
+const duplicates = duplicateItemProblems(registry.items);
+if (duplicates.length) {
+  console.error(`Registry order failed:\n${duplicates.map((problem) => `  - ${problem}`).join("\n")}`);
+  process.exit(1);
+}
+const orderedItems = sortRegistryItems(registry.items);
+if (registry.items.some((item, index) => item.name !== orderedItems[index].name)) {
+  const reordered = reorderItemsText(registryText, registry.items, orderedItems);
+  if (JSON.stringify(JSON.parse(reordered)) !== JSON.stringify({ ...registry, items: orderedItems })) {
+    throw new Error("registry.json: reordering changed more than the order of the items");
+  }
+  await writeFile(registryPath, reordered);
+  console.log(`• registry.json: ${orderedItems.length} items written in registry id order`);
+}
+registry.items = orderedItems;
 
 async function readDocs() {
   const entries = await readdir(docsDir).catch(() => []);
