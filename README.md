@@ -134,7 +134,7 @@ pnpm check            # typecheck + lint + registry check + parity + tests
 node scripts/new-item.mjs --name tooltip --tier T2   # scaffold a component
 ```
 
-Run `pnpm registry:build` before `pnpm check` after touching `registry.json`, `content/`, or shipped source. Requires Node 20+ and pnpm 10 (a standalone pnpm binary, no corepack; `packageManager` pins 10.34.5).
+Run `pnpm registry:build` before `pnpm check` after touching `registry.json`, `content/`, or shipped source. Requires the Node version in `.nvmrc` and pnpm through `corepack enable`; `packageManager` pins the exact pnpm. [docs/onboarding.md](docs/onboarding.md) walks the whole setup.
 
 Upstream source is fetched into `.cache/shadcn/` (gitignored) and summarised in the committed `upstream/manifest.json`, so `parity:check` runs offline. Re-pin deliberately with `pnpm upstream:sync --latest`, then bump every `meta.upstream.version` and rebuild.
 
