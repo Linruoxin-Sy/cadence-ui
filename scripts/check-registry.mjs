@@ -2,7 +2,8 @@
  * Verifies that the published registry agrees with the source:
  *
  *   - every file listed in registry.json exists and has the canonical target
- *   - every item has a fresh payload with embedded content and docs
+ *   - every item has a fresh payload with embedded content, docs and its own content hash
+ *   - the untracked llms files exist (build output); the full one matches the expanded docs
  *   - UI and block items declare `meta.tier`, `meta.batch`, `meta.upstream`, `meta.motion`, `meta.intensity`
  *   - tier gzip comparisons (including meta.budget references) are advisory under ADR-023
  *   - no component imports a validation library or an alias, and every animated file has a reduced branch
@@ -50,7 +51,24 @@ problems.push(...(await checkMotionDocs(root, registry, RECIPES)));
 const implementations = await checkMotionImplementations(root, registry);
 problems.push(...implementations.problems, ...checkMotionCoverage(registry, implementations));
 const docsDir = path.join(root, "content", "components");
-const fullDocs = await readFile(path.join(root, "public", "llms-full.txt"), "utf8");
+/**
+ * `public/llms*.txt` are build output, not tracked files (ADR-025). A missing one is a missing
+ * build, never a reason to skip the comparison: say which command produces it and stop.
+ */
+async function readBuilt(file) {
+  try {
+    return await readFile(path.join(root, file), "utf8");
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    console.error(
+      `Registry check failed:\n  - ${file} is missing. It is generated, not committed: run \`pnpm registry:build\` first (ADR-025).`,
+    );
+    process.exit(1);
+  }
+}
+
+const fullDocs = await readBuilt("public/llms-full.txt");
+await readBuilt("public/llms.txt");
 const publishedCatalog = JSON.parse(await readFile(path.join(root, "public/r/catalog.json"), "utf8"));
 const publishedIndex = JSON.parse(await readFile(path.join(root, "public/r/registry.json"), "utf8"));
 
@@ -95,6 +113,12 @@ for (const item of registry.items) {
     continue;
   }
   const payload = JSON.parse(await readFile(payloadPath, "utf8"));
+
+  // ADR-025: `meta.sourceSha` is this item's own content hash, not a commit id. A short commit sha
+  // or a missing field means the payload was written before the item's current source.
+  if (item.meta && !/^[0-9a-f]{8}$/.test(payload.meta?.sourceSha ?? "")) {
+    problems.push(`${item.name}: payload needs an 8-hex meta.sourceSha content hash (run registry:build)`);
+  }
 
   if (isComponent(item) && (!payload.docs || payload.docs.length < 200)) {
     problems.push(`${item.name}: payload is missing a real docs body`);
