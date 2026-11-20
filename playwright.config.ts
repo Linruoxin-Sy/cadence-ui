@@ -26,7 +26,15 @@ export default defineConfig({
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : [["list"]],
   use: {
     baseURL,
+    // A retried test carries the trace that explains why it failed; a first failure
+    // has its screenshots and report entries.
     trace: "on-first-retry",
+    // Evidence, not debugging: the `browser` job asks for one screenshot per test, so
+    // `test-results/<test>/` holds a frame of every mode the suite exercised and a
+    // reviewer downloads what the component rendered instead of reading a description
+    // of an ignored `.cache/` directory. Off by default because a local pass should not
+    // write a PNG per assertion case.
+    screenshot: process.env.PLAYWRIGHT_SCREENSHOT === "on" ? "on" : "off",
   },
   projects: [
     {
