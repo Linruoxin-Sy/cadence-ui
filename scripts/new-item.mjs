@@ -19,6 +19,7 @@ import matter from "gray-matter";
 import { componentRouteSource } from "./component-routes.mjs";
 import { INPUT_DOCS, validateDocTemplate } from "./doc-template.mjs";
 import { appendMotionIndex, motionTargetTemplate } from "./motion-target-template.mjs";
+import { compareItemNames } from "./registry-order.mjs";
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -317,7 +318,11 @@ await writeFile(routePath, componentRouteSource(id));
 await writeFile(exampleCatalogPath, `${JSON.stringify(exampleCatalog, null, 2)}\n`);
 
 const registry = JSON.parse(await readFile(registryPath, "utf8"));
-registry.items.push({
+// ADR-025: registry.json is written in registry id order. Inserting at that position — not at the
+// end — keeps the scaffold's output sorted without a build, so `registry:check` passes on the fresh
+// item and two people scaffolding different components still edit different regions.
+const position = registry.items.findIndex((item) => compareItemNames(id, item.name) < 0);
+const entry = {
   name: id,
   type: "registry:ui",
   title,
@@ -343,7 +348,8 @@ registry.items.push({
     complexity,
     upstream: { registry: "shadcn", style: "base-ui", version: "2026-10" },
   },
-});
+};
+registry.items.splice(position === -1 ? registry.items.length : position, 0, entry);
 await writeFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
 
 console.log(`✓ ${id} scaffolded

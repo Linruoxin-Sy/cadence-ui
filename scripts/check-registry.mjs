@@ -36,12 +36,20 @@ import { checkMotionTargets } from "./motion-targets.mjs";
 import { authoredCssTokens, loadMotionSource } from "./motion-token-source.mjs";
 import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
 import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
+import { duplicateItemProblems, registryOrderProblems } from "./registry-order.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
 await verifySnapshots(root);
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
-const problems = [...checkCatalogIntensity(registry), ...(await checkDocTemplates(root, registry))];
+const problems = [
+  // ADR-025: the committed file is in registry id order, so an addition lands in one region for
+  // everyone and a conflict is resolved by taking both entries and rebuilding, never by hand.
+  ...duplicateItemProblems(registry.items),
+  ...registryOrderProblems(registry.items),
+  ...checkCatalogIntensity(registry),
+  ...(await checkDocTemplates(root, registry)),
+];
 // Target closure is independent of installed recipe/source/docs evidence below.
 const targets = await checkMotionTargets(root, registry);
 problems.push(...targets.problems);
@@ -71,6 +79,10 @@ const fullDocs = await readBuilt("public/llms-full.txt");
 await readBuilt("public/llms.txt");
 const publishedCatalog = JSON.parse(await readFile(path.join(root, "public/r/catalog.json"), "utf8"));
 const publishedIndex = JSON.parse(await readFile(path.join(root, "public/r/registry.json"), "utf8"));
+// The build writes the index in the same order as the source. The per-item comparison below cannot
+// see an out-of-order index, and neither the index nor the catalog is diffed as a whole, so assert
+// the published order directly instead of trusting that the build ran.
+problems.push(...registryOrderProblems(publishedIndex.items, "public/r/registry.json"));
 
 /** Frontmatter is the human-facing copy of `meta`; the two must not drift. */
 async function docFrontmatter(name) {
