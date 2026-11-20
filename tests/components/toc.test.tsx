@@ -1,12 +1,18 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { frame } from "motion/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Toc } from "@/registry/cadence/toc";
 import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
-import { imperativeControls, imperativeSamples } from "../motion-observer";
+import { imperativeControls, imperativeSamples, presentationSamples } from "../motion-observer";
+import {
+  expectV2MotionAction,
+  expectV2MotionInsertion,
+  expectV2NativeBoundaries,
+  prepareV2MotionPlan,
+} from "../motion-v2-contract";
 
 const observers = new Set<ResizeObserverCallback>();
 beforeEach(() => {
@@ -30,6 +36,44 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
 });
+
+/**
+ * jsdom has no Web Animations API. Presence and projection adapters settle
+ * immediately without it, so the tests that certify a real entrance or a live
+ * indicator flight supply the minimal native surface they call.
+ */
+function stubAnimations() {
+  const previous = HTMLElement.prototype.animate;
+  const animate = vi.fn(function (this: HTMLElement, frames: Keyframe[]) {
+    let reject: ((reason?: unknown) => void) | undefined;
+    const finished = new Promise<void>((_, no) => {
+      reject = no;
+    });
+    return {
+      finished,
+      playState: "running",
+      effect: {
+        getKeyframes: () => frames,
+        getTiming: () => ({ duration: 100 }),
+        setKeyframes() {},
+      },
+      cancel() {
+        reject?.(new Error("cancelled"));
+      },
+      finish() {},
+    } as unknown as Animation;
+  });
+  HTMLElement.prototype.animate = animate as unknown as typeof HTMLElement.prototype.animate;
+  return () => {
+    HTMLElement.prototype.animate = previous;
+  };
+}
+
+function slot<T extends HTMLElement = HTMLElement>(name: string): T {
+  const element = document.querySelector<T>(`[data-slot="${name}"]`);
+  if (!element) throw new Error(`no [data-slot="${name}"] in the document`);
+  return element;
+}
 
 function measure() {
   const track = document.querySelector('[data-slot="toc-track"]') as HTMLElement;
@@ -228,7 +272,11 @@ describe("Toc", () => {
     );
     const marker = measure();
     expect(screen.getByRole("link", { name: "Props" })).toHaveAttribute("aria-current", "location");
-    expect(marker.style.transform).toContain("translateY(80px)");
+    // Initial placement writes the clamped entry box; no tween starts.
+    expect(marker.style.top).toBe("80px");
+    expect(marker.style.height).toBe("28px");
+    expect(marker.style.width).toBe("1px");
+    expect(marker).not.toHaveAttribute("hidden");
     expect(imperativeSamples).toHaveLength(0);
   });
 
@@ -241,6 +289,7 @@ describe("Toc", () => {
   });
 
   it.each(["full", "reduced", "none"] as const)("moves one indicator and honours %s motion", (mode) => {
+    const restore = stubAnimations();
     const fixture = (activeId: string) => (
       <CadenceProvider mode={mode}>
         <Toc items={items} activeId={activeId} />
@@ -248,17 +297,17 @@ describe("Toc", () => {
     );
     const { rerender } = render(fixture("intro"));
     const marker = measure();
-    expect(marker.style.visibility).toBe("visible");
+    expect(marker).not.toHaveAttribute("hidden");
     expect(imperativeSamples).toHaveLength(0); // Initial placement never flies in.
     rerender(fixture("api"));
     expect(document.querySelector('[data-slot="toc-indicator"]')).toBe(marker);
     expect(screen.getByRole("link", { name: "API" })).toHaveAttribute("aria-current", "location");
     if (mode === "full") {
-      expect(imperativeSamples.slice(-2).map((call) => call[1])).toEqual([40, 92]);
+      // One endpoint box: left, top, right and bottom of the measured entry.
+      expect(imperativeSamples.slice(-4).map((call) => call[1])).toEqual([0, 40, 1, 92]);
       expect(imperativeSamples.at(-1)?.[2]).toMatchObject({ type: "spring", mass: 1 });
     } else {
       expect(imperativeSamples).toHaveLength(0);
-      expect(marker.style.transform).toBe("none");
       expect(marker.style.top).toBe("40px");
       expect(marker.style.height).toBe("52px");
     }
@@ -266,12 +315,14 @@ describe("Toc", () => {
       instantImperative: true,
       behavior: () => {
         expect(marker).toHaveAttribute("data-motion", mode);
-        expect(marker).toHaveStyle({ visibility: "visible" });
+        expect(marker).not.toHaveAttribute("hidden");
       },
     });
+    restore();
   });
 
   it("cancels live movement on the same node and restores full without replay", () => {
+    const restore = stubAnimations();
     const fixture = (mode: "full" | "reduced" | "none", activeId: string, timeScale = 1) => (
       <CadenceProvider mode={mode} timeScale={timeScale}>
         <Toc items={items} activeId={activeId} />
@@ -280,19 +331,21 @@ describe("Toc", () => {
     const { rerender } = render(fixture("full", "intro"));
     const marker = measure();
     rerender(fixture("full", "api"));
-    const values = imperativeSamples.slice(-2).map((call) => call[0] as { isAnimating(): boolean });
+    const values = imperativeSamples.slice(-4).map((call) => call[0] as { isAnimating(): boolean });
+    expect(values).toHaveLength(4);
     expect(values.every((value) => value.isAnimating())).toBe(true);
     rerender(fixture("none", "api"));
     expect(values.every((value) => !value.isAnimating())).toBe(true);
-    expect(marker.style.transform).toBe("none");
+    expect(marker.style.top).toBe("40px");
     expect(marker.style.height).toBe("52px");
     rerender(fixture("full", "api", 0));
     expect(values.every((value) => !value.isAnimating())).toBe(true);
     expect(document.querySelector('[data-slot="toc-indicator"]')).toBe(marker);
-    expect(marker.style.transform).toContain("translateY(40px)");
+    expect(marker.style.top).toBe("40px");
     rerender(fixture("reduced", "props"));
     expect(marker.style.top).toBe("80px");
     expect(marker.style.height).toBe("28px");
+    restore();
   });
 
   it("renders native, keyboard-accessible links and nested sections", async () => {
@@ -362,5 +415,148 @@ describe("Toc", () => {
     expect(screen.getByRole("link")).toHaveAttribute("aria-current", "location");
     rerender(<Toc items={[]} />);
     expect(screen.queryByRole("navigation")).toBeNull();
+  });
+});
+
+const ownedMode = ["full", "reduced", "none"] as const;
+type OwnedMode = (typeof ownedMode)[number];
+
+const ownedItems = [
+  { id: "intro", title: "Introduction" },
+  { id: "api", title: "API" },
+] as const;
+
+function Owned({
+  mode,
+  active,
+  items = ownedItems,
+  label = "Sections",
+  timeScale = 0,
+}: {
+  mode: OwnedMode;
+  active?: string;
+  items?: readonly { id: string; title: string; depth?: 2 | 3 }[];
+  label?: string;
+  timeScale?: number;
+}) {
+  return (
+    <CadenceProvider mode={mode} timeScale={timeScale}>
+      <Toc items={items} activeId={active} label={label} />
+    </CadenceProvider>
+  );
+}
+
+describe("Toc v2 owners", () => {
+  beforeAll(() => prepareV2MotionPlan());
+
+  it.each(ownedMode)("executes every owned action in %s", async (mode) => {
+    const restore = stubAnimations();
+    const owned = (binding: string, exercise: () => void | Promise<void>) =>
+      expectV2MotionAction("toc", `toc.${binding}`, mode, exercise).catch((error) => {
+        throw new Error(`${binding}: ${(error as Error).message}`);
+      });
+
+    // A later-inserted navigation is the only entrance cause; the initial one is visible.
+    const inserted = render(<Owned mode={mode} items={[]} timeScale={1} />);
+    await expectV2MotionInsertion("toc", "toc.surface.enter", mode, async () => {
+      await act(async () => {
+        inserted.rerender(<Owned mode={mode} active="intro" timeScale={1} />);
+      });
+    });
+    inserted.unmount();
+
+    // One persistent indicator retargets between two measured entries.
+    const move = (active: string) => <Owned mode={mode} active={active} />;
+    const indicator = render(move("intro"));
+    measure();
+    await owned("indicator.select", () => indicator.rerender(move("api")));
+    expect(slot("toc-indicator")).toHaveAttribute("data-motion", mode);
+    indicator.unmount();
+
+    // The shell owns its own block size and the labels own their changed runs.
+    const items = (title: string) => [{ id: "intro", title }] as const;
+    const relabel = (title: string, label: string) => (
+      <Owned mode={mode} active="intro" items={items(title)} label={label} />
+    );
+    const content = render(relabel("Introduction", "On this page"));
+    await owned("list.resize", () => content.rerender(relabel("Introduction with a longer label", "On this page")));
+    await owned("title.replace", () => content.rerender(relabel("Introduction renamed", "Contents")));
+    expect(slot("toc-link-text")).toHaveTextContent("Introduction renamed");
+    expect(slot("toc-title")).toHaveTextContent("Contents");
+
+    // Each colour owner keeps its own declared paint clock. jsdom has no cascade, so
+    // the test writes the paint a theme/token revision would produce on that property.
+    await owned("link.colour", () => {
+      slot("toc-link").style.color = "#123456";
+    });
+    await owned("indicator.colour", () => {
+      slot("toc-indicator").style.backgroundColor = "#0a0a0a";
+    });
+
+    expectMotionContract(mode, { policy: ["color"] });
+    restore();
+  });
+
+  it.each(ownedMode)("keeps one mode on the same hosts in %s", async (mode) => {
+    const draw = (next: OwnedMode) => <Owned mode={next} active="api" />;
+    const view = render(draw("full"));
+    expect(slot("toc")).toHaveAttribute("data-motion", "full");
+    view.rerender(draw(mode));
+    for (const name of ["toc", "toc-title", "toc-list", "toc-link", "toc-link-text", "toc-indicator"])
+      expect(slot(name)).toHaveAttribute("data-motion", mode);
+    // The surface states its own lack of a CSS transition; nothing composes one.
+    expect(slot("toc").className).toContain("transition-none");
+    expect(slot("toc-list").className).not.toContain("transition-[");
+    for (const node of [slot("toc"), slot("toc-list")])
+      expect(node.getAnimations?.().filter((animation) => "animationName" in animation) ?? []).toHaveLength(0);
+  });
+
+  it("leaves the quantity rows to their native boundaries", () => {
+    const view = render(<Owned mode="none" active="intro" items={[{ id: "intro", title: "Introduction" }]} />);
+    return expectV2NativeBoundaries("toc", { container: view.container });
+  });
+
+  it("reverses a rapid selection and keeps a passive resize out of the owned revision", () => {
+    const restore = stubAnimations();
+    const draw = (active: string, items: readonly { id: string; title: string }[] = ownedItems) => (
+      <Owned mode="full" active={active} items={items} timeScale={1} />
+    );
+    try {
+      const view = render(draw("intro"));
+      const marker = measure();
+      // A reversal keeps the same indicator and settles on the newest entry, not on
+      // an intermediate destination.
+      view.rerender(draw("api"));
+      view.rerender(draw("intro"));
+      expect(slot("toc-indicator")).toBe(marker);
+      expect(marker.style.top).toBe("0px");
+
+      // A passive resize refreshes the cached box without creating a semantic
+      // revision; a known entries change does commit a new one.
+      const geometry = () =>
+        [...presentationSamples.values()].find(
+          (sample) =>
+            sample.form === "geometry.resize/measured" && sample.node.getAttribute("data-slot") === "toc-list",
+        );
+      const semantic = geometry()?.revision;
+      expect(semantic).toBeTruthy();
+      measure();
+      expect(geometry()?.revision).toBe(semantic);
+      view.rerender(draw("intro", [...ownedItems, { id: "end", title: "End" }]));
+      expect(geometry()?.revision).not.toBe(semantic);
+    } finally {
+      restore();
+    }
+  });
+
+  it("keeps every retained link node across a selection change", () => {
+    const view = render(<Owned mode="none" active="intro" />);
+    const before = screen.getAllByRole("link");
+    view.rerender(<Owned mode="none" active="api" />);
+    const after = screen.getAllByRole("link");
+    expect(after).toHaveLength(before.length);
+    for (const [index, link] of after.entries()) expect(link).toBe(before[index]);
+    expect(after[1]).toHaveAttribute("aria-current", "location");
+    expect(after[0]).not.toHaveAttribute("aria-current");
   });
 });
