@@ -13,7 +13,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Button } from "../button";
+import { Button, type ButtonProps } from "../button";
 import { cn } from "../lib/cn";
 import { useContinuousMotion, useStateColor } from "../lib/css-motion";
 import { createModalPresence } from "../lib/modal-presence";
@@ -293,15 +293,20 @@ function ToastDescription({ className, style, children, ...props }: ToastPrimiti
   );
 }
 
-function ToastAction({
-  className,
-  render = <Button variant="outline" size="sm" data-slot="toast-action" />,
-  ...props
-}: ToastPrimitive.Action.Props) {
+function ToastAction({ className, render, ...props }: ToastPrimitive.Action.Props) {
+  // Base UI evaluates a function render target in place instead of cloning an element,
+  // so the Cadence Button stays a direct child of this adapter: its paint, label,
+  // quantity, press and retained exit remain its own owners, and it keeps the safe press
+  // layer that a `render` element would replace. A caller `render` still replaces Button.
   return (
     <ToastPrimitive.Action
       data-slot="toast-action"
-      render={render}
+      render={
+        render ??
+        ((actionProps: ToastPrimitive.Action.Props) => (
+          <Button data-slot="toast-action" variant="outline" size="sm" {...(actionProps as ButtonProps)} />
+        ))
+      }
       className={stateClasses(cn("shrink-0"), className)}
       {...props}
     />

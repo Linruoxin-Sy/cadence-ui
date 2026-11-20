@@ -1,5 +1,6 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { PresenceContext } from "motion/react";
 import { useEffect, useState } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
@@ -179,6 +180,71 @@ function RetainedList() {
 
 const modes = ["full", "reduced", "none"] as const;
 
+type PaintFrame = {
+  surface: string;
+  foreground: string;
+  paint: boolean;
+  present: boolean;
+  label: string | number;
+};
+
+/** The shipped list holds no caller paint, so this scene supplies the component's own
+ * known tokens for the surface and foreground regions and one Button-backed action whose
+ * paint, label, quantity, press and retained exit stay Button's owners. */
+function PaintedList({ frame }: { frame: PaintFrame }) {
+  const { toasts } = useToastManager();
+  const [item, setItem] = useState<unknown>(null);
+  useEffect(() => {
+    if (toasts[0]) setItem(toasts[0]);
+  }, [toasts]);
+  if (!item) return null;
+  return (
+    <Toast toast={item as never} className={frame.surface}>
+      <ToastContent>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <ToastTitle className={frame.foreground}>Saved</ToastTitle>
+          <ToastDescription className={frame.foreground}>Workspace updated</ToastDescription>
+        </div>
+        <PresenceContext.Provider value={retainedPresence(frame.present)}>
+          <ToastAction
+            style={
+              frame.paint
+                ? {
+                    backgroundColor: "#303030",
+                    borderColor: "#404040",
+                    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.4)",
+                    color: "#fafafa",
+                  }
+                : undefined
+            }
+          >
+            {frame.label}
+          </ToastAction>
+        </PresenceContext.Provider>
+      </ToastContent>
+    </Toast>
+  );
+}
+
+/** A presence boundary the composed action can be flipped through without a mount. */
+const retainedPresence = (present: boolean) => ({
+  id: "toast-action",
+  initial: false as const,
+  isPresent: present,
+  register: () => () => {},
+  onExitComplete: () => {},
+});
+
+/** jsdom applies no Tailwind stylesheet, so the stand-in below also resolves the
+ * component's own known paint tokens. That is the palette the toast treats as
+ * readable; a caller's inline palette deliberately settles immediately instead. */
+const tokenPaint: Record<string, Record<string, string>> = {
+  "bg-popover": { "background-color": "rgb(255, 255, 255)" },
+  "bg-muted": { "background-color": "rgb(244, 244, 245)" },
+  "text-foreground": { color: "rgb(9, 9, 11)" },
+  "text-muted-foreground": { color: "rgb(113, 113, 122)" },
+};
+
 /** jsdom has no Web Animations and no computed animation name. Give every host a
  * readable computed paint so a released theme-clock loop reports `none` and the
  * owned envelopes can commit their endpoints. */
@@ -187,8 +253,10 @@ function installComputedPaint() {
   vi.spyOn(window, "getComputedStyle").mockImplementation((element: Element) => {
     const host = element as HTMLElement;
     const css = original(element);
+    const tokens: Record<string, string> = {};
+    for (const name of host.classList ?? []) Object.assign(tokens, tokenPaint[name]);
     const read = (name: string, fallback = "") =>
-      host.style?.getPropertyValue?.(name) || css.getPropertyValue(name) || fallback;
+      host.style?.getPropertyValue?.(name) || tokens[name] || css.getPropertyValue(name) || fallback;
     return {
       width: css.width,
       height: css.height,
@@ -281,6 +349,62 @@ describe("Toast v2 owners", () => {
         id = manager.add({ title: "Saved", description: "Workspace updated" });
       }),
     );
+    view.unmount();
+  });
+
+  it.each(modes)("executes the list's surface, foreground and inherited action owners in %s", async (mode) => {
+    const manager = createToastManager();
+    // The shipped list holds no caller paint, so this scene supplies the component's
+    // own known tokens (surface/foreground) and one Button-backed action whose paint,
+    // label, quantity, press and retained exit stay Button's owners.
+    let frame: PaintFrame = {
+      surface: "bg-popover",
+      foreground: "text-foreground",
+      paint: false,
+      present: true,
+      label: "Undo",
+    };
+    let view: ReturnType<typeof render>;
+    const update = (next: Partial<PaintFrame>) => {
+      frame = { ...frame, ...next };
+      view.rerender(scene());
+    };
+    const scene = () => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <ToastProvider toastManager={manager} timeout={0}>
+          <ToastPortal>
+            <ToastViewport>
+              <PaintedList frame={frame} />
+            </ToastViewport>
+          </ToastPortal>
+        </ToastProvider>
+      </CadenceProvider>
+    );
+    view = render(scene());
+    act(() => {
+      manager.add({ title: "Saved", description: "Workspace updated" });
+    });
+    await screen.findByText("Saved");
+    const action = document.querySelector('[data-slot="toast-action"]') as HTMLButtonElement;
+    expect(action).toBeInstanceOf(HTMLButtonElement);
+
+    await expectV2MotionAction("toast", "toast.surface.colour", mode, () => update({ surface: "bg-muted" }));
+    await expectV2MotionAction("toast", "toast.foreground.colour", mode, () =>
+      update({ foreground: "text-muted-foreground" }),
+    );
+    await expectV2MotionAction("toast", "toast.actions-surface.colour", mode, () => update({ paint: true }));
+    await expectV2MotionAction("toast", "toast.actions-label.replace", mode, () => update({ label: "Undo it" }));
+    update({ label: 7 });
+    await expectV2MotionAction("toast", "toast.actions-number.roll", mode, () => update({ label: 8 }));
+    await expectV2MotionAction("toast", "toast.actions.press", mode, () => {
+      fireEvent.pointerDown(action.querySelector('[data-slot="button-feedback"]') ?? action, {
+        button: 0,
+        pointerId: 1,
+        isPrimary: true,
+      });
+    });
+    // Button keeps the retained exit on its own host; the toast adds no second fade.
+    await expectV2MotionAction("toast", "toast.actions-surface.exit", mode, () => update({ present: false }));
     view.unmount();
   });
 });

@@ -6579,10 +6579,6 @@
         "parity": {
           "props": [
             {
-              "path": "ToastAction.render",
-              "reason": "The default render element names the composed slot the toast owns, so the Button-backed action keeps its upstream defaults while its inherited paint, label, quantity and press owners resolve to toast-action."
-            },
-            {
               "path": "ToastClose.render",
               "reason": "The close control names the composed slot for the same reason: Button keeps its own owners and the toast never writes that region."
             }
