@@ -816,23 +816,26 @@ without Button's independent press recipe. Navigation uses the same static varia
 
 ### 3.1.4 `layout.shared` for the Toc reading indicator
 
-Toc is T3. One persistent decorative indicator follows the active link using the
-`layout.shared` physics spring. A ResizeObserver caches link offsets/heights, including
-wrapped labels; committed target changes read that cache, not layout. Two Motion values
-represent its top/bottom edges, preserving velocity when retargeted. One native style
-writer converts those edges to translateY/scaleY on a one-pixel base; it clamps both
-edges to the measured rail. Reading/indicator changes author no width/height interpolation or list
-reflow. Explicit content revisions of the list shell follow the separate
-[Toc target contract](motion/components/toc.md); they do not resize the shell on every active-link change.
+Toc is T3. One persistent decorative indicator follows the active link through the
+shared `createSelectionProjection` controller of the `layout.shared` physics spring. A
+ResizeObserver caches link offsets/heights, including wrapped labels; a committed
+selection change reads that cache, not layout. The controller owns one endpoint box in
+the track's own content coordinates: a one-pixel-wide, rail-clamped rectangle whose four
+edges are Motion values, so a retarget preserves velocity and a clamp keeps both
+endpoints inside the measured rail. Its single native writer converts those edges to a
+transform on that fixed box. Reading/indicator changes author no width/height
+interpolation or list reflow. Explicit content revisions of the list shell follow the
+separate [Toc target contract](motion/components/toc.md); they do not resize the shell on
+every active-link change.
 
 Initial placement, reappearance after a cleared selection, reduced, none and zero
-clock all jump. Reduced/none use instant native top/height placement and no transform;
-live downgrades synchronously stop both springs before paint without replacing the
-indicator or links. Restoring full starts at the settled position. Clock changes
-retarget the existing values. The server uses the active link's static border until
-the first measurement, so no-JS navigation retains a visible current section.
-Text/aria-current follow the current section immediately. Click navigation follows
-§3.1.5; the site's mobile disclosure remains instant. There is no scroll.progress or popup recipe.
+clock all jump: the box is written and no tween starts. A live downgrade synchronously
+stops the running edges before paint without replacing the indicator or links.
+Restoring full starts at the settled position. Clock changes retarget the existing
+values. The server uses the active link's static border until the first measurement, so
+no-JS navigation retains a visible current section. Text/aria-current follow the current
+section immediately. Click navigation follows §3.1.5; the site's mobile disclosure
+remains instant. There is no scroll.progress or popup recipe.
 
 ### 3.1.5 `scroll.navigate` for explicit section navigation
 
@@ -843,6 +846,10 @@ sticky layout, focus, history and scroll tracking. Never translate the article t
 simulate scrolling, use a second native smooth-scroll clock, or read layout per frame.
 Measure the target, scroll margins/padding and host bounds in the click handler,
 clamp the destination, and use instant native scroll writes from one Motion tween.
+The shared `createScrollFlight` engine in `registry/cadence/lib/scroll-navigation.ts`
+owns that tween, its one native writer and every cancellation path, so a component
+source never calls an engine writer directly; it resolves the clock with
+`scrollNavigationClock(cm)` and hands the measured destination over once.
 
 Reduced, none and zero clock navigate immediately. A live downgrade completes the
 current destination before paint; positive clock changes retime from the current
