@@ -1,0 +1,35 @@
+# The status label on an issue follows its pull request:
+#
+#   opened, reopened    -> status:in-review
+#   converted_to_draft  -> status:claimed
+#   closed and merged   -> status:done
+#   closed, not merged  -> status:claimed
+#
+# Labels are the only state this workflow writes. It opens no comment, writes no
+# file and makes no commit, so the issue and the pull request stay the single
+# record of the plan.
+name: issue-status
+
+on:
+  pull_request:
+    types: [opened, reopened, converted_to_draft, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue-status-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/plan/issue-status.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
