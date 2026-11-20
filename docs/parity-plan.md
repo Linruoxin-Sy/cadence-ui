@@ -175,11 +175,13 @@ changes their role to button. Current parity exceptions otherwise live in regist
 
 ## 8. Next work
 
-Implement the target animation system through the dependency-ordered phases in
-[animation-system-plan.md](animation-system-plan.md). All implementation phases remain pending:
-shared recipes/controllers and checks, the Button/Badge/Card/Tabs/Select pilots, the 59-component
-rollout, the planned public primitives, and full distribution/performance acceptance. Keep actual
-registry declarations and public documentation truthful until each capability is implemented.
+Implement the target animation system through the dependency-ordered phases tracked as issues: five
+phase epics, each listing its own child issues, dependencies and acceptance evidence (see
+[where the rollout plan lives](animation-system-plan.md) for the entry points). Functional migration
+remains pending — shared recipes/controllers and checks, the Button/Badge/Card/Tabs/Select pilots,
+the 59-component rollout, the planned public primitives, and full distribution/performance
+acceptance. Keep actual registry declarations and public documentation truthful until each capability
+is implemented.
 
 Follow [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards): complete
 intended effects and full-library functional migration first. Numeric source/compiled/runtime/page,

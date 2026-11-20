@@ -12,8 +12,9 @@ values, plus a motion contract. The batch conventions, compatibility tiers, scop
 
 The motion v2 target is capability-based: every component is assessed for applicable appearance, geometry,
 colour, text, number and interaction changes, with one owner for each animated property. A tier is not an
-animation allowance. [docs/animation-system.md](docs/animation-system.md) defines that target;
-[docs/animation-system-plan.md](docs/animation-system-plan.md) tracks its implementation. The current runtime,
+animation allowance. [docs/animation-system.md](docs/animation-system.md) defines that target; the issue
+tracker records its implementation, entered from [docs/animation-system-plan.md](docs/animation-system-plan.md).
+The current runtime,
 registry metadata, MDX and test helpers remain the compatibility surface until migrated together; this design
 update does not make v2 complete or make planned recipes and public helpers installable.
 
