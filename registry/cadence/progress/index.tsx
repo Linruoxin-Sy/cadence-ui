@@ -394,6 +394,7 @@ function ProgressFill({ className, style, ref, ...props }: ProgressIndicatorProp
   if (parameters.kind !== "progress") throw new RangeError("data.progress must resolve to a progress clock");
   return (
     <ProgressPrimitive.Indicator
+      ref={pulse.ref}
       data-slot={INDICATOR_SLOT}
       data-motion={cm.mode}
       // Base UI writes `width: <value>%`; the fill is driven by a transform instead,
@@ -498,6 +499,10 @@ function ProgressValue({ className, style, children, ref, ...props }: ProgressVa
   return (
     <ProgressPrimitive.Value
       {...props}
+      className={(state) =>
+        cn("text-sm text-muted-foreground tabular-nums", typeof className === "function" ? className(state) : className)
+      }
+      style={(state) => ({ ...paint.style, ...(typeof style === "function" ? style(state) : style) })}
       render={(partProps) => {
         const {
           children: partChildren,
@@ -510,14 +515,9 @@ function ProgressValue({ className, style, children, ref, ...props }: ProgressVa
           <span
             {...rest}
             {...paint}
-            ref={paint.ref}
             data-motion={cm.mode}
             data-slot="progress-value"
-            className={cn(
-              "text-sm text-muted-foreground tabular-nums",
-              typeof className === "function" ? className({} as never) : className,
-              partClassName,
-            )}
+            className={partClassName}
             style={{ ...paint.style, ...partStyle }}
           >
             {composed ? partChildren : <ProgressValueNumber fallback={partChildren} />}
