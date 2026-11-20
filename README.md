@@ -143,7 +143,8 @@ Upstream source is fetched into `.cache/shadcn/` (gitignored) and summarised in 
 - Site: `/docs/installation`, `/docs/theming`, `/docs/motion`, `/docs/motion-modes`, plus a page per component.
 - Machine-readable: `/llms.txt`, `/llms-full.txt`, `/r/registry.json`, `/r/catalog.json`, `/r/<id>.md`.
 - Design record: [overall design](docs/overall-design.md), [animation system](docs/animation-system.md), [motion implementation plan](docs/animation-system-plan.md), [documentation site and distribution](docs/documentation-site-and-distribution.md), [parity plan](docs/parity-plan.md), [ADRs](docs/adr.md).
-- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md); agent notes: [AGENTS.md](AGENTS.md).
+- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md), first-change walkthrough in [docs/onboarding.md](docs/onboarding.md); agent notes: [AGENTS.md](AGENTS.md).
+- Work in progress: the [issue tracker](https://github.com/Linruoxin-Sy/cadence-ui/issues?q=is%3Aissue%20label%3Amotion-v2) holds the schedule, dependencies and acceptance for every open task.
 
 ## License
 

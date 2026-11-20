@@ -1,6 +1,12 @@
 ## What changed
 
-<!-- One or two sentences. Link the migration task or issue. -->
+<!-- One or two sentences. -->
+
+## Issue
+
+Closes #
+
+<!-- One task issue per pull request. The issue carries scope, dependencies and acceptance. -->
 
 ## Branch
 
@@ -33,6 +39,8 @@ non-native binding means the host is unresolved. See
 - [ ] No test was skipped, excluded or edited to hide a failure.
 - [ ] Native/API/accessibility behavior and all three modes are covered; browser, buildId and
   screenshot evidence is stated as done or explicitly left unresolved.
+- [ ] Browser evidence for full/reduced/none is linked here as a CI artifact or checked-in
+  screenshots, not described from an ignored local directory.
 
 ## Notes for review
 

@@ -14,6 +14,8 @@ validation.
 
 ## Before you start
 
+- If this is your first change, follow [docs/onboarding.md](docs/onboarding.md) for the toolchain, the
+  first run and how to claim a task; this page then covers what the change itself must satisfy.
 - Read the [parity plan](docs/parity-plan.md) for scope, batches, compatibility metadata and budgets.
 - Read the [motion v2 design](docs/animation-system.md), its [implementation plan](docs/animation-system-plan.md),
   and the [architecture overview](docs/overall-design.md). The [user motion guide](content/docs/motion.mdx)
@@ -240,7 +242,7 @@ temporary projects. Choose the layer that can still fail:
 | Scoped | `pnpm test:local tests/components/<id>.test.tsx`                  | While iterating on one component                                                             |
 | Shared | `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` hit | Once, when the component's own suite is green, to catch shared-gate assumptions              |
 | Gates  | `pnpm test:gate`                                                  | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts |
-| Full   | `pnpm test`                                                       | Once per change set, in the background, while the handoff is being written                   |
+| Full   | `pnpm test`                                                       | Once per change set, in the background, while the pull request description is written        |
 
 [`.github/workflows/check.yml`](.github/workflows/check.yml) runs the gate on `ubuntu-latest`. It fans
 the commands out into parallel jobs — typecheck, lint, parity, registry check, runtime tests and one
@@ -268,7 +270,7 @@ Rules that came out of timing two migration sessions on this repository:
 Known or currently unexplained failures in the full run are recorded in
 [the quarantine list](docs/testing-quarantine.md); everything not listed there must pass.
 
-Record five numbers in the handoff, not a total wall clock: full runs (target 1), longest single wait
+Record five numbers in the pull request description, not a total wall clock: full runs (target 1), longest single wait
 while iterating (target ≤ 6 min), retreats caused by a binding the gate could not certify (target 0),
 new implicit gate rules (target 0; each one becomes an evidence recipe), and pre-commit gate time
 (target ≤ 5 min). Total wall clock mostly describes the host; these five describe whether the loop
