@@ -13,6 +13,12 @@ test-results/
 # Upstream sources fetched for diffing; the pinned summary is committed in upstream/manifest.json.
 .cache/
 
+# Generated LLM entry points: `pnpm registry:build` writes them from payload docs, the site serves
+# them, and no one edits or reviews them by hand. They are not per-component files, so tracking them
+# only produced a whole-file conflict on every component change (ADR-025).
+public/llms.txt
+public/llms-full.txt
+
 # Agent working files: session memory and local editor state stay on this machine.
 .workbuddy/
 

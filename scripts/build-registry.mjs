@@ -3,13 +3,14 @@
  *
  *   1. reads registry.json and the component docs in content/components/*.mdx
  *   2. validates that install metadata and docs agree
- *   3. injects the doc body into every item (`docs`) and stamps `meta.since`
+ *   3. injects the doc body into every item (`docs`), stamps `meta.since` and the per-item
+ *      `meta.sourceSha` content hash
  *   4. runs `shadcn build` to produce public/r/<id>.json with embedded source
- *   5. finalizes payloads (docs, sourceSha), writes /r/<id>.md, catalog and llms files
+ *   5. finalizes payloads, writes /r/<id>.md, the index/catalog and the untracked llms files
  *
  *   node scripts/build-registry.mjs
  */
-import { execFileSync, execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -20,6 +21,7 @@ import { expandInstallation } from "./installation.mjs";
 import { checkMotionCoverage, motionMetadataProblems } from "./motion-coverage.mjs";
 import { motionForms, motionRecipes } from "./motion-manifest.mjs";
 import { generateMotionTokens } from "./motion-token-source.mjs";
+import { componentSha, hashableMeta } from "./payload-hash.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
@@ -32,16 +34,6 @@ const docsDir = path.join(root, "content", "components");
 const site = "https://cadence.dev";
 
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
-
-function sourceSha() {
-  try {
-    return execSync("git rev-parse --short HEAD", { cwd: root, stdio: ["ignore", "pipe", "ignore"] })
-      .toString()
-      .trim();
-  } catch {
-    return "dev";
-  }
-}
 
 async function readDocs() {
   const entries = await readdir(docsDir).catch(() => []);
@@ -112,7 +104,6 @@ if (problems.length) {
 // Every distribution channel below consumes the same validated, expanded body.
 for (const [id, doc] of docs) doc.body = expandInstallation(doc.body, registry.items, id);
 
-const sha = sourceSha();
 const staged = {
   ...registry,
   items: registry.items.map((item) => {
@@ -121,10 +112,18 @@ const staged = {
     return {
       ...item,
       docs: doc.body,
-      meta: { ...item.meta, since: item.meta?.since ?? doc.data.since ?? "0.1.0", sourceSha: sha },
+      meta: { ...item.meta, since: item.meta?.since ?? doc.data.since ?? "0.1.0" },
     };
   }),
 };
+
+// A payload is identified by its own content, never by HEAD. Stamping the commit hash rewrote all 63
+// component payloads, the shared index and the 2.3 MB llms file on every push, so two branches
+// migrating different components conflicted on every file (ADR-025).
+for (const item of staged.items) {
+  if (!item.meta) continue;
+  item.meta = { ...item.meta, sourceSha: await componentSha(root, item) };
+}
 
 const tmpDir = await mkdtemp(path.join(os.tmpdir(), "cadence-registry-"));
 const tmpRegistry = path.join(tmpDir, "registry.json");
@@ -144,7 +143,7 @@ execFileSync(shadcnBin, ["build", tmpRegistry, "-o", outDir], {
   shell: process.platform === "win32",
 });
 
-// Finalize payloads: keep docs/meta even if a future CLI drops them, and add a source stamp.
+// Finalize payloads: keep docs/meta even if a future CLI drops them, and keep the item's own hash.
 const built = [];
 for (const item of staged.items) {
   const payloadPath = path.join(outDir, `${item.name}.json`);
@@ -156,7 +155,7 @@ for (const item of staged.items) {
     payload = { $schema: "https://ui.shadcn.com/schema/registry-item.json", ...item };
   }
   if (item.docs) payload.docs = item.docs;
-  if (item.meta) payload.meta = { ...payload.meta, ...item.meta, sourceSha: sha };
+  if (item.meta) payload.meta = { ...payload.meta, ...item.meta };
   await writeFile(payloadPath, `${JSON.stringify(payload, null, 2)}\n`);
   built.push(payload);
 }
@@ -190,6 +189,10 @@ for (const item of staged.items) {
 }
 
 // Registry index and machine-readable catalog.
+//
+// Neither carries `meta.sourceSha`: they are the one file every component edit touches, and a
+// per-item content hash there would turn a one-file change back into a whole-index rewrite. The
+// per-item payload remains the traceability surface (ADR-025).
 const index = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: registry.name,
@@ -200,7 +203,7 @@ const index = {
     title: item.title,
     description: item.description,
     categories: item.categories ?? [],
-    meta: item.meta ?? {},
+    meta: hashableMeta(item.meta) ?? {},
   })),
 };
 await writeFile(path.join(outDir, "registry.json"), `${JSON.stringify(index, null, 2)}\n`);
@@ -215,7 +218,7 @@ await writeFile(
       categories: item.categories ?? [],
       dependencies: item.dependencies ?? [],
       registryDependencies: item.registryDependencies ?? [],
-      ...item.meta,
+      ...(hashableMeta(item.meta) ?? {}),
       docs: `/r/${item.name}.md`,
       item: `/r/${item.name}.json`,
     })),

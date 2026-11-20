@@ -497,12 +497,15 @@ Fragment history, focus and no-JS navigation remain available.
 content/components/<id>.mdx  ─┐
 registry.json (install meta)  ├─→ scripts/build-registry.mjs
 registry/cadence/<id>/*.tsx  ─┘        │
-                                       ├─→ public/r/<id>.json   (content + docs + meta)
-                                       ├─→ public/r/<id>.md     (plain markdown)
-                                       ├─→ public/r/catalog.json
-                                       ├─→ public/llms.txt / llms-full.txt / llms-small.txt
+                                       ├─→ public/r/<id>.json   (content + docs + meta)  tracked
+                                       ├─→ public/r/<id>.md     (plain markdown)         tracked
+                                       ├─→ public/r/catalog.json                         tracked
+                                       ├─→ public/llms.txt / llms-full.txt / llms-small.txt  generated
                                        └─→ component pages statically rendered at build time
 ```
+
+`tracked` files are reviewed and committed per component; `generated` ones are build output that
+deployment produces and no one commits (ADR-025).
 
 ### 3.1 Frontmatter conventions
 
@@ -539,10 +542,34 @@ const mdx = await readFile(`content/components/${id}.mdx`, "utf8");
 const body = mdx.replace(/^---[\s\S]*?---\n/, "").trim();
 item.docs = body; // goes into the payload; AI/CLI get it in one request
 item.meta.since ??= since;
-item.meta.sourceSha = commitSha;
+item.meta.sourceSha = await componentSha(root, item); // 8 hex over this item's own content
 ```
 
 > Difference from Arc: Arc's payload only carries a `meta.docs` URL; we put the body itself in the payload, so MCP needs no second fetch and docs are readable offline.
+
+### 3.3 Who owns a generated file
+
+`public/r/<id>.json` and `public/r/<id>.md` are reviewed files. `meta.sourceSha` is the item's own
+content hash — its files (path + content), its expanded `docs` and its metadata without the hash —
+so a payload changes only when that component changes, and a rebuild of unchanged input is
+byte-identical. `public/r/registry.json` and `public/r/catalog.json` deliberately omit the hash: they
+are the shared index, and a per-item hash there would rewrite the whole file for any component edit.
+`public/llms.txt` and `public/llms-full.txt` are not committed at all; `pnpm registry:build` writes
+them, CI uploads the build output as an artifact, and `pnpm build` regenerates them for deployment.
+
+Consequences a contributor has to honour:
+
+- never hand-edit anything under `public/r/**` or the llms files; edit the source or the MDX body and
+  rebuild, then review the generated diff;
+- run `pnpm registry:build` before `pnpm check` (and before `pnpm test`, whose registry and llms
+  fixtures read the build output), because `registry:check` compares payloads against source and
+  fails on stale or missing artifacts;
+- resolve a payload conflict by rebuilding on top of the merge result, never by picking a side;
+- a full-local rebuild is expected only when the build itself changes. Ordinary component work
+  touches that component's payload only.
+
+`public/r/snapshots/**` is outside this rule: ADR-017 freezes those bytes on purpose and they are
+never regenerated.
 
 ---
 
@@ -601,7 +628,7 @@ See the registry guide for namespace pinning and self-hosting; a frozen index al
 
 | Endpoint                     | Purpose                                                                                             |
 | ---------------------------- | --------------------------------------------------------------------------------------------------- |
-| `/llms-full.txt`             | All component markdown inlined (~200–400 KB)                                                        |
+| `/llms-full.txt`             | All component markdown inlined (~200–400 KB); built by `registry:build`, not committed              |
 | `/llms-small.txt` (planned)  | Overview + one line per component (< 20 KB)                                                         |
 | `/r/catalog.json`            | Structured catalog (name, category, deps, motion, since)                                            |
 | `/api/mcp` (planned, absent) | MCP: `list_components` / `search` / `get_component` / `get_install_command` / `get_motion_contract` |

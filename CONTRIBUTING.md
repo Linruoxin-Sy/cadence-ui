@@ -230,6 +230,12 @@ declarations and requires animated test files; the test reporter
 requires three-mode helper adoption. Neither replaces the animation review or browser evidence for
 running cancellation, first paint, nested providers and measured geometry.
 
+Commit the payload files the build changed — normally just your component's — and never edit them by
+hand. `public/llms.txt` and `public/llms-full.txt` are not in Git: `registry:build` writes them for the
+site and CI uploads them as a build artifact, so a missing copy is a missing build rather than a
+merge problem. The full rule, including how to resolve a payload conflict, is
+[ADR-025](docs/adr.md#adr-025--payloads-carry-their-own-content-hash-llms-output-is-not-committed).
+
 ## Verification loop
 
 `pnpm check` is the gate and CI runs it on every pull request. Do not run it after every edit: most of
