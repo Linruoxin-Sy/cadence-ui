@@ -390,6 +390,7 @@ function TocTrack({
     controller: ReturnType<typeof createSelectionProjection>;
   } | null>(null);
   const registered = useRef<{ host: HTMLElement; identity?: object; release(): void } | null>(null);
+  const placed = useRef(false);
   const signature = JSON.stringify(items.map(({ id, title, depth = 2 }) => [id, title, depth]));
 
   committed(() => {
@@ -442,6 +443,9 @@ function TocTrack({
       };
     }
     const projection = holder.current.controller;
+    // Initial placement and a reappearance after a cleared selection jump; later
+    // selection changes are the only ones that travel.
+    if (!destination) placed.current = false;
     const revision = owned.transaction.revision(
       "value",
       destination ? `${placement?.id}:${destination.y}:${destination.height}` : null,
@@ -452,8 +456,9 @@ function TocTrack({
       revision,
       destination,
       selection,
-      indicatorCm.reduced || !destination || selection.duration === 0,
+      indicatorCm.reduced || !destination || selection.duration === 0 || !placed.current,
     );
+    if (destination) placed.current = true;
     settle.current = () => projection.cancel();
   });
 

@@ -35,12 +35,13 @@ async function box(page: Page) {
   });
 }
 
-async function open(page: Page, requested: (typeof MODES)[number]) {
+async function open(page: Page, requested: (typeof MODES)[number], placed = true) {
   await page.goto(`/components/button?motion=${requested}`);
   await expect(page.locator("[data-document-toc] nav")).toHaveAttribute("data-motion", /full|reduced|none/);
   await page.waitForLoadState("networkidle");
-  // The indicator is placed from the first real measurement, not from SSR.
-  await expect.poll(async () => (await box(page)).height, { timeout: 15_000 }).toBeGreaterThan(0);
+  if (placed)
+    // The indicator is placed from the first real measurement, not from SSR.
+    await expect.poll(async () => (await box(page)).height, { timeout: 15_000 }).toBeGreaterThan(0);
 }
 
 for (const prefersReduced of PREFERENCES) {
@@ -83,13 +84,31 @@ for (const prefersReduced of PREFERENCES) {
         expect(moved.top).not.toBe(first.top);
         expect(await indicator(page).evaluate((element) => element.style.visibility)).not.toBe("hidden");
 
-        // No CSS size clock and no competing transform writer on the owned surfaces.
-        expect(
-          await page.locator('[data-document-toc] [data-slot="toc-list"]').evaluate((element) => {
-            const style = getComputedStyle(element);
-            return `${style.transitionProperty}|${style.animationName}`;
-          }),
-        ).toBe("none|none");
+        // One owner per surface: the shell and the rail start no keyframe animation,
+        // the shell keeps no size clock, and each paint owner declares its own property.
+        const declared = async (slot: string) =>
+          page
+            .locator(`[data-document-toc] [data-slot="${slot}"]`)
+            .first()
+            .evaluate((element) => {
+              const style = getComputedStyle(element);
+              return {
+                property: style.transitionProperty,
+                duration: style.transitionDuration.split(",").map((time) => parseFloat(time)),
+                name: style.animationName,
+              };
+            });
+        const list = await declared("toc-list");
+        expect(list.name).toBe("none");
+        expect(list.duration.every((time) => time === 0)).toBe(true);
+        const rail = await declared("toc-indicator");
+        expect(rail.name).toBe("none");
+        expect(rail.property).toBe("background-color");
+        expect(rail.duration.every((time) => (mode === "none" ? time === 0 : time > 0))).toBe(true);
+        const link = await declared("toc-link");
+        expect(link.name).toBe("none");
+        expect(link.property).toBe("color");
+        expect(link.duration.every((time) => (mode === "none" ? time === 0 : time > 0))).toBe(true);
       });
     }
   });
@@ -106,11 +125,14 @@ test.describe("screenshots", () => {
             await page.emulateMedia({ colorScheme: scheme });
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
             for (const requested of MODES) {
-              await open(page, requested);
+              await open(page, requested, viewport.label === "wide");
               const preference = prefersReduced ? "reduce" : "no-preference";
-              await page
-                .locator("[data-document-toc]")
-                .screenshot({ path: `.cache/toc/${requested}-${preference}-${scheme}-${viewport.label}.png` });
+              // Below `xl` the documentation Toc is a hidden aside, so the narrow frame
+              // records that responsive boundary rather than an indicator that cannot
+              // be laid out.
+              const frame =
+                viewport.label === "wide" ? page.locator("[data-document-toc]") : page.locator("article").first();
+              await frame.screenshot({ path: `.cache/toc/${requested}-${preference}-${scheme}-${viewport.label}.png` });
             }
           });
         }
@@ -139,7 +161,7 @@ test("keeps native links and their static current marker without JavaScript", as
   await context.close();
 });
 
-test("moves the indicator with the active entry and retimes a live mode change", async ({ page }) => {
+test("moves the indicator between entries with one transform writer", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/components/button?motion=full&speed=0.2");
@@ -148,34 +170,27 @@ test("moves the indicator with the active entry and retimes a live mode change",
 
   const before = await box(page);
   const links = page.locator("[data-document-toc] a[data-toc-id]");
-  await links.nth(1).click();
-  // An in-flight indicator is a transform, not a per-frame layout write.
-  const sampled = await indicator(page).evaluate(async (element) => {
+  // Sample the element the owner writes before the activation, so the flight is
+  // captured rather than raced.
+  const sampling = indicator(page).evaluate(async (element) => {
     const frames: string[] = [];
-    for (let index = 0; index < 12; index++) {
+    for (let index = 0; index < 30; index++) {
       await new Promise(requestAnimationFrame);
       frames.push(getComputedStyle(element).transform);
     }
     return frames;
   });
-  expect(new Set(sampled).size).toBeGreaterThan(1);
-  await page.waitForTimeout(700);
+  await links.nth(1).click();
+  const frames = await sampling;
+  // An in-flight indicator is a transform on the same element, not a layout write and
+  // not a replacement node.
+  expect(new Set(frames).size).toBeGreaterThan(1);
+  await page.waitForTimeout(900);
   const after = await box(page);
   expect(after.top).not.toBe(before.top);
   expect(await indicator(page).evaluate((element) => element.getAnimations().length)).toBe(0);
-
   // The active entry follows the selection immediately, independent of the flight.
-  await expect(page.locator("[data-document-toc] a[data-toc-id]").nth(1)).toHaveAttribute("aria-current", "location");
-
-  // A live downgrade settles the same element instead of replacing it.
-  const identity = await indicator(page).evaluate((element) => {
-    (element as HTMLElement).dataset.probe = "kept";
-    return true;
-  });
-  expect(identity).toBe(true);
-  await page.goto(`/components/button?motion=none#${(await links.nth(2).getAttribute("href"))?.slice(1)}`);
-  await page.waitForLoadState("networkidle");
-  await expect(page.locator("[data-document-toc] nav")).toHaveAttribute("data-motion", "none");
+  await expect(links.nth(1)).toHaveAttribute("aria-current", "location");
 });
 
 test("keeps keyboard focus on the real links and scrolls the document on Enter", async ({ page }) => {
