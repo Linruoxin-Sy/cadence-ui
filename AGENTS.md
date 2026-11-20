@@ -45,15 +45,16 @@ API/native interaction/accessibility, full/reduced/none, cancellation/interrupti
 owner, genuine source/action evidence, declaration = implementation = documentation, compatibility
 and correctness checks remain mandatory. Functional v2 markers still require actual functional
 evidence; this policy grants none. This section overrides conflicting budget/performance-stage
-wording in older contracts, component bounds, queue prompts and ADR-022; see
+wording in older contracts, component bounds, retired task briefs and ADR-022; see
 [ADR-023](docs/adr.md#adr-023--effects-first-migration-performance-governance-afterwards).
 
 ## Read the design record first
 
-The `docs/` directory contains current concepts, contracts and future work for contributors, not site content. Start at [docs/README.md](docs/README.md). Completed work and handoffs belong in Git history; generated reports go to `.cache/`, and executable regression inputs go to `tests/fixtures/`.
+The `docs/` directory contains current concepts, contracts and future work for contributors, not site content. Start at [docs/README.md](docs/README.md). Completed work belongs in Git history, and the live plan, its dependencies and the handoff for an open task belong in its issue; generated reports go to `.cache/`, and executable regression inputs go to `tests/fixtures/`.
 
 | Document                                                                                   | Read it before                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [docs/onboarding.md](docs/onboarding.md)                                                   | Setting up the checkout, claiming an issue, or opening a first pull request.                                                                                                      |
 | [docs/parity-plan.md](docs/parity-plan.md)                                                 | Adding a component, choosing compatibility metadata/a batch, or selecting future work.                                                                                            |
 | [docs/overall-design.md](docs/overall-design.md)                                           | Changing the repo layout, registry model, install paths, theming, component API, or build pipeline.                                                                               |
 | [docs/animation-system.md](docs/animation-system.md)                                       | Writing or editing any animation: tokens, recipes, Base UI popup integration, reduced-motion strategy, performance budgets, motion tests.                                         |
@@ -67,6 +68,17 @@ Supporting material outside `docs/`:
 - `content/docs/*.mdx` and `content/components/*.mdx` — user-facing documentation, rendered by the site and injected into registry payloads.
 - `CONTRIBUTING.md` — what a component needs before a PR is ready.
 - `README.md` — install commands, component list, repository map.
+
+## Claim, branch, deliver
+
+The schedule is the [issue tracker](https://github.com/Linruoxin-Sy/cadence-ui/issues?q=is%3Aissue%20label%3Amotion-v2),
+not a file in this repository. A task is claimed by assigning yourself and swapping `status:ready` for
+`status:claimed`; it is delivered by one pull request per issue with exactly one `Closes #<n>` in the body; the
+merge closes the issue. `scripts/plan/check.mjs` fails the `plan` job when the link, the `task` label, the
+claimed/in-review status, or a still-open `Blocked by` reference does not hold, and
+`.github/workflows/issue-status.yml` writes the status label from the pull request's events. No board, queue or
+rolling handoff file carries state: a second contributor reads the same issue, and the ignored `.workbuddy/`
+and `.cache/` directories are scratch space, not a plan. First change: [docs/onboarding.md](docs/onboarding.md).
 
 ## Rules that are easy to break
 
@@ -151,7 +163,7 @@ accurate while implementing the target; a passing legacy check alone does not es
    per-frame cancellation, v2 colour/loop guarantees or the cross-library live audit.
 
 This applies to a new component and to any component you touch — do not copy an existing component's
-deviation. Fix implementation failures; keep remaining v2 work explicit in the implementation plan rather
+deviation. Fix implementation failures; keep remaining v2 work explicit on the issue that owns it rather
 than changing user docs to claim unimplemented behaviour. If the scheme itself needs a change, edit
 [docs/animation-system.md](docs/animation-system.md) first and explain it in the PR.
 

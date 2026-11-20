@@ -46,7 +46,8 @@ gh issue list --label status:blocked                          # waiting on anoth
 gh issue list --label "task" --search "C41"                    # one task by id
 ```
 
-- **Claim** an issue by assigning yourself and replacing `status:ready` with `status:claimed`.
+- **Claim** it with `gh issue edit <n> --remove-label status:ready --add-label status:claimed --add-assignee @me`.
+  An issue a pull request closes must also carry the `task` label; the `plan` job checks both.
 - **One issue, one branch, one pull request.** Do not fold an unrelated docs or chore change into a
   component migration.
 - Read the issue's _Blocked by_ list first; a pending dependency means the composition cannot be
@@ -68,7 +69,10 @@ gh pr create --base main --head feature/<component>-motion
 destination is `main`; the CI `branch-policy` job refuses a pull request from a branch outside the
 naming table in [CONTRIBUTING.md](../CONTRIBUTING.md#branch-and-merge-policy).
 
-Put `Closes #<issue>` in the pull request body. The issue closes on merge; nothing else updates it.
+Put exactly one `Closes #<issue>` in the pull request body. The `plan` job fails the pull request when the
+body has zero or two, when the issue is not a claimed task, or when a `Blocked by` reference is still open.
+Merge with `gh pr merge <n> --squash` once `check` is green and delete the branch; the merge closes the
+issue and `issue-status.yml` moves its label to `status:done`. Nothing else records the outcome.
 
 ## 5. Verification layers
 
@@ -83,7 +87,9 @@ Run the narrowest layer that can still fail, then one full pass per change set.
 | Full   | `pnpm test`                                                       | Once per change set                                                      |
 
 CI is the authority. `check` is the only required status on `main`; it fails when any fan-out job
-fails, is cancelled or is skipped. A local "all assertions passed" note does not replace it.
+fails, is cancelled or is skipped. The `plan` job is part of `check` and reads the issue link, not the
+diff, so a docs-only pull request is held to the same rule. A local "all assertions passed" note does
+not replace it.
 
 ## 6. Evidence and generated files
 

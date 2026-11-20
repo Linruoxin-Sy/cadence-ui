@@ -40,7 +40,7 @@ Per-item v2 enablement still requires the pending strict joint runtime gate, alo
 browser, installation and performance requirements.
 Planned `text.change`, numeric rolling changes and public primitives are not installable APIs merely
 because they appear in the design. Keep source, declarations and user-facing documentation in sync
-for each migrated component, and leave outstanding implementation work explicit in the plan.
+for each migrated component, and leave outstanding implementation work explicit on its issue.
 
 ## Local setup
 
@@ -246,8 +246,10 @@ temporary projects. Choose the layer that can still fail:
 
 [`.github/workflows/check.yml`](.github/workflows/check.yml) runs the gate on `ubuntu-latest`. It fans
 the commands out into parallel jobs — typecheck, lint, parity, registry check, runtime tests and one
-job per `cli-gates` file — and aggregates them into a single `check` job. Only `check` is a required
-status on `main`; it fails when any fan-out job fails, is cancelled or is skipped.
+job per `cli-gates` file — plus `plan`, which checks the issue a pull request closes and its `Blocked by`
+references, and `branch-policy`, which checks the head branch name. It aggregates them into a single
+`check` job. Only `check` is a required status on `main`; it fails when any fan-out job fails, is
+cancelled or is skipped.
 
 Rules that came out of timing two migration sessions on this repository:
 
@@ -297,13 +299,14 @@ By contributing, you agree that your contribution is licensed under the MIT Lice
 Normal `registry:build` preserves and verifies `public/r/snapshots/**`. Never edit or delete a
 previously distributed snapshot. To prepare an explicit snapshot, build/check current aliases,
 run `node scripts/freeze-registry.mjs`, review and commit its entire new hash directory separately.
-Do not freeze for ordinary docs/handoff commits. Verify production GET/HEAD/ETag/304/cache headers
+Do not freeze for ordinary docs-only commits. Verify production GET/HEAD/ETag/304/cache headers
 when changing distribution; static file existence is not HTTP evidence. See ADR-017 and the registry guide.
 
 
 ## Internal documentation
 
 Read docs/README.md for the current design contracts and future work. Keep completed-task records
-and handoffs in Git history. Reusable tests read minimal inputs from tests/fixtures; generated
+in Git history and close the task out on its issue; the plan for open work lives in the tracker,
+not in a file here. Reusable tests read minimal inputs from tests/fixtures; generated
 audit output, traces and screenshots belong in ignored .cache/audits. Do not make tests depend on
 previous measurement reports or add generated report directories under docs.

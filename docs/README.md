@@ -3,7 +3,7 @@
 This directory contains current concepts and contracts. User-facing documentation lives in
 `content/docs/` and `content/components/`; component inventory and install metadata live in
 `registry.json`. The execution plan and its acceptance evidence live in the issue tracker; Git
-history is the record of completed work, measurements and handoffs.
+history records completed work and measurements, and each issue records how its task ended.
 
 | Read                                                            | Before                                                                               |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -37,6 +37,6 @@ assessment, budget redesign, optimization and acceptance; historical failures re
 See animation-system §7 and its rollout plan before interpreting older budget wording.
 
 Keep rules in their owning document and link to them. Update future work by replacing resolved items,
-not appending completion logs. Add no handoff, evidence or archive directory here. Test inputs belong
+not appending completion logs. Add no task-status, evidence or archive directory here. Test inputs belong
 in `tests/fixtures/`; generated audit reports, traces and screenshots belong in ignored `.cache/`.
 Never delete a fixture needed by a regression test as part of documentation cleanup.
