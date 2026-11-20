@@ -102,6 +102,33 @@ function compare(actual, expected, label, catalogue) {
   return problems;
 }
 
+/** A recipe may carry more than one installed form — one entry per form, as Tabs'
+ * directional content and Calendar's month grid already do. The declaration itself
+ * is therefore keyed by recipe/form: the same recipe in two distinct forms is a real
+ * composition, while the same recipe/form twice (including a bare name beside its own
+ * one-shot form) is still a duplicate. */
+function duplicateDeclarations(entries, label) {
+  const forms = motionForms(entries ?? []);
+  return [...new Set(forms.filter((form, index) => forms.indexOf(form) !== index))].map(
+    (form) => `${label}: duplicate recipe "${form.split("/")[0]}"`,
+  );
+}
+
+function compareDeclarations(actual, expected, label, catalogue) {
+  const problems = duplicateDeclarations(actual, label);
+  const actualForms = motionForms(actual ?? []);
+  const expectedForms = motionForms(expected ?? []);
+  for (const recipe of new Set(actualForms.map((form) => form.split("/")[0]))) {
+    if (!catalogue.includes(recipe)) problems.push(`${label}: unknown recipe "${recipe}"`);
+    if (!expectedForms.some((form) => form.split("/")[0] === recipe))
+      problems.push(`${label}: extra recipe "${recipe}"`);
+  }
+  for (const recipe of new Set(expectedForms.map((form) => form.split("/")[0])))
+    if (!actualForms.some((form) => form.split("/")[0] === recipe))
+      problems.push(`${label}: missing recipe "${recipe}"`);
+  return problems;
+}
+
 /** Called by registry:check and exercised with isolated mutated fixtures in tests. */
 export async function checkMotionDocs(root, registry, catalogue) {
   const problems = [];
@@ -120,7 +147,7 @@ export async function checkMotionDocs(root, registry, catalogue) {
     const profileDescription = `Authored intensity is **${item.meta?.intensity}**: ${item.meta?.motionProfile?.reason}`;
     if (!visibleLines(doc.content).join(" ").replace(/\s+/g, " ").includes(profileDescription.replace(/\s+/g, " ")))
       problems.push(`${label}: visible authored intensity/profile explanation differs from installed metadata`);
-    problems.push(...compare(declared, declared, `${item.name}: meta.motion`, catalogue));
+    problems.push(...compareDeclarations(item.meta?.motion, item.meta?.motion, `${item.name}: meta.motion`, catalogue));
     if (
       !Array.isArray(doc.data.motion) ||
       !doc.data.motion.every(
@@ -134,7 +161,9 @@ export async function checkMotionDocs(root, registry, catalogue) {
     ) {
       problems.push(`${label}: frontmatter motion must be an array of recipe names or recipe/form objects`);
     } else {
-      problems.push(...compare(motionRecipes(doc.data.motion), declared, `${label}: frontmatter motion`, catalogue));
+      problems.push(
+        ...compareDeclarations(doc.data.motion, item.meta?.motion, `${label}: frontmatter motion`, catalogue),
+      );
       const actual = motionForms(doc.data.motion).sort();
       if (JSON.stringify(actual) !== JSON.stringify(motionForms(item.meta?.motion).sort()))
         problems.push(`${label}: frontmatter motion forms differ from meta.motion`);

@@ -2,15 +2,15 @@
 title: Progress
 description: Uploads, imports, and other work with a measurable end.
 category: feedback
-motion: [data.transition]
+motion: [data.transition, {"recipe":"data.transition","form":"continuous"}, {"recipe":"state.color","form":"css-transition"}, {"recipe":"geometry.resize","form":"measured"}, {"recipe":"text.change","form":"changed-runs"}, {"recipe":"number.roll","form":"reels"}]
 intensity: subtle
-motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"A local progress fill follows the semantic value inside its fixed track."}
-motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"progress","reason":"Progress integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"A local progress root owns its entrance, content-driven height and per-part paint; the fill retargets inside the caller's fixed track, the formatted readout settles when the fill still has to travel, and the status pulse is one theme-clock opacity owner."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"progress","reason":"Progress owns one opacity entrance on its own root at the already-correct fill and value, plus the determinate fill retarget on its indicator; a presenting parent, a hidden host or an unusable control keeps native paint."}],"data.transition/continuous":[{"relationship":"default","owner":"progress","reason":"The indicator owns one theme-clock opacity pulse only while the primitive reports indeterminate and the host is visible; reduced and none release it and keep the static fill."}],"state.color/css-transition":[{"relationship":"default","owner":"progress","reason":"The track owns its background set and the label and value each own their foreground set; an unverified caller palette, focus or invalid paint settles that owner immediately."}],"geometry.resize/measured":[{"relationship":"default","owner":"progress","reason":"The root shell owns one measured content height for the label/value flow; the track keeps the caller width and a caller-fixed or clipped box keeps native layout."}],"text.change/changed-runs":[{"relationship":"default","owner":"progress","reason":"A plain ProgressLabel string replaces only changed runs; unchanged graphemes keep their identity and rich children pass through untouched."}],"number.roll/reels":[{"relationship":"default","owner":"progress","reason":"The formatted determinate readout and a direct numeric label each roll their own changed places; a fill that still has to travel settles that revision's readout immediately."}]}}
 complexity: M
 tier: T4
 since: 0.3.0
 deps: ["@base-ui/react", "motion"]
-registryDeps: ["@cadence/cadence-provider", "@cadence/cadence-utils"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils", "@cadence/cadence-geometry", "@cadence/cadence-text", "@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -25,22 +25,26 @@ npx shadcn@latest add @cadence/progress
 
 [Manual installation files](https://cadence.dev/r/progress.json)
 
-Copy all nine target files, keeping `progress/index.tsx` beside the shared
-`lib/` directory, the relative imports intact and the sources' `"use client"`
-directives. Progress imports `NativeControlDiv` from `control-animation.tsx`,
-which also reaches `native-div.tsx` and `press-button.tsx`. Copy the complete
-provider, motion and utilities payloads, even without a provider wrapper.
-The provider files and `motion` package remain required imports.
+Copy every target file in the Manual tab, keeping `progress/index.tsx` beside
+the shared `lib/` directory, the relative imports intact and the sources'
+`"use client"` directives. Progress imports `NativeControlDiv` from
+`control-animation.tsx`, the preset bindings from `motion.ts`, the policy hooks
+from `css-motion.ts`, `createInlineEntrance` from `inline-entrance.ts`,
+`createMeasuredGeometry` from `measured-geometry.ts` and the text/number
+adapters from `use-text-presentation.ts` and `use-number-presentation.ts`.
+Copy the complete provider, motion, geometry, text, number and utilities
+payloads, even without a provider wrapper. The provider files and `motion`
+package remain required imports.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. Progress needs no additional item-specific CSS, icon package or external
 asset. Its full-width indicator uses `scaleX` for determinate updates through
-`data.transition`; reduced and none jump to the new fraction. A null value
-uses the theme's opacity-only `animate-pulse` in full and reduced, and
-`animate-none` in none. Continuous loops follow the theme animation token,
-not the provider speed. Standalone bars follow the system motion preference;
-an optional `CadenceProvider` controls a subtree, and nested full still respects
-system reduced motion.
+`data.transition`; reduced and none place the new fraction immediately, as does
+a revised range or a determinate/indeterminate boundary. A null value pulses
+through one theme-clock opacity owner in full and stays static in reduced and
+none. Continuous loops follow the theme animation token, not the provider speed.
+Standalone bars follow the system motion preference; an optional `CadenceProvider`
+controls a subtree, and nested full still respects system reduced motion.
 
 Usage, the top specimen, Labelled, Indeterminate, Complete, Custom range,
 Composed track and Explicit motion scopes use only Progress and its included
@@ -88,6 +92,20 @@ with `ProgressIndicator` creates an additional track sharing the same fraction,
 as Composed track shows; it does not replace the default. Keep the indicator's
 full width and transform ownership when styling it. A custom indicator `render`
 replaces the animation adapter, so the caller must preserve its motion contract.
+
+The root shell measures its own content height after `ProgressLabel` and
+`ProgressValue` have laid out, so a label that wraps to a second line grows the
+bar's box instead of clipping it; a caller-fixed height or a clipped parent keeps
+native layout. The track keeps the caller's width and never animates size while
+the fill is animating its transform. The determinate `ProgressValue` rolls only
+changed digits and settles immediately when the fill is still travelling to a new
+fraction in the same render; the accessible value is final at once. A plain
+`ProgressLabel` string replaces only the characters that changed, while a rich
+label child passes through untouched and owns its own animation. An explicit
+track colour transition belongs to `ProgressTrack`, and the label and value each
+own their own foreground transition; the indicator's own background stays a
+caller-owned static paint because it already carries the fill writer and the
+indeterminate pulse.
 
 The root owns `role="progressbar"` and its range/value ARIA attributes, not
 the track. Give it an `aria-label` or `aria-labelledby`, or let the nested
@@ -141,7 +159,7 @@ export function LabelledProgress() {
 
 ## Indeterminate
 
-A null value omits aria-valuenow and pulses the full track using opacity. This loop remains under reduced motion, stops under none and follows the theme animation token rather than the provider speed.
+A null value omits aria-valuenow and pulses the full track using opacity. The pulse stops under reduced and none, and follows the theme animation token rather than the provider speed when it runs.
 
 <ComponentExample name="indeterminate" />
 
@@ -354,21 +372,32 @@ Plain wrappers over Base UI's parts; each forwards `className` and native props.
 
 ## Motion contract
 
-Authored intensity is **subtle**: A local progress fill follows the semantic value inside its fixed track.
+Authored intensity is **subtle**: A local progress root owns its entrance, content-driven height and
+per-part paint; the fill retargets inside the caller's fixed track, the formatted readout settles when the
+fill still has to travel, and the status pulse is one theme-clock opacity owner.
 
-Recipe: `data.transition/one-shot`, in both of its documented forms.
+Recipes: `data.transition/one-shot`, `data.transition/continuous`, `state.color/css-transition`,
+`geometry.resize/measured`, `text.change/changed-runs`, `number.roll/reels`.
 
-| Phase         | Properties                     | Token            | Interruptible |
-| ------------- | ------------------------------ | ---------------- | ------------- |
-| value change  | `scaleX old → new` (one-shot)  | `data.transition/one-shot`| yes           |
-| indeterminate | `opacity` pulse (continuous)   | `data.transition/one-shot`| yes           |
-| reduced       | value jumps; pulse kept, opacity only | `data.transition/one-shot` | yes     |
-| none          | no transition, `animate-none`  | –                | –             |
+| Phase              | Properties                              | Token                          | Interruptible |
+| ------------------ | --------------------------------------- | ---------------------------------- | ------------- |
+| insertion          | `opacity` entrance at the current value | `data.transition/one-shot`     | yes           |
+| value change       | `scaleX old → new` (one-shot)           | `data.transition/one-shot`     | yes           |
+| indeterminate      | `opacity` pulse (continuous)            | `data.transition/continuous`   | yes           |
+| readout change     | changed digits roll; settled when the fill travels | `number.roll/reels`  | yes           |
+| label text change  | changed runs only, `stagger: none`      | `text.change/changed-runs`     | yes           |
+| colour change      | track background, label/value foreground | `state.color/css-transition`  | yes           |
+| content growth     | measured root height, clamped            | `geometry.resize/measured`     | yes           |
+| reduced            | fill, text, digits and geometry settle; no pulse, short colour | –         | –             |
+| none               | no transition, delay or loop of any property, colour included | –          | –             |
 
-The fill is a `scaleX` transform on an element that keeps the full track width, so
-a value change never triggers layout. Under `reduced` the fill jumps to the new
-value — position is information, the animation is not — while the indeterminate
-pulse survives, because opacity-only loading feedback is what M5 keeps.
+The fill is a `scaleX` transform on an element that keeps the full track width, so a value change never
+triggers layout. Under `reduced` the fill places the new value immediately — position is information, the
+animation is not — and the indeterminate pulse stops because a repeated opacity loop is decorative motion,
+not state. Under `none` every property, including colour, reaches its semantic target with no duration or
+delay. A revised `min`/`max`, `format` or `locale` that changes normalization, and any determinate ↔
+indeterminate boundary, settle the fill through a zero-length clock so the new geometry is placed instead
+of being interpolated from a full-width indeterminate shape.
 
 ## Keyboard interactions
 

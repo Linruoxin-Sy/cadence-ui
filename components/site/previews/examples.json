@@ -208,7 +208,8 @@
     "without-overflow",
     "caller-rendering",
     "rtl",
-    "changing-content"
+    "changing-content",
+    "nested-display"
   ],
   "calendar": [
     "single-selection",
