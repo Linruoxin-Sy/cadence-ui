@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/toc`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: layout.shared, scroll.navigate
+- Motion recipes: data.transition, layout.shared, geometry.resize, state.color, text.change
 
 ## Installation
 
@@ -32,6 +32,10 @@ npm install clsx tailwind-merge motion
 - [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-selection](https://cadence.dev/r/cadence-selection.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -54,13 +58,34 @@ npm install clsx tailwind-merge motion
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-selection | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | toc | `@components/cadence/toc/index.tsx` | [JSON files[].content](https://cadence.dev/r/toc.json) |
+| toc | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/toc.json) |
+| toc | `@components/cadence/lib/scroll-navigation.ts` | [JSON files[].content](https://cadence.dev/r/toc.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-selection](https://cadence.dev/r/cadence-selection.json)
 
 [Source files: toc](https://cadence.dev/r/toc.json)
 
@@ -217,14 +242,15 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all 9 target files, including every shared motion and provider helper.
-Keep the sibling `cadence/` tree, relative imports and shipped `"use client"`
-directives. Complete the linked manual base setup with Cadence theme CSS,
-ensure Tailwind CSS v4 scans the copied files, and apply
-`bg-background text-foreground` to your application root. No additional
-item-specific stylesheet is required. The provider files are required imports;
-wrapping the application is optional. Standalone Toc respects the system
-motion preference; a provider selects a local mode or recipe clock.
+Copy every file in the target list, keeping `toc/index.tsx` beside the shared
+`lib/` directory that holds `cn.ts`, `inline-entrance.ts` and the motion,
+geometry, selection and text helpers Toc imports. Keep the sibling `cadence/`
+tree, relative imports and shipped `"use client"` directives. Complete the
+linked manual base setup with Cadence theme CSS, ensure Tailwind CSS v4 scans
+the copied files, and apply `bg-background text-foreground` to your application
+root. No additional item-specific stylesheet is required. The provider files are
+required imports; wrapping the application is optional. Standalone Toc respects
+the system motion preference; a provider selects a local mode or recipe clock.
 
 The Controlled active section example additionally uses Button. For a fully
 manual installation, install its complete recursive npm dependencies:
@@ -280,13 +306,13 @@ is restored on blur/unmount. Modified clicks, missing targets and
 caller-cancelled events retain native behavior. A nav `onClick` runs first;
 call `preventDefault()` only when the caller intends to suppress navigation.
 
-Full mode uses `layout.shared` for one persistent reading indicator and
-`scroll.navigate` for explicit link navigation. Initial measured placement
-is immediate. Reduced/none place the indicator and navigate
-immediately; a live downgrade completes an active trip, while user input,
-resize, history, external hashes or unmount cancel it. Positive clock changes
-retime from the current position. Static placement geometry is not a resize
-animation. Optional Button actions retain Button's separate `feedback.press`
+Full mode moves one persistent reading indicator with `layout.shared` and
+navigates explicit link activation with `scroll.navigate`. Initial measured
+placement is immediate, and a passive heading change only selects a cached
+entry box. Reduced/none place the indicator and navigate immediately; a live
+downgrade completes an active trip, while user input, resize, history, external
+hashes or unmount cancel it. Positive clock changes retime from the current
+position. Optional Button actions retain Button's separate `feedback.press`
 contract.
 
 ## Usage
@@ -506,37 +532,44 @@ export function ScrollTracking() {
 | native nav props | `ComponentProps<"nav">` | – | Includes ref, style, aria attributes, and event handlers. |
 
 `TocEntry` has `id: string`, `title: string`, and optional `depth: 2 | 3` (default `2`).
-Slots are `toc`, `toc-title`, `toc-track`, `toc-rail`, `toc-indicator`, `toc-list`, `toc-item`, and `toc-link`.
+Slots are `toc`, `toc-title`, `toc-track`, `toc-rail`, `toc-indicator`, `toc-list`, `toc-item`,
+`toc-link`, and `toc-link-text`; the last one carries the entry label so a rename replaces only its
+changed graphemes.
 
 ## Motion contract
 
-Authored intensity is **medium**: Native section navigation scrolls the page while a local indicator follows the active heading.
+Authored intensity is **medium**: Native section navigation scrolls the page while one persistent indicator follows the active heading and the shell owns only its own block size.
 
-One persistent indicator follows the active entry. Its top and bottom edges use the shared physics
-spring, then render as translation and vertical scale on a one-pixel base. Wrapped labels determine
-the destination's length. Edges stay inside the rail, and interrupted movement preserves velocity.
-Text and `aria-current` follow the current section immediately. Activating a link smoothly scrolls
-the actual scrolling host to its heading in full mode. The destination respects the heading's scroll
-margin and the host's scroll padding; movement stays within the host's scroll bounds.
+One persistent indicator follows the active entry as a single endpoint box inside the track's own
+coordinates, clamped to the measured rail. Wrapped labels determine the destination's length, an
+interrupted move keeps its velocity, and a first placement or a reappearance with no valid active
+entry is immediate. Text and `aria-current` follow the current section immediately. Activating a link
+smoothly scrolls the actual scrolling host to its heading in full mode. The destination respects the
+heading's scroll margin and the host's scroll padding; movement stays within the host's scroll bounds.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Active section or label size changes | Indicator translateY / scaleY | `layout.shared/one-shot` / `spring.morph` | Yes; the existing indicator follows the latest target. |
-| Section link activation | Native scroll offset | `scroll.navigate/one-shot` / `duration.page` / `ease.inOut` | Yes; another link retargets from the current position. |
+| Active entry changes | Indicator transform | `layout.shared/selection` / `spring.smooth` | Yes; the same indicator retargets from its current box. |
+| Later inserted navigation | Surface opacity | `data.transition/one-shot` / `duration.fast` / `ease.out` | Yes; a passive reading change never replays it. |
+| Known entries or label revision | List block size | `geometry.resize/measured` / `sizeCompact` | Yes; a newer revision replaces the pending destination. |
+| Link state or entry label | Link foreground, changed runs | `state.color/css-transition` / `text.change/changed-runs` | Yes; only changed graphemes are replaced. |
+| Rail and indicator paint | Indicator background | `state.color/css-transition` / `duration.fast` | Yes; independent of the selected endpoint geometry. |
+| Section link activation | Native scroll offset | `duration.page` / `ease.inOut` (explicit section navigation) | Yes; another link retargets from the current position. |
 | Initial measurement / restored selection | Instant placement, no entrance | — | — |
-| reduced | Instant indicator placement and section navigation | — | Stops springs; completes an active navigation before paint. |
-| none | Instant placement and navigation, no animation clock | — | Stops springs; completes an active navigation before paint. |
+| reduced | Instant indicator placement and section navigation; short colour and changed runs | — | Stops springs; completes an active navigation before paint. |
+| none | Instant placement, navigation and paint, no animation clock | — | Stops springs; completes an active navigation before paint. |
 
 Zero provider timeScale also places the indicator immediately. Restoring full motion keeps the
-settled position until the next section or size change. A ResizeObserver supplies geometry; no
-layout is read during render. Navigation uses one token-backed tween, with no separate CSS/native
-smooth-scroll clock. Wheel, touch, pointer input, scrolling keys, resizing, history traversal and
-external hash changes cancel it at the current position. Positive clock changes retime the current
-trip; reduced/none or zero clock complete it immediately. No interrupted trip restarts later.
-Removed/replaced targets and passive scroll-host geometry changes cancel a trip before it can focus
-or snap to an obsolete destination. Hidden/offscreen links settle their reading indicator while a
-valid user-activated trip retains its target and focus. Document hiding, print and forced-colours
-cancel navigation; restoration does not resume an abandoned trip.
+settled position until the next section or size change. A ResizeObserver supplies geometry; a passive
+reading change reads the cached entry box and never measures during render or scroll. Navigation uses
+one token-backed tween, with no separate CSS/native smooth-scroll clock. Wheel, touch, pointer input,
+scrolling keys, resizing, history traversal and external hash changes cancel it at the current
+position. Positive clock changes retime the current trip; reduced/none or zero clock complete it
+immediately. No interrupted trip restarts later. Removed/replaced targets and passive scroll-host
+geometry changes cancel a trip before it can focus or snap to an obsolete destination.
+Hidden/offscreen links settle their reading indicator while a valid user-activated trip retains its
+target and focus. Document hiding, print and forced-colours cancel navigation; restoration does not
+resume an abandoned trip.
 The site's mobile disclosure stays instant. Initial hashes, reload, history traversal and no-JS
 links keep native behavior; only an explicit unmodified section link activation starts the recipe.
 
