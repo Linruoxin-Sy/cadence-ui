@@ -161,6 +161,33 @@ export function ChangingContentExample() {
   );
 }
 
+export function NestedDisplayExample() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="grid gap-3">
+      <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
+        Change task totals
+      </Button>
+      <ScrollArea aria-label="Task board" className="h-64 w-full rounded-md border">
+        <div className="grid gap-3 p-4 text-sm">
+          <p>Outer board scrolls the two nested lanes below.</p>
+          <ScrollArea aria-label="Task count" className="h-20 rounded-md border">
+            {expanded ? 30 : 12}
+          </ScrollArea>
+          <ScrollArea aria-label="Task label" className="h-20 rounded-md border">
+            {expanded ? "Archive tasks are visible." : "Inbox tasks are visible."}
+          </ScrollArea>
+          <ol className="flex flex-col gap-1">
+            {Array.from({ length: 20 }, (_, i) => (
+              <li key={i.toString()}>Board row {i + 1}: review the component notes.</li>
+            ))}
+          </ol>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
 function BasicExample() {
   return (
     <div className="grid min-w-0 gap-5">
@@ -184,6 +211,7 @@ const examples = {
   "caller-rendering": CallerRenderingExample,
   rtl: RtlExample,
   "changing-content": ChangingContentExample,
+  "nested-display": NestedDisplayExample,
 };
 
 export function ScrollAreaPreview({ example }: { example?: string }) {

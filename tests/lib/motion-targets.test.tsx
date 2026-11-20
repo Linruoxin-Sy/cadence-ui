@@ -211,6 +211,7 @@ describe("current registry inventory and real part references", () => {
         "tabs",
         "navigation-menu",
         "progress",
+        "scroll-area",
       ].sort(),
     );
     expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(

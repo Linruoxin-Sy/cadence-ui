@@ -5227,7 +5227,13 @@
       "description": "Constrained lists and wide content with native scrolling and custom scrollbars.",
       "categories": ["scroll"],
       "dependencies": ["@base-ui/react"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/scroll-area/index.tsx",
@@ -5239,7 +5245,21 @@
         "since": "0.4.0",
         "tier": "T0",
         "batch": "B6",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -5248,14 +5268,43 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Scroll Area declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "Track opacity, scoped thumb and focus colour, changed text and compact quantity reels stay local while native scrolling, thumb geometry and content layout remain the direct owner."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "scroll-area",
+                "reason": "ScrollArea integrates this executor on the track the primitive inserts when the viewport gains overflow; native scrolling and the primitive's own mount/removal policy remain the owner."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "scroll-area",
+                "reason": "ScrollArea owns the thumb's declared background paint and the viewport's declared foreground and focus paint; native thumb geometry and content layout stay immediate."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "scroll-area",
+                "reason": "ScrollArea owns changed runs only for a direct plain string child of its viewport; rich child content and caller display components retain their own owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "scroll-area",
+                "reason": "ScrollArea owns compact reels only for a direct numeric child of its viewport; scroll offsets, extents and numeric identifiers are never counters."
+              }
+            ]
+          }
         }
       }
     },
