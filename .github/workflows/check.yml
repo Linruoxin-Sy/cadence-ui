@@ -1,11 +1,13 @@
 # `pnpm check` is the local equivalent. CI runs the same commands as independent
 # jobs so one long gate cannot serialize the rest; `check` aggregates them and is
-# the only required status on main. `branch-policy` has no local equivalent: the
-# committed hooks guard the same rule on the machine that commits.
+# the only required status on main. `branch-policy` and `plan` have no `pnpm check`
+# equivalent: one reads the branch name, the other the issue a pull request closes.
 name: check
 
 on:
   pull_request:
+    # `edited` reruns the plan job when the body gains or loses its link.
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
 
@@ -71,6 +73,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: node scripts/branch-policy.mjs --ci
+
+  plan:
+    # The pull request must name the task it closes and that task must be ready: the
+    # `task` label, status:claimed or status:in-review, and no open `Blocked by`
+    # reference. It reads the event payload and the REST API, never the diff, so a
+    # docs-only pull request is judged by the same rules and a fork's read-only token
+    # is enough to check it.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/plan/check.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
   registry-check:
     needs: prepare
@@ -146,7 +166,7 @@ jobs:
     # The required status. It fails when any fan-out job failed, was cancelled or
     # was skipped; individual job names are diagnostics, not merge requirements.
     if: always()
-    needs: [prepare, static, branch-policy, registry-check, runtime, gate]
+    needs: [prepare, static, branch-policy, plan, registry-check, runtime, gate]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
