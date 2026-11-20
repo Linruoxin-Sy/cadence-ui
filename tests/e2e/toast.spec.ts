@@ -34,7 +34,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             await computed(page, '[data-slot="toast"]', "transform"),
           );
         }
-        expect(await computed(page, '[data-slot="toast"]', "transition-property")).not.toMatch(/height|bottom|all/);
+        // The root's CSS clock is its scoped colour family; presence is a WAAPI
+        // envelope, so no authored height/bottom/all/travel property may appear here.
+        // (A substring match would trip on `border-bottom-color`, which is colour.)
+        const properties = (await computed(page, '[data-slot="toast"]', "transition-property"))
+          .split(",")
+          .map((property) => property.trim());
+        expect(properties).not.toContain("all");
+        expect(
+          properties.filter((property) => ["height", "bottom", "transform", "opacity"].includes(property)),
+        ).toEqual([]);
         await page.keyboard.press("F6");
         await expect(page.locator('[data-slot="toast-viewport"]').filter({ has: toast })).toBeFocused();
         await page.keyboard.press("Tab");
