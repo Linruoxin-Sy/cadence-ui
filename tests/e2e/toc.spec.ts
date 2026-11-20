@@ -186,8 +186,10 @@ test("one indicator slides, resizes for wrapping, reverses and cancels before th
   await toc.evaluate((node) => {
     node.style.width = "6rem";
   });
+  // The wrap is a layout consequence of the new width: wait for it, then compare the
+  // indicator against the very height the label reached.
+  await expect.poll(() => wrapped.evaluate((node) => (node as HTMLElement).offsetHeight)).toBeGreaterThan(30);
   const targetHeight = await wrapped.evaluate((node) => (node as HTMLElement).offsetHeight);
-  expect(targetHeight).toBeGreaterThan(30);
   await expect.poll(() => marker.evaluate((node) => node.getBoundingClientRect().height)).toBeCloseTo(targetHeight, 1);
 });
 
