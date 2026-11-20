@@ -2,15 +2,22 @@
 title: Scroll Area
 description: Constrained lists and wide content with native scrolling and custom scrollbars.
 category: scroll
-motion: []
+motion:
+  - data.transition
+  - recipe: state.color
+    form: css-transition
+  - recipe: text.change
+    form: changed-runs
+  - recipe: number.roll
+    form: reels
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Scroll Area declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"Track opacity, scoped thumb and focus colour, changed text and compact quantity reels stay local while native scrolling, thumb geometry and content layout remain the direct owner."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"scroll-area","reason":"ScrollArea integrates this executor on the track the primitive inserts when the viewport gains overflow; native scrolling and the primitive's own mount/removal policy remain the owner."}],"state.color/css-transition":[{"relationship":"default","owner":"scroll-area","reason":"ScrollArea owns the thumb's declared background paint and the viewport's declared foreground and focus paint; native thumb geometry and content layout stay immediate."}],"text.change/changed-runs":[{"relationship":"default","owner":"scroll-area","reason":"ScrollArea owns changed runs only for a direct plain string child of its viewport; rich child content and caller display components retain their own owners."}],"number.roll/reels":[{"relationship":"default","owner":"scroll-area","reason":"ScrollArea owns compact reels only for a direct numeric child of its viewport; scroll offsets, extents and numeric identifiers are never counters."}]}}
 complexity: S
 tier: T0
 since: 0.4.0
 deps: ["@base-ui/react"]
-registryDeps: ["@cadence/cadence-utils"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-text", "@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -25,10 +32,12 @@ npx shadcn@latest add @cadence/scroll-area
 
 [Manual installation files](https://cadence.dev/r/scroll-area.json)
 
-Copy both target files into the same `cadence/` tree so the relative import
-of `lib/cn` resolves. Preserve the component's `"use client"` directive.
+Copy the component and the shared Cadence files the CLI lists into the same
+`cadence/` tree so the relative imports resolve. Preserve the component's `"use client"` directive.
 Complete the base theme setup linked above and ensure Tailwind scans the copied
-files. No motion runtime, provider or additional item-specific CSS is required.
+files. The shared motion runtime, provider and text/number helpers are part of the
+item's installation graph; `CadenceProvider` is optional because the runtime falls
+back to the system preference.
 
 Usage, Vertical scrolling, Horizontal scrolling, Both axes and Without overflow
 use serializable props and children and can be composed in a Server Component.
@@ -76,11 +85,12 @@ scrolling and viewport resize; content-only growth can leave the thumb stale unt
 one of those occurs because this wrapper has no Content part. The caller owns
 entries, dimensions, scrolling to new data, pagination and virtualization.
 
-Scroll Area is static in full, reduced and none: native thumb positioning remains
-functional and no fade, smoothing or resize interpolation is added. Native wheel,
-touch momentum and keyboard scrolling follow the browser/platform policy.
-Application-added smooth scrolling or animation remains caller-owned; the optional
-Button composition retains Button's separate motion contract.
+Scroll Area keeps native scrolling in full, reduced and none. Native thumb positioning stays
+functional and no smoothing, automatic scrolling or resize interpolation is added. Authored motion is
+limited to the track the primitive inserts when overflow appears, scoped thumb/focus colour and bounded
+direct display content. Native wheel, touch momentum and keyboard scrolling follow the
+browser/platform policy. Application-added smooth scrolling or animation remains caller-owned; the
+optional Button composition retains Button's separate motion contract.
 
 ## Usage
 
@@ -334,6 +344,53 @@ export function ChangingContentExample() {
 }
 ```
 
+## Nested areas and direct display content
+
+A ScrollArea nests inside another ScrollArea's content: each keeps its own native
+viewport, tracks and mode, and pointer or wheel input resolves against the area the
+pointer is over. The nested lanes also pass one direct number child and one direct
+string child of their viewport, so `scroll-area-number` and `scroll-area-text` update
+that display in place while the surrounding board stays untouched. Rich children keep
+their own trees; each lane owns one direct plain string or numeric child, not a mixed
+array.
+
+<ComponentExample name="nested-display" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ScrollArea } from "@/components/cadence/scroll-area";
+
+export function NestedDisplayExample() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="grid gap-3">
+      <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
+        Change task totals
+      </Button>
+      <ScrollArea aria-label="Task board" className="h-64 w-full rounded-md border">
+        <div className="grid gap-3 p-4 text-sm">
+          <p>Outer board scrolls the two nested lanes below.</p>
+          <ScrollArea aria-label="Task count" className="h-20 rounded-md border">
+            {expanded ? 30 : 12}
+          </ScrollArea>
+          <ScrollArea aria-label="Task label" className="h-20 rounded-md border">
+            {expanded ? "Archive tasks are visible." : "Inbox tasks are visible."}
+          </ScrollArea>
+          <ol className="flex flex-col gap-1">
+            {Array.from({ length: 20 }, (_, i) => (
+              <li key={i.toString()}>Board row {i + 1}: review the component notes.</li>
+            ))}
+          </ol>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+```
+
 ## When to use
 
 - Long activity feeds constrained by a panel height.
@@ -361,30 +418,31 @@ and corner. ScrollArea's `children` render inside the viewport, including any
 additional horizontal track, matching the pinned upstream composition.
 
 Slots: `scroll-area`, `scroll-area-viewport`, `scroll-area-scrollbar`,
-`scroll-area-thumb`. The scrollbar includes `data-orientation`.
+`scroll-area-thumb`, plus `scroll-area-text` and `scroll-area-number` around a
+direct plain string or numeric child. The scrollbar includes `data-orientation`.
 Root classes, padding, borders and styles remain on the root; content padding
 belongs on a child. Root ref does not address the viewport. No viewport prop or
 ref API is invented; query its slot from the root for application-owned imperative scrolling.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Scroll Area declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: Track opacity, scoped thumb and focus colour, changed text and compact quantity reels stay local while native scrolling, thumb geometry and content layout remain the direct owner.
 
-T0: empty recipe set, no provider, hook, timing token or authored animation.
-Enter, exit and resize are immediate. Full, reduced and none share static markup.
-The primitive positions and sizes its thumb from actual native scroll geometry;
-those transforms represent user position and remain functional in every mode.
-No smoothing, automatic scrolling, entrance or opacity transition is added.
+| Recipe | Owner and full behaviour | reduced | none |
+| --- | --- | --- | --- |
+| `data.transition/one-shot` | The track the primitive inserts when overflow appears fades in from its current paint. Removal is the primitive's own unmount, not a retained exit. | Short opacity. | Immediate visibility. |
+| `state.color/css-transition` | The thumb's declared background and the viewport's declared foreground/focus paint, `duration.fast`/`ease.out`; focus within the viewport settles the whole paint immediately. | Short colour; focus-gated paint immediate. | Zero duration and delay. |
+| `text.change/changed-runs` | Changed runs of a direct plain string child only; unchanged graphemes keep their identity and rich children keep their tree. | Changed-text opacity only. | Exact text immediately. |
+| `number.roll/reels` | Changed places of a direct numeric child, compact reels; scroll offsets, extents and identifiers are never counters. | Exact value immediately. | Exact value immediately. |
 
-| Mode | Authored motion |
-| --- | --- |
-| full | none |
-| reduced | none |
-| none | none |
+Thumb translation, scroll extent, corner geometry and content layout stay native in every mode: the
+primitive positions the thumb from actual scroll geometry and the browser owns momentum and snapping.
+A live downgrade cancels the reel clock and keeps only short opacity and colour; none or a zero recipe
+clock settles every authored writer without disabling direct scrolling.
 
-Upstream focus-ring and colour feedback remain CSS state feedback. Native wheel,
-touch momentum and keyboard scrolling follow browser/platform preferences.
-Caller-added smooth scrolling and CSS animation are application-owned.
+Upstream focus-ring and colour feedback are now issued through the shared colour owner. Native wheel,
+touch momentum and keyboard scrolling follow browser/platform preferences. Caller-added smooth
+scrolling and CSS animation are application-owned.
 
 ## Accessibility
 
@@ -408,12 +466,18 @@ Give the root explicit dimensions so its viewport can scroll; horizontal scrolli
 corresponding ScrollBar. Parent grids may need min-w-0. Base UI manages custom scrollbar interaction
 while content uses native scrolling; it does not virtualize children.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
-HTML behavior remains browser-owned. The server renders the real content and bounded overflow viewport, so native scrolling remains available without JavaScript. Custom track measurement, pointer dragging and caller-owned update buttons require hydration. The registry enforces a 4 KiB gzip budget for this item's own shipped
-source; dependencies and application bundles are measured separately.
+The authored moving set is the existing track paint plus bounded changed direct content: one opacity
+owner per track, one scoped colour owner per thumb and viewport, and one display controller per direct
+plain child. No per-child measurement, per-line observer or second scroll loop is added. Base UI
+behavior requires hydration; native HTML behavior remains browser-owned. The server renders the real
+content and bounded overflow viewport, so native scrolling remains available without JavaScript.
+Custom track measurement, pointer dragging and caller-owned update buttons require hydration. The
+registry reports this item's own shipped source against its recorded tier reference; dependencies and
+application bundles are measured separately.
 
 ## Notes for AI
 
 - Preserve root/viewport ownership, native scrolling and Base UI render/ref support.
 - Add ScrollBar with horizontal orientation for wide content; its default stays vertical.
-- Do not add decorative fading, smooth scrolling or animation to this T0 component.
+- Keep the track fade tied to the primitive's own insertion; never add a second scroll controller,
+  smooth scrolling or an animated thumb extent.
