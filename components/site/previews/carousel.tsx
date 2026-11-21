@@ -471,6 +471,46 @@ export function WithoutMotionExample() {
   );
 }
 
+export function ContentExample() {
+  const [step, setStep] = useState(0);
+  const label = ["Kickoff", "Review", "Release"][step];
+  const count = [3, 7, 12][step];
+  return (
+    <div className="grid w-full max-w-lg gap-4">
+      <div className="flex justify-center">
+        <Button size="sm" variant="outline" onClick={() => setStep((step + 1) % 3)}>
+          Update slide content
+        </Button>
+      </div>
+      <div className="px-12 py-12">
+        <Carousel
+          aria-label="Content updates"
+          tabIndex={0}
+          opts={{ align: "start" }}
+          className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <CarouselContent className="touch-pan-y">
+            <CarouselItem
+              aria-label="Stage 1 of 2"
+              className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold"
+            >
+              {label}
+            </CarouselItem>
+            <CarouselItem
+              aria-label="Stage 2 of 2"
+              className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold"
+            >
+              {count}
+            </CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+    </div>
+  );
+}
+
 export function CarouselPreview({ example }: { example?: string }) {
   const examples: Record<string, React.ReactNode> = {
     multiple: <MultipleExample />,
@@ -479,6 +519,7 @@ export function CarouselPreview({ example }: { example?: string }) {
     rtl: <RtlExample />,
     drag: <DragExample />,
     "changing-slides": <ChangingExample />,
+    content: <ContentExample />,
     api: <ApiExample />,
     alignment: <AlignmentExample />,
     "custom-controls": <CustomControlsExample />,
