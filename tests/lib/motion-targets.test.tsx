@@ -174,6 +174,7 @@ describe("current registry inventory and real part references", () => {
         "input",
         "textarea",
         "card",
+        "code-block",
         "aspect-ratio",
         "avatar",
         "skeleton",
