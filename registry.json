@@ -2830,6 +2830,11 @@
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
                 "reason": "Data Table mounts dropdown-menu for popup closing; that installed component remains the integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "table",
+                "reason": "Data Table mounts Table, whose surface-presence runtime implements the same retained exit form; Table remains that independent integration owner."
               }
             ]
           }
@@ -6202,8 +6207,13 @@
       "title": "Table",
       "description": "Invoices, transaction histories, and small collections of structured records.",
       "categories": ["collection"],
-      "dependencies": [],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/table/index.tsx",
@@ -6215,8 +6225,14 @@
         "since": "0.4.0",
         "tier": "T0",
         "batch": "B6",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "enter.pop",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
+        "intensity": "medium",
         "complexity": "S",
         "upstream": {
           "registry": "shadcn",
@@ -6224,14 +6240,29 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "surface",
           "travel": "none",
-          "coordination": "independent",
-          "reason": "Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "coordination": "group",
+          "reason": "One table surface fades in once, and row/footer paint keeps a single scoped owner per host; cell content stays the caller's native readout."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "table",
+                "reason": "Table integrates the surface envelope on its retained container; row insertion and collection choreography remain composed by the owner."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "table",
+                "reason": "TableRow and TableFooter own their row and footer paint; head, cell and caption keep their authored static colours without a per-cell clock."
+              }
+            ]
+          }
         }
       }
     },
