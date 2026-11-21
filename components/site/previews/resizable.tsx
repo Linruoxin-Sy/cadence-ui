@@ -52,6 +52,31 @@ function HandleStyles() {
   );
 }
 
+function DisplayRevision() {
+  const [revision, setRevision] = useState(0);
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setRevision((value) => value + 1)}>
+          Revise panels
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setRevision(0)}>
+          Reset
+        </Button>
+      </div>
+      <ResizablePanelGroup className="rounded-md border" style={{ height: 160 }}>
+        <ResizablePanel defaultSize="50%" minSize="20%" className="overflow-auto p-4 text-sm">
+          {["Draft attached", "Draft awaiting review", "Draft approved"][revision % 3]}
+        </ResizablePanel>
+        <ResizableHandle withHandle aria-label="Resize display panels" />
+        <ResizablePanel minSize="20%" className="overflow-auto p-4 text-sm">
+          {1000 + revision}
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
+  );
+}
+
 function CollapsiblePanels() {
   return (
     <ResizablePanelGroup className="rounded-md border" style={{ height: 240 }}>
@@ -320,6 +345,9 @@ export function ResizablePreview({ example }: { example?: string }) {
       break;
     case "handle-styles":
       content = <HandleStyles />;
+      break;
+    case "display-revision":
+      content = <DisplayRevision />;
       break;
     case "collapsible-panels":
       content = <CollapsiblePanels />;
