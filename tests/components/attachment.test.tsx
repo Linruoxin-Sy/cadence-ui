@@ -254,6 +254,8 @@ describe.each(modes)("attachment v2 actions in %s", (mode) => {
       mediaPaint: "",
       titleTint: "",
       descTint: "",
+      actionLabel: "Remove" as string | number,
+      actionPaint: false,
       extra: false,
     };
     const draw = () => (
@@ -289,7 +291,14 @@ describe.each(modes)("attachment v2 actions in %s", (mode) => {
                 <img alt="" key={frame.media} src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
               </AttachmentMedia>
               <AttachmentActions>
-                <AttachmentAction aria-label="Remove" />
+                <AttachmentAction
+                  style={{
+                    color: frame.actionPaint ? "#222" : "#111",
+                    backgroundColor: frame.actionPaint ? "#eee" : "#fff",
+                  }}
+                >
+                  {frame.actionLabel}
+                </AttachmentAction>
               </AttachmentActions>
             </PresenceContext.Provider>
             <AttachmentContent>
@@ -317,6 +326,13 @@ describe.each(modes)("attachment v2 actions in %s", (mode) => {
     const titleText = view.container.querySelector('[data-slot="attachment-title"] [data-slot="attachment-text"]');
     const description = view.container.querySelector('[data-slot="attachment-description"]');
 
+    // Button keeps its own paint, label, box and quantity while the tile is quiet.
+    await owned("attachment.action-paint.colour", () => update({ actionPaint: true }));
+    await owned("attachment.action-label.replace", () => update({ actionLabel: "Remove file" }));
+    await owned("attachment.action-box.resize", () => update({ actionLabel: "Remove" }));
+    update({ actionLabel: 3 });
+    await owned("attachment.action-quantity.roll", () => update({ actionLabel: 4 }));
+
     // Tile presence and the group's native membership.
     await owned("attachment.root.exit", () => update({ root: false }));
     await owned("attachment.root.enter", () => update({ root: true }));
@@ -324,6 +340,10 @@ describe.each(modes)("attachment v2 actions in %s", (mode) => {
     // A later media/action region leaves and enters on its own retained hosts.
     await owned("attachment.part.exit", () => update({ parts: false }));
     await owned("attachment.part.enter", () => update({ parts: true }));
+
+    // Button keeps its own retained exit and entrance on the shared action host.
+    await owned("attachment.action-exit.exit", () => update({ parts: false }));
+    await owned("attachment.action-button.enter", () => update({ parts: true }));
 
     // The supplied preview and the supplied state share one media envelope.
     await owned("attachment.media.replace", () => update({ media: "second" }));
