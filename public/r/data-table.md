@@ -47,6 +47,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
 - [@cadence/dropdown-menu](https://cadence.dev/r/dropdown-menu.json) — direct registry dependency.
 - [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
+- [@cadence/cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json) — transitive registry dependency.
 - [@cadence/table](https://cadence.dev/r/table.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -89,6 +90,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | dropdown-menu | `@components/cadence/dropdown-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/dropdown-menu.json) |
 | input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | table | `@components/cadence/table/index.tsx` | [JSON files[].content](https://cadence.dev/r/table.json) |
 | data-table | `@components/cadence/data-table/index.tsx` | [JSON files[].content](https://cadence.dev/r/data-table.json) |
 
@@ -115,6 +117,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: dropdown-menu](https://cadence.dev/r/dropdown-menu.json)
 
 [Source files: input](https://cadence.dev/r/input.json)
+
+[Source files: cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json)
 
 [Source files: table](https://cadence.dev/r/table.json)
 

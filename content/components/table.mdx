@@ -2,15 +2,24 @@
 title: Table
 description: Invoices, transaction histories, and small collections of structured records.
 category: collection
-motion: []
-intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motion:
+  - enter.pop
+  - recipe: state.color
+    form: css-transition
+intensity: medium
+motionProfile: {"scope":"surface","travel":"none","coordination":"group","reason":"One table surface fades in once, and row/footer paint keeps a single scoped owner per host; cell content stays the caller's native readout."}
+motionCoverage: {"schema":1,"effects":{"enter.pop/one-shot":[{"relationship":"default","owner":"table","reason":"Table integrates the surface envelope on its retained container; row insertion and collection choreography remain composed by the owner."}],"state.color/css-transition":[{"relationship":"default","owner":"table","reason":"TableRow and TableFooter own their row and footer paint; head, cell and caption keep their authored static colours without a per-cell clock."}]}}
 complexity: S
 tier: T0
 since: 0.4.0
-deps: []
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["motion"]
+registryDeps:
+  [
+    "@cadence/cadence-motion",
+    "@cadence/cadence-utils",
+    "@cadence/cadence-provider",
+    "@cadence/cadence-surface-presence",
+  ]
 ---
 
 ## Installation
@@ -25,12 +34,14 @@ npx shadcn@latest add @cadence/table
 
 [Manual installation files](https://cadence.dev/r/table.json)
 
-Copy both target files, keeping `table/index.tsx` and `lib/cn.ts` in the
-same `cadence/` tree so the relative import resolves. Preserve the source's
-`"use client"` directive. Complete the base theme setup linked above and
-ensure Tailwind scans the copied files. Table needs no motion runtime,
-provider or additional item-specific CSS; all three motion modes keep its
-native table parts static. Row colour feedback is CSS state feedback.
+Copy the recursive dependency files from the Manual panel, keeping
+`table/index.tsx` beside `lib/cn.ts`, the motion runtime modules and the shared
+surface-presence module in the same `cadence/` tree so the
+relative imports resolve. Preserve the source's `"use client"` directive. Complete
+the base theme setup linked above and ensure Tailwind scans the copied files. Table
+installs the Cadence motion runtime and provider: one surface envelope and one scoped
+row/footer colour owner. Cell content, rich children, editors and caller paint keep
+their own owners, and all three motion modes keep the native table hierarchy.
 
 Usage, Footer totals, Density and alignment, Horizontal overflow, and Empty
 results pass serializable props and children and can be composed in a Server
@@ -445,6 +456,12 @@ React 19 `ref`. Classes merge last. No custom props or defaults are added.
 Each part's slot is its kebab-case name: `table`, `table-header`, `table-body`,
 `table-footer`, `table-row`, `table-head`, `table-cell`, and `table-caption`.
 
+Cell, head and caption children render exactly as given: a plain string or number
+stays the caller's own native text node, and rich children, controls, editors and
+formatted values are untouched. Table wraps no cell content in an internal display
+element and adds no per-cell controller, so selection, copy, intrinsic sizing and
+editing keep native semantics.
+
 `Table` also creates a `div` with `data-slot="table-container"` and
 `relative w-full overflow-x-auto`. Its props, classes and ref target the **table**,
 not that wrapper. Size the surrounding layout to constrain the scrolling region.
@@ -453,19 +470,29 @@ Rows retain hover, `data-state="selected"` and descendant `aria-expanded` feedba
 
 ## Motion contract
 
-Authored intensity is **subtle**: Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: One table surface fades in once, and row/footer paint keeps a single scoped owner per host; cell content stays the caller's native readout.
 
-T0: no motion recipe, hook, provider, or animation runtime. All modes render the
-same static table. Row colour feedback is the upstream CSS colour transition;
-rows do not enter, reorder, resize, or animate selection.
+Only a later-inserted whole table fades in; the first server/hydration paint stays
+visible, and row insertion or removal belongs to the composition that owns the
+records. One scoped colour owner sits on `TableRow` and one on `TableFooter`;
+head, cell and caption keep their authored static colours so a large table gains
+no per-cell clock. A caller-painted row or footer commits its colours
+immediately, and focus or an invalid state inside that region settles its whole
+paint. Changed cell text and quantities are the caller's own native content: Table
+declares no text or number recipe, so a new value commits at once in every mode and
+a virtualized cell carries no stale controller state.
 
-| Mode | Animated properties |
-| --- | --- |
-| full | none |
-| reduced | none |
-| none | none |
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| Independent late insertion of the table surface | container opacity; first SSR/hydration paint stays visible | `enter.pop/one-shot` | Yes, retargets the same host |
+| Row hover/expanded/selected, footer surface, footer rule | scoped background, foreground and the footer's top rule at one owner per host | `state.color/css-transition` | Yes, latest paint wins |
+| reduced | short surface opacity and eligible colour, no travel | Same recipes | Live cancellation |
+| none / zero clock | immediate current semantic target; no duration, delay or loop, colour included | Same recipes, zero clock | Cancels active work |
 
-No timing token or interruption lifecycle applies.
+Native table layout owns every column width, row height and wrap decision: Table
+adds no measured size writer, no per-cell observer and no inferred sort. The
+composition that owns the records declares its own layout or geometry binding
+instead of asking the primitive to spring each cell.
 
 ## Accessibility
 
@@ -480,6 +507,8 @@ No timing token or interruption lifecycle applies.
   can scroll that ancestor without adding grid keyboard semantics.
 - No layout measurement or data processing runs. Render large datasets through
   application-owned pagination or virtualization; the server markup remains native HTML.
+- Reduced motion keeps only short opacity and eligible colour feedback; the
+  `none` mode commits every declared property, including colour, immediately.
 
 ## Responsiveness and performance
 
@@ -487,14 +516,20 @@ The table fills its container, which provides native horizontal scrolling when c
 width. The caller owns column sizing, wrapping and any sticky behavior. Rows are all rendered; large
 datasets need application pagination or virtualization.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Server-rendered markup does not
-imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
-this item's own shipped source; dependencies and application bundles are measured separately.
+The surface envelope and the row/footer colour owners reuse the shared Cadence
+runtime, so this item installs the provider and the surface-presence module. Table
+adds no measured size writer, no per-cell observer and no per-cell text controller;
+each cell is the caller's own content. Interactive children and application
+handlers still need their own client code, and server-rendered markup does not
+imply that every interaction works without
+JavaScript. The historical T0 source reference for this item is advisory under
+[ADR-023](/docs/adr#adr-023--effects-first-migration-performance-governance-afterwards); it is not a
+functional gate, and dependency and application bundles are measured separately.
 
 ## Notes for AI
 
 - Preserve the table hierarchy: caption, header, body and footer belong inside Table.
 - Class names and refs on Table address the table; constrain its parent for overflow.
 - Table does not fetch data, validate values, sort, filter, paginate or own selection.
-- Do not add decorative row entrance or reorder motion to this T0 component.
+- Do not add row entrance, reorder or resize motion here: row insertion belongs to the
+  composition that owns the records. The only local envelope is the later-inserted table surface.
