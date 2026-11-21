@@ -2,15 +2,15 @@
 title: Resizable
 description: Adjustable split panels with pointer and keyboard resizing.
 category: layout
-motion: []
+motion: ["data.transition",{"recipe":"state.color","form":"css-transition"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Resizable declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"A genuinely inserted handle or grip fades in and the rule transitions its own scoped paint while native panel allocation stays immediate."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"resizable","reason":"Resizable integrates one opacity entrance per handle and its independently inserted decorative grip; panel insertion is inherited from the enclosing composition."}],"state.color/css-transition":[{"relationship":"default","owner":"resizable","reason":"Resizable owns the handle rule's declared hover/active surface and foreground paint; focus/invalid state settles it immediately and hit regions stay native."}]}}
 complexity: S
 tier: T0
 since: 0.4.0
 deps: ["react-resizable-panels@4.16.0", "lucide-react"]
-registryDeps: ["@cadence/cadence-utils"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider"]
 ---
 
 ## Installation
@@ -25,11 +25,18 @@ npx shadcn@latest add @cadence/resizable
 
 [Manual installation files](https://cadence.dev/r/resizable.json)
 
-Copy both target files into the same `cadence/` tree, keeping the relative
-`../lib/cn` import and the shipped `"use client"` directive. Complete the
-base theme setup and ensure Tailwind CSS v4 scans the copied files. Keep
-`react-resizable-panels` pinned to `4.16.0`: these wrappers use its v4
-Group, Panel and Separator APIs. No Resizable stylesheet or Provider is required.
+Copy every file in the target list, keeping `resizable/index.tsx` beside the shared
+`lib/` files (`cn`, `css-motion`, `inline-presence`, `motion`, `motion-ref` and
+`provider`) in the listed relative tree, and keep the relative `../lib/` imports and
+the shipped `"use client"` directive. Those helpers are required imports; wrapping
+the application in `CadenceProvider` is optional. Complete the base theme setup and
+ensure Tailwind CSS v4 scans the copied files. Keep `react-resizable-panels` pinned
+to `4.16.0`: these wrappers use its v4 Group, Panel and Separator APIs. No Resizable
+stylesheet is required.
+
+The wrapper owns one insertion opacity per inserted handle and grip, plus the rule's
+own scoped paint. Panel allocation, constraints, separator hit regions, keyboard
+resizing and every panel child stay with the engine and the caller in all modes.
 
 External updates, Container resizing and Custom parts additionally use
 [Button manual installation](https://cadence.dev/components/button#installation).
@@ -73,14 +80,16 @@ reads `localStorage` during rendering, even in a `"use client"` caller.
 Initial mount and imperative updates can also report completed changes;
 an unchanged applied layout may emit no new completed callback.
 
-Resizable adds no authored animation: full, reduced and none keep direct
-layout updates immediate. Separator preview defers pointer commitment until
-release; it does not tween geometry. Avoid adding width/flex transitions.
-No motion Provider is needed for Resizable itself. Static panel content and
-initial drafts render without JavaScript, while pointer/keyboard resizing
-and public refs require hydration. Percentage-based initial sizes may be
-adjusted after the engine measures the container. Both installation panels expose
-complete source without JavaScript.
+Resizable never makes the divider trail the pointer: full, reduced and none keep
+direct layout updates immediate, and separator preview still defers pointer
+commitment until release instead of tweening geometry. The authored work is the
+divider's own appearance — one opacity entrance for an inserted rule and its
+decorative grip and its scoped hover/active paint — so avoid adding width/flex
+transitions yourself. No motion Provider is required.
+Static panel text and initial drafts render without JavaScript, while
+pointer/keyboard resizing and public refs require hydration. Percentage-based
+initial sizes may be adjusted after the engine measures the container. Both
+installation panels expose complete source without JavaScript.
 
 ## Usage
 
@@ -140,7 +149,7 @@ export function Vertical() {
 
 ## Handle styles
 
-`withHandle` adds a decorative grip. Both fixed examples retain the same focusable, labelled separator and keyboard/pointer target; the plain divider is the default. The grip adds no animation and does not change the resize API.
+`withHandle` adds a decorative grip. Both fixed examples retain the same focusable, labelled separator and keyboard/pointer target; the plain divider is the default. An inserted rule fades in once and its initial grip shares that envelope; a grip inserted later runs its own entrance. The grip adds no size or geometry work and does not change the resize API.
 
 <ComponentExample name="handle-styles" />
 
@@ -157,6 +166,39 @@ export function HandleStyles() {
           <ResizablePanel minSize="20%" className="overflow-auto p-4 text-sm">Content</ResizablePanel>
         </ResizablePanelGroup>
       ))}
+    </div>
+  );
+}
+```
+
+## Panel content revisions
+
+Panel children are caller content and render exactly as given, in every mode: a plain string, a number and a rich subtree all stay one exact native tree with no authored display host. Replacing that content commits immediately at the panel's current allocation; no replacement effect rewrites it, splits it or re-lays it out, so an editor, a selection or a live drag never competes with a second writer. Nothing here labels a panel size: sizes and ids are geometry and identity.
+
+<ComponentExample name="display-revision" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function DisplayRevision() {
+  const [revision, setRevision] = useState(0);
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setRevision((value) => value + 1)}>Revise panels</Button>
+        <Button variant="outline" size="sm" onClick={() => setRevision(0)}>Reset</Button>
+      </div>
+      <ResizablePanelGroup className="rounded-md border" style={{ height: 160 }}>
+        <ResizablePanel defaultSize="50%" minSize="20%" className="overflow-auto p-4 text-sm">
+          {["Draft attached", "Draft awaiting review", "Draft approved"][revision % 3]}
+        </ResizablePanel>
+        <ResizableHandle withHandle aria-label="Resize display panels" />
+        <ResizablePanel minSize="20%" className="overflow-auto p-4 text-sm">{1000 + revision}</ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }
@@ -400,38 +442,56 @@ export function CustomParts() {
 
 | Export | Props and defaults |
 | --- | --- |
-| `ResizablePanelGroup` | `react-resizable-panels` `GroupProps`; orientation horizontal, resizing enabled, immediate panel preview. |
-| `ResizablePanel` | `PanelProps`; min 0%, max 100%, collapsible false, collapsed size 0%, relative resize behavior. |
+| `ResizablePanelGroup` | `react-resizable-panels` `GroupProps` plus an optional `ref`; orientation horizontal, resizing enabled, immediate panel preview. |
+| `ResizablePanel` | `PanelProps` plus an optional `ref`; min 0%, max 100%, collapsible false, collapsed size 0%, relative resize behavior. |
 | `ResizableHandle` | `SeparatorProps` plus optional `withHandle` (unset by default). |
 
 All native attributes/events, string classes, style objects, `elementRef`, `groupRef`,
-`panelRef`, constraints, callbacks, disabled state and preview props pass through. This primitive
-has no Base UI `render`, `asChild`, or callback class/style API. Group and handle classes merge
-caller last. Panel classes and caller styles target the library's inner content element; `elementRef` addresses
-its root. Managed flex/display geometry retains library precedence; other caller styles pass through.
-Handle children follow upstream: the wrapper renders its optional grip instead of caller children.
+`panelRef`, constraints, callbacks, disabled state and preview props pass through. A caller
+`ref` on `ResizablePanelGroup` or `ResizablePanel` reaches the same root element as `elementRef`.
+This primitive has no Base UI `render`, `asChild`, or callback class/style API. Group and handle
+classes merge caller last. Panel classes and caller styles target the library's inner content
+element; `elementRef` addresses its root. Managed flex/display geometry retains library
+precedence; other caller styles pass through. Handle children follow upstream: the wrapper renders
+its optional grip instead of caller children.
+
+Panel children render exactly as given: a plain string, a number and a rich subtree are
+all the same exact native tree, with no added display host or second layout owner.
 
 Numeric sizes are **pixels**; use strings such as `"40%"` for percentages. Group layouts map
 stable panel ids to numeric percentages. Slots: `resizable-panel-group`, `resizable-panel`,
-`resizable-handle`. Use `elementRef` for DOM access rather than a generic React ref.
+`resizable-handle`, `resizable-handle-rule`, `resizable-handle-grip`. Use `elementRef` or
+a caller `ref` for DOM access.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Resizable declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: A genuinely inserted handle or grip fades in and the rule transitions its own scoped paint while native panel allocation stays immediate.
 
-T0: declared, implemented and documented recipe sets are empty. Direct manipulation is functional
-layout, not an authored animation. The default panel preview, keyboard, collapse/expand and imperative updates apply
-immediately in full, reduced and none. Separator preview defers pointer commitment until release without interpolation. No spring, timer, geometry tween, opacity reveal, provider,
-`data-motion` or motion hook is shipped. Mode changes preserve the same panel nodes and input state.
+Panel allocation, constraints, separator hit regions, keyboard resizing and panel
+children are direct manipulation or caller content, never an authored size or
+content animation.
 
-| Mode | Authored motion |
-| --- | --- |
-| full | none; immediate layout |
-| reduced | none; immediate layout |
-| none | none; immediate layout |
+| Recipe | Owner and full behaviour | reduced | none |
+| --- | --- | --- | --- |
+| `data.transition/one-shot` | A genuinely inserted rule fades once on its own opacity host; its initial grip shares that envelope and a grip inserted later runs its own entrance. A presenting parent or a missing host keeps native paint. | Short opacity. | Visible immediately. |
+| `state.color/css-transition` | The rule owns only its declared surface and foreground, including the engine's `data-separator` hover/active state and theme changes. Focus within the rule or its own invalid state settles all of that paint immediately; hit regions, radius and geometry stay native. | Short eligible colour. | Zero duration and delay. |
 
-Caller-added animation is application-owned. Do not transition flex or width/height on these panels:
-it makes the divider lag behind input and bypasses the geometry recipe budget.
+Changed text and changed numbers are **not applicable**: this wrapper renders no
+display text or quantity of its own. A panel's plain or rich children are exact
+caller content with their own owners, so nothing here splits a run, reels a digit or
+re-lays a panel's text — replacing it commits immediately in every mode.
+
+Direct pointer and keyboard resizing stay immediate in every mode: a drag or a
+keyboard resize sequence tracks the pointer exactly and the divider never trails it.
+Live reduction settles permitted paint through the reduced clock; `none` reaches the
+semantic target with zero duration and delay for every property, including colour and
+opacity, and this primitive has no continuous loop. Returning to full never replays an
+insertion that already happened, and closure or unmount releases the local writers
+before the group's gesture listeners retire.
+
+Caller-added animation is application-owned. Do not transition flex or width/height on
+these panels: it makes the divider lag behind input and bypasses the geometry
+ownership above.
 
 ## Accessibility
 
@@ -451,13 +511,19 @@ The library adjusts constraints on container resize; at least one panel must pre
 
 ## Performance
 
-No Cadence animation or extra measurement engine is added. The library owns resize observation and
-pointer/keyboard handling. Keep expensive persistence work in `onLayoutChanged`, not every live update.
-Percentage defaults can shift slightly during SSR hydration; provide stable ids and consistent initial
-layout. Static panel text and the initial draft render without JavaScript; pointer/keyboard resizing and public refs require hydration. This T0 source budget excludes the declared third-party dependency; it is not a total bundle claim.
+The library owns resize observation and pointer/keyboard handling; the wrapper adds one opacity
+channel per handle and grip and one scoped paint owner on the rule, and nothing per panel child.
+It adds no measurement engine, no per-frame content read and no geometry writer, so direct
+dragging keeps the freshly measured offsets instead of reading layout again.
+Keep expensive persistence work in `onLayoutChanged`, not every live update. Percentage defaults
+can shift slightly during SSR hydration; provide stable ids and consistent initial layout. Static
+panel text and the initial draft render without JavaScript; pointer/keyboard resizing and public
+refs require hydration. The tier's gzip figure excludes the declared third-party dependency and
+remains an advisory reference under ADR-023, not a functional limit or total bundle claim.
 
 ## Notes for AI
 
 - Use v4 Group/Panel/Separator props and public refs; v3 direction/PanelGroup APIs do not apply.
-- Preserve constraints and immediate resizing in all modes.
+- Preserve constraints and immediate resizing in all modes; never tween flex or width/height.
+- Panel children are exact caller content: do not wrap them to add a display or motion host.
 - Use stable ids when persisting layouts and explicit units for panel sizes.

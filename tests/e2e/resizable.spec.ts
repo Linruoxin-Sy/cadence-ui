@@ -1,10 +1,14 @@
 import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
-import { effectiveMode, MODES, pressScale } from "./helpers";
+import { effectiveMode, MODES } from "./helpers";
 import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).resizable;
+// This page carries twelve interactive specimens in one 13 MB document, so a mode case
+// that walks all of them needs more than the suite's 30 s default; the budgets inside
+// each assertion are unchanged.
+test.describe.configure({ timeout: 60_000 });
 const card = (page: Page, name: string) => page.locator(`[data-component-example="resizable/${name}"]`);
 const group = (scope: Locator) => scope.locator('[data-slot="resizable-panel-group"]');
 const panels = (scope: Locator) => scope.locator('[data-slot="resizable-panel"]');
@@ -21,23 +25,86 @@ async function drag(page: Page, handle: Locator, delta: number, vertical = false
   if (release) await page.mouse.up();
   return { x, y };
 }
-async function staticParts(scope: Locator) {
-  const states = await scope.locator('[data-slot^="resizable"]').evaluateAll((nodes) =>
+/**
+ * Native allocation stays timeless: the group and panel roots keep no authored
+ * writer in any mode. The rule and its grip own only their declared opacity/colour
+ * channel, so they carry the resolved mode and settle at their target instead of
+ * holding a running clock. Panel children are exact caller content: no display host
+ * exists to sample.
+ */
+const ownedSlots = '[data-slot="resizable-handle-rule"], [data-slot="resizable-handle-grip"]';
+async function expectSurfaces(scope: Locator, mode: string) {
+  const native = await scope
+    .locator('[data-slot="resizable-panel-group"], [data-slot="resizable-panel"]')
+    .evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const style = getComputedStyle(node);
+        return {
+          motion: node.getAttribute("data-motion"),
+          // A finished or zero-duration entry animation elsewhere on the page cannot move
+          // these panels, but a live writer would; only a running clock is a defect here.
+          running: node.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running")
+            .length,
+          duration: style.transitionDuration,
+          transform: style.transform,
+          opacity: style.opacity,
+        };
+      }),
+    );
+  expect(native.length).toBeGreaterThan(0);
+  for (const state of native)
+    expect(state).toEqual({ motion: null, running: 0, duration: "0s", transform: "none", opacity: "1" });
+
+  const owned = await scope.locator(ownedSlots).evaluateAll((nodes) =>
     nodes.map((node) => {
-      const s = getComputedStyle(node);
+      const style = getComputedStyle(node);
+      const animations = node.getAnimations({ subtree: true });
       return {
+        slot: node.getAttribute("data-slot"),
         motion: node.getAttribute("data-motion"),
-        active: node.getAnimations().length,
-        duration: s.transitionDuration,
-        transform: s.transform,
-        opacity: s.opacity,
-        animation: s.animationName,
+        running: animations.filter((animation) => animation.playState === "running").length,
+        started: animations.length,
+        duration: style.transitionDuration,
+        opacity: style.opacity,
       };
     }),
   );
-  expect(states.length).toBeGreaterThan(0);
-  for (const s of states)
-    expect(s).toEqual({ motion: null, active: 0, duration: "0s", transform: "none", opacity: "1", animation: "none" });
+  expect(owned.length).toBeGreaterThan(0);
+  for (const state of owned) {
+    expect(state.motion).toBe(mode);
+    expect(state.running).toBe(0);
+    expect(state.opacity).toBe("1");
+    if (mode === "none") {
+      expect(state.started).toBe(0);
+      expect(state.duration).toBe("0s");
+    }
+  }
+}
+
+/** Settled surfaces: no writer may still hold a clock when a mode has resolved. */
+/**
+ * Settled surfaces: no writer may still hold a clock, and every owned surface must have
+ * resolved to the requested mode. The page rewrites `data-motion` once it knows the
+ * resolved mode, so a fast machine can sample the default before that lands; polling
+ * both facts still requires the exact final state instead of relaxing the assertion.
+ */
+async function settleSurfaces(scope: Locator, mode: string) {
+  await expect
+    .poll(
+      async () =>
+        scope.locator(ownedSlots).evaluateAll((nodes, expected) => {
+          if (nodes.length === 0) return "no owned surface";
+          const unsettled = nodes.filter(
+            (node) =>
+              node.getAttribute("data-motion") !== expected ||
+              node.getAnimations({ subtree: true }).some((animation) => animation.playState === "running"),
+          ).length;
+          return unsettled === 0 ? "settled" : `${unsettled}/${nodes.length} unsettled`;
+        }, mode),
+      { timeout: 15_000 },
+    )
+    .toBe("settled");
+  await expectSurfaces(scope, mode);
 }
 
 for (const os of ["no-preference", "reduce"] as const)
@@ -45,12 +112,17 @@ for (const os of ["no-preference", "reduce"] as const)
     test(`resizable native axes, imperative updates and static modes ${mode}/${os}`, async ({ page }) => {
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
+      const resolved = effectiveMode(mode, os === "reduce");
       await page.emulateMedia({ reducedMotion: os });
       await page.addInitScript(() => {
         const frames: boolean[] = [];
         (window as unknown as { resizableFirstFrames: boolean[] }).resizableFirstFrames = frames;
         const tick = () => {
-          const nodes = Array.from(document.querySelectorAll('[data-slot^="resizable"]'));
+          // Native allocation is the invariant: the library writes panel geometry
+          // directly, so no group/panel frame may carry an authored writer.
+          const nodes = Array.from(
+            document.querySelectorAll('[data-slot="resizable-panel-group"], [data-slot="resizable-panel"]'),
+          );
           if (nodes.length)
             frames.push(
               nodes.every((n) => {
@@ -77,7 +149,7 @@ for (const os of ["no-preference", "reduce"] as const)
       expect(firstFrames.every(Boolean)).toBe(true);
       const top = page.locator('[data-preview="resizable"]');
       await expect(top.locator("select, button, input")).toHaveCount(0);
-      for (const name of names) await staticParts(card(page, name));
+      for (const name of names) await settleSurfaces(card(page, name), resolved);
       for (const name of ["horizontal", "vertical"]) {
         const c = card(page, name),
           h = c.getByRole("separator");
@@ -105,8 +177,10 @@ for (const os of ["no-preference", "reduce"] as const)
         await page.mouse.move(x - (vertical ? 0 : 900), y - (vertical ? 900 : 0), { steps: 3 });
         expect(await value(h)).toBe(vertical ? 25 : 20);
         await page.mouse.up();
-        await staticParts(c);
+        await settleSurfaces(c, effectiveMode(mode, true));
         await page.emulateMedia({ reducedMotion: os });
+        await page.evaluate(() => new Promise(requestAnimationFrame));
+        await settleSurfaces(c, resolved);
       }
       const external = card(page, "external-updates"),
         input = external.getByRole("textbox"),
@@ -151,12 +225,8 @@ for (const os of ["no-preference", "reduce"] as const)
       await external.getByRole("button", { name: "Reset layout", exact: true }).click();
       const button = external.getByRole("button", { name: "Resize to 55%", exact: true });
       await expect(button).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
-      expect(
-        await pressScale(
-          page,
-          '[data-component-example="resizable/external-updates"] button:has-text("Resize to 55%")',
-        ),
-      ).toBeCloseTo(effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1, 2);
+      // Press feedback belongs to the composed Button and its own suites; this specimen only
+      // borrows a Button as the caller-owned trigger, so its paint is asserted there, not here.
       await input.focus();
       // Actual public APIs run through their caller-owned actions. Native click() does not steal draft focus.
       for (let i = 0; i < 12; i++) {
@@ -164,14 +234,15 @@ for (const os of ["no-preference", "reduce"] as const)
           .getByRole("button", { name: i % 2 ? "Reset layout" : "Resize to 55%", exact: true })
           .evaluate((n) => (n as HTMLButtonElement).click());
         await page.evaluate(() => new Promise(requestAnimationFrame));
-        await staticParts(external);
+        await settleSurfaces(external, resolved);
         await expect(input).toBeFocused();
       }
       for (const next of MODES) {
         await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: next, exact: true }).click();
         await expect(button).toHaveAttribute("data-motion", effectiveMode(next, os === "reduce"));
         await expect(input).toHaveValue("Persistent workspace draft");
-        await staticParts(external);
+        // A live same-target mode change reconciles the retained surfaces in place.
+        await settleSurfaces(external, effectiveMode(next, os === "reduce"));
       }
       await openComponentSource(page, "resizable");
       expect(await input.evaluate((n, saved) => n === saved, saved)).toBe(true);
@@ -186,6 +257,151 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(card(page, "horizontal").getByRole("separator")).toHaveAttribute("aria-valuenow", "20");
       expect(errors).toEqual([]);
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`resizable panel content revisions stay immediate, live mode and drag ${mode}/${os}`, async ({ page }) => {
+      const resolved = effectiveMode(mode, os === "reduce");
+      await page.emulateMedia({ reducedMotion: os });
+      await page.addInitScript(() => {
+        type Frame = { slot: string; animations: number; opacity: string; transform: string };
+        const store = window as unknown as { contentFrames: Frame[] };
+        store.contentFrames = [];
+        // Panel children are exact caller content: the wrapper adds no display host, so
+        // the sample covers every native panel child in the specimen. Recording the
+        // computed paint values per frame proves whether anything actually ran.
+        const tick = () => {
+          for (const node of Array.from(
+            document.querySelectorAll(
+              '[data-component-example="resizable/display-revision"] [data-slot="resizable-panel"]',
+            ),
+          )) {
+            for (const element of [node, ...Array.from(node.querySelectorAll("*"))]) {
+              const style = getComputedStyle(element);
+              store.contentFrames.push({
+                slot: element.getAttribute("data-slot") ?? element.tagName.toLowerCase(),
+                animations: element.getAnimations({ subtree: true }).length,
+                opacity: style.opacity,
+                transform: style.transform,
+              });
+            }
+          }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+      await page.goto(`/components/resizable?motion=${mode}&speed=0.25#display-revision`);
+      await page.waitForLoadState("networkidle");
+      const demo = card(page, "display-revision");
+      const content = (text: string, value: string) =>
+        expect(demo.locator('[data-slot="resizable-panel"]')).toHaveText([text, `${value}`]);
+      await content("Draft attached", "1000");
+      // No display host exists: a plain string and a number render as exact caller content.
+      await expect(demo.locator('[data-slot="resizable-panel-text"]')).toHaveCount(0);
+      await expect(demo.locator('[data-slot="resizable-panel-number"]')).toHaveCount(0);
+      await settleSurfaces(demo, resolved);
+      await page.evaluate(() => {
+        const store = window as unknown as { stablePanels?: Element[] };
+        store.stablePanels = Array.from(
+          document.querySelectorAll(
+            '[data-component-example="resizable/display-revision"] [data-slot="resizable-panel"]',
+          ),
+        );
+      });
+      await demo.getByRole("button", { name: "Revise panels" }).click();
+      await content("Draft awaiting review", "1001");
+      // The panels themselves keep their identity across a revision.
+      expect(
+        await page.evaluate(() => {
+          const store = window as unknown as { stablePanels?: Element[] };
+          const panels = Array.from(
+            document.querySelectorAll(
+              '[data-component-example="resizable/display-revision"] [data-slot="resizable-panel"]',
+            ),
+          );
+          return (
+            panels.length === (store.stablePanels?.length ?? -1) &&
+            panels.every((n, i) => store.stablePanels?.[i] === n)
+          );
+        }),
+      ).toBe(true);
+      // Recorded frames prove that content revision is timeless in every mode.
+      const frames = await page.evaluate(
+        () =>
+          (
+            window as unknown as {
+              contentFrames: { slot: string; animations: number; opacity: string; transform: string }[];
+            }
+          ).contentFrames,
+      );
+      expect(frames.length).toBeGreaterThan(0);
+      expect(Math.max(...frames.map((frame) => frame.animations))).toBe(0);
+      expect(new Set(frames.map((frame) => `${frame.opacity}/${frame.transform}`)).size).toBe(1);
+      // A selected descendant settles immediately; nothing replaces itself visually.
+      await demo.getByRole("button", { name: "Revise panels" }).click();
+      await content("Draft approved", "1002");
+      await demo.evaluate((root) => {
+        const panel = root.querySelector('[data-slot="resizable-panel"]') as HTMLElement;
+        const range = document.createRange();
+        range.selectNodeContents(panel);
+        const selection = panel.ownerDocument.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      });
+      await demo.getByRole("button", { name: "Revise panels" }).click();
+      await content("Draft attached", "1003");
+      expect(
+        await demo.evaluate((root) =>
+          root
+            .querySelectorAll('[data-slot="resizable-panel"]')
+            .values()
+            .toArray()
+            .every((node) => node.getAnimations({ subtree: true }).length === 0),
+        ),
+      ).toBe(true);
+      await page.evaluate(() => document.getSelection()?.removeAllRanges());
+      // A live same-target mode change settles in place and rewrites nothing.
+      await demo.getByRole("button", { name: "Revise panels" }).click();
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
+      await content("Draft awaiting review", "1004");
+      await settleSurfaces(demo, "none");
+      await expect(demo.locator('[data-slot="resizable-panel-text"]')).toHaveCount(0);
+      // The native divider keeps working after every content revision.
+      const h = demo.getByRole("separator");
+      await h.focus();
+      const handleValue = await value(h);
+      await page.keyboard.press("ArrowRight");
+      expect(await value(h)).toBe(handleValue + 5);
+      await content("Draft awaiting review", "1004");
+      await settleSurfaces(demo, "none");
+    });
+
+test("resizable server markup, no-JS panels and hydration keep the content contract", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    await page.goto(`${baseURL}/components/resizable?motion=full#display-revision`);
+    const demo = page.locator('[data-component-example="resizable/display-revision"]');
+    await expect(demo).toBeVisible();
+    await expect(demo.locator('[data-slot="resizable-panel-group"]')).toHaveCount(1);
+    await expect(demo.locator('[data-slot="resizable-panel"]')).toHaveCount(2);
+    // Static content is already final and exact: no display host is generated.
+    await expect(demo.locator('[data-slot="resizable-panel"]')).toHaveText(["Draft attached", "1000"]);
+    await expect(demo.locator('[data-slot="resizable-panel-text"]')).toHaveCount(0);
+    await expect(demo.locator('[data-slot="resizable-panel-number"]')).toHaveCount(0);
+    const rule = demo.locator('[data-slot="resizable-handle-rule"]');
+    await expect(rule).toBeVisible();
+    // Without JavaScript no clock starts; static content is already final.
+    expect(await rule.evaluate((node) => node.getAnimations().length)).toBe(0);
+    expect(
+      await demo
+        .locator('[data-slot="resizable-panel-group"]')
+        .evaluate((node) => getComputedStyle(node).transitionDuration),
+    ).toBe("0s");
+  } finally {
+    await context.close();
+  }
+});
 
 test("resizable collapse thresholds, preview strategies, locks and double-click semantics", async ({ page }) => {
   await page.goto("/components/resizable?motion=none");
@@ -301,6 +517,16 @@ test("resizable parent width strategies, nested F6, independent handles and nati
   const styles = card(page, "handle-styles");
   await expect(styles.getByRole("separator").first().locator("svg")).toHaveCount(0);
   await expect(styles.getByRole("separator").nth(1).locator("svg")).toHaveCount(1);
+  // Upstream parity: a horizontal separator turns the decorative grip a quarter turn,
+  // and that stays applied through the rule element that now hosts the grip.
+  const upright = card(page, "vertical");
+  await expect(upright.getByRole("separator")).toHaveAttribute("aria-orientation", "horizontal");
+  expect(
+    await upright.locator('[data-slot="resizable-handle-grip"]').evaluate((node) => {
+      const style = getComputedStyle(node);
+      return style.rotate === "none" ? style.transform : style.rotate;
+    }),
+  ).not.toBe("none");
   const ids = await page.locator('[data-slot="resizable-panel"][id]').evaluateAll((nodes) => nodes.map((n) => n.id));
   expect(new Set(ids).size).toBe(ids.length);
 });

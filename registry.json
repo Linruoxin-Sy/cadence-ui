@@ -5083,7 +5083,7 @@
       "description": "Adjustable split panels with pointer and keyboard resizing.",
       "categories": ["layout"],
       "dependencies": ["react-resizable-panels@4.16.0", "lucide-react"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "registryDependencies": ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider"],
       "files": [
         {
           "path": "registry/cadence/resizable/index.tsx",
@@ -5095,7 +5095,13 @@
         "since": "0.4.0",
         "tier": "T0",
         "batch": "B7",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -5104,14 +5110,29 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Resizable declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "A genuinely inserted handle or grip fades in and the rule transitions its own scoped paint while native panel allocation stays immediate."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "resizable",
+                "reason": "Resizable integrates one opacity entrance per handle and its independently inserted decorative grip; panel insertion is inherited from the enclosing composition."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "resizable",
+                "reason": "Resizable owns the handle rule's declared hover/active surface and foreground paint; focus/invalid state settles it immediately and hit regions stay native."
+              }
+            ]
+          }
         }
       }
     },
