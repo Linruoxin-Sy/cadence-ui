@@ -53,9 +53,9 @@ for (const os of [false, true])
         const f = await frames(r.locator('[data-slot="attachment-title"]'));
         await info.attach(`native-${state}-frames`, { body: JSON.stringify(f), contentType: "application/json" });
         expect(f.every((s) => s.transform === "none" && s.duration === "0s")).toBe(true);
-        if (actual === "none" || !["uploading", "processing"].includes(state))
-          expect(f.every((s) => s.opacity === 1 && s.animations === 0)).toBe(true);
-        else expect(new Set(f.map((s) => s.opacity)).size).toBeGreaterThan(2);
+        if (actual === "full" && ["uploading", "processing"].includes(state))
+          expect(new Set(f.map((s) => s.opacity)).size).toBeGreaterThan(2);
+        else expect(f.every((s) => s.opacity === 1 && s.animations === 0)).toBe(true);
       }
       const download = page.waitForEvent("download");
       await top.getByRole("link", { name: "Download project notes" }).press("Enter");
@@ -222,8 +222,9 @@ for (const os of [false, true])
       await expect(title).toHaveAttribute("data-motion", effectiveMode(requested, true));
       const sampled = await frames(title);
       await info.attach(`${requested}-live-frames`, { body: JSON.stringify(sampled), contentType: "application/json" });
-      if (requested === "none") expect(sampled.every((f) => f.animations === 0 && f.opacity === 1)).toBe(true);
-      else expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      if (effectiveMode(requested, true) === "full")
+        expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      else expect(sampled.every((f) => f.animations === 0 && f.opacity === 1)).toBe(true);
       expect(await title.evaluate((el, saved) => el === saved, saved)).toBe(true);
       expect(await input.evaluate((el, saved) => el === saved, savedInput)).toBe(true);
       expect(await input.evaluate((el) => (el as HTMLInputElement).files?.[0]?.name)).toBe("retained.txt");
@@ -338,7 +339,7 @@ test("Attachment SSR, no-JS, distributed runnable code and inert legacy variant 
   for (const name of names) expect(html).toContain(`attachment/${name}`);
   const ctx = await browser.newContext({ javaScriptEnabled: false });
   const p = await ctx.newPage();
-  await p.goto("http://127.0.0.1:3100/components/attachment");
+  await p.goto(`http://127.0.0.1:${process.env.PLAYWRIGHT_PORT ?? 3100}/components/attachment`);
   await expect(p.locator('[data-preview="attachment"] [data-slot="attachment"]')).toBeVisible();
   for (const name of names) await expect(card(p, name)).toBeVisible();
   await ctx.close();
@@ -423,8 +424,8 @@ for (const os of [false, true])
         contentType: "application/json",
       });
       expect(sampled.every((f) => f.transform === "none")).toBe(true);
-      if (mode === "none") expect(sampled.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
-      else expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      if (effectiveMode(mode, os) === "full") expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      else expect(sampled.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
       const saved = await title.elementHandle();
       const focused = await trigger.elementHandle();
       await title.evaluate((el) => {
@@ -460,6 +461,6 @@ for (const os of [false, true])
           })),
         );
         expect(kinds.every((a) => a.kind === "CSSAnimation" && a.properties.every((p) => p === "opacity"))).toBe(true);
-        if (mode === "none") expect(kinds).toEqual([]);
+        if (effectiveMode(mode, os) !== "full") expect(kinds).toEqual([]);
       }
     });

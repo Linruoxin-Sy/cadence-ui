@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { PresenceContext } from "motion/react";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   Attachment,
   AttachmentAction,
@@ -14,6 +15,51 @@ import {
 } from "@/registry/cadence/attachment";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
+
+const modes = ["full", "reduced", "none"] as const;
+
+// The cold plan parses every live contract and installed closure once per suite;
+// this suite additionally resolves the inherited Button action paths. That is a
+// hang guard for the audit, not a performance acceptance deadline (ADR-023).
+beforeAll(async () => {
+  await prepareV2MotionPlan();
+}, 300_000);
+
+/** jsdom has no layout: give tiles a real on-screen box so the busy loop sees a
+ * visible host and measured geometry commits a real destination. An unset
+ * computed opacity is opaque, not zero, which is what a pulse requires. */
+const computedStyle = window.getComputedStyle.bind(window);
+beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+    () =>
+      ({
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        right: 160,
+        bottom: 44,
+        width: 160,
+        height: 44,
+        toJSON() {},
+      }) as DOMRect,
+  );
+  vi.spyOn(window, "getComputedStyle").mockImplementation((element: Element, pseudo?: string | null) => {
+    const css = computedStyle(element, pseudo ?? undefined);
+    return new Proxy(css, {
+      get(target, key) {
+        const value = Reflect.get(target, key);
+        if (key === "opacity" && value === "") return "1";
+        if (key === "animationName" && value === "") return "none";
+        return typeof value === "function" ? value.bind(target) : value;
+      },
+    }) as CSSStyleDeclaration;
+  });
+});
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 it("retains all nine slots, defaults and native attributes", () => {
   const { container } = render(
@@ -51,6 +97,8 @@ it("retains all nine slots, defaults and native attributes", () => {
   expect(screen.getByRole("button", { name: "Remove" })).toHaveAttribute("data-variant", "ghost");
   expect(screen.getByRole("button", { name: "Remove" })).toHaveAttribute("data-size", "icon-xs");
   expect(screen.getByRole("button", { name: "Open" })).toHaveAttribute("type", "button");
+  // Known display text lives on private spans so the public hosts keep their identity.
+  expect(container.querySelector('[data-slot="attachment-text"]')).toBeTruthy();
 });
 
 it("keeps actions and trigger independent, forwards keyboard, disabled, callback class/style", async () => {
@@ -144,8 +192,8 @@ it("keeps caller render functions, native refs and state/size/media updates", ()
   expect(cleanup).toHaveBeenCalled();
 });
 
-describe.each(["full", "reduced", "none"] as const)("motion %s", (mode) => {
-  it("keeps mode branches and nodes through external state changes", () => {
+describe.each(modes)("motion %s", (mode) => {
+  it("keeps the loop branch and the retained title through external state changes", () => {
     const tree = (state: "uploading" | "done") => (
       <CadenceProvider mode={mode}>
         <Attachment state={state}>
@@ -155,21 +203,23 @@ describe.each(["full", "reduced", "none"] as const)("motion %s", (mode) => {
       </CadenceProvider>
     );
     const { container, rerender } = render(tree("uploading"));
-    const title = screen.getByText("File");
+    const title = container.querySelector<HTMLElement>('[data-slot="attachment-title"]');
     const root = container.querySelector('[data-slot="attachment"]');
     expectMotionContract(mode, { parts: [root] });
     expect(title).toHaveAttribute("data-motion", mode);
+    expect(title).toHaveAttribute("data-state", "uploading");
     expect(screen.getByRole("button")).toHaveAttribute("data-motion", mode);
-    if (mode === "none") expect(title).toHaveClass("animate-none");
-    else expect(title.className).toContain("animate-pulse");
-    if (mode !== "full") expect(title).toHaveClass("transform-none");
+    if (mode === "none") expect(title?.style.animation).toBe("none");
+    else if (mode === "reduced") expect(title?.style.animation).toBe("none");
+    else expect(title?.style.animation).toContain("--animate-pulse");
     rerender(tree("done"));
-    expect(screen.getByText("File")).toBe(title);
+    expect(container.querySelector('[data-slot="attachment-title"]')).toBe(title);
+    expect(title).toHaveAttribute("data-state", "done");
     expect(root).toHaveAttribute("data-state", "done");
   });
 });
 
-it("cancels to none and restores nested full without replacing the title", () => {
+it("cancels to none and restores nested full without replacing the title or its text span", () => {
   const tree = (mode: "full" | "none") => (
     <CadenceProvider mode="none">
       <CadenceProvider mode={mode}>
@@ -179,12 +229,137 @@ it("cancels to none and restores nested full without replacing the title", () =>
       </CadenceProvider>
     </CadenceProvider>
   );
-  const { rerender } = render(tree("full"));
-  const title = screen.getByText("File");
+  const { container, rerender } = render(tree("full"));
+  const title = container.querySelector<HTMLElement>('[data-slot="attachment-title"]');
+  const text = container.querySelector('[data-slot="attachment-text"]');
   expect(title).toHaveAttribute("data-motion", "full");
   rerender(tree("none"));
-  expect(screen.getByText("File")).toBe(title);
-  expect(title).toHaveClass("animate-none");
+  expect(container.querySelector('[data-slot="attachment-title"]')).toBe(title);
+  expect(container.querySelector('[data-slot="attachment-text"]')).toBe(text);
+  expect(title?.style.animation).toBe("none");
   rerender(tree("full"));
-  expect(title.className).toContain("animate-pulse");
+  expect(title?.style.animation).toContain("--animate-pulse");
+});
+
+describe.each(modes)("attachment v2 actions in %s", (mode) => {
+  it("executes every owned action on one live instance", async () => {
+    const frame = {
+      root: true,
+      parts: true,
+      media: "first",
+      state: "done" as "idle" | "uploading" | "processing" | "error" | "done",
+      title: "report.pdf",
+      description: "PDF · 2 pages" as string | number,
+      paint: "",
+      mediaPaint: "",
+      titleTint: "",
+      descTint: "",
+      extra: false,
+    };
+    const draw = () => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <PresenceContext.Provider
+          value={{
+            id: "attachment-root",
+            initial: false,
+            isPresent: frame.root,
+            register: () => () => {},
+            onExitComplete: () => {},
+          }}
+        >
+          <Attachment
+            data-testid="tile"
+            state={frame.state}
+            style={frame.paint ? { backgroundColor: frame.paint } : undefined}
+          >
+            <PresenceContext.Provider
+              value={{
+                id: "attachment-parts",
+                initial: false,
+                isPresent: frame.parts,
+                register: () => () => {},
+                onExitComplete: () => {},
+              }}
+            >
+              <AttachmentMedia
+                variant="image"
+                style={frame.mediaPaint ? { backgroundColor: frame.mediaPaint } : undefined}
+              >
+                {/* biome-ignore lint/performance/noImgElement: the supplied preview is the public AttachmentMedia composition. */}
+                <img alt="" key={frame.media} src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
+              </AttachmentMedia>
+              <AttachmentActions>
+                <AttachmentAction aria-label="Remove" />
+              </AttachmentActions>
+            </PresenceContext.Provider>
+            <AttachmentContent>
+              <AttachmentTitle style={frame.titleTint ? { color: frame.titleTint } : undefined}>
+                {frame.title}
+              </AttachmentTitle>
+              <AttachmentDescription style={frame.descTint ? { color: frame.descTint } : undefined}>
+                {frame.description}
+              </AttachmentDescription>
+              {frame.extra ? <AttachmentDescription>attached 2026-11-22</AttachmentDescription> : null}
+            </AttachmentContent>
+          </Attachment>
+        </PresenceContext.Provider>
+      </CadenceProvider>
+    );
+    const view = render(draw());
+    const update = (next: Partial<typeof frame>) => {
+      Object.assign(frame, next);
+      view.rerender(draw());
+    };
+    const owned = (binding: string, exercise: () => void) =>
+      expectV2MotionAction("attachment", binding, mode, exercise).catch((error) => {
+        throw new Error(`${binding}: ${(error as Error).message}\n${(error as Error).stack ?? ""}`);
+      });
+    const titleText = view.container.querySelector('[data-slot="attachment-title"] [data-slot="attachment-text"]');
+    const description = view.container.querySelector('[data-slot="attachment-description"]');
+
+    // Tile presence and the group's native membership.
+    await owned("attachment.root.exit", () => update({ root: false }));
+    await owned("attachment.root.enter", () => update({ root: true }));
+
+    // A later media/action region leaves and enters on its own retained hosts.
+    await owned("attachment.part.exit", () => update({ parts: false }));
+    await owned("attachment.part.enter", () => update({ parts: true }));
+
+    // The supplied preview and the supplied state share one media envelope.
+    await owned("attachment.media.replace", () => update({ media: "second" }));
+    await owned("attachment.media.update", () => update({ state: "processing" }));
+
+    // Scoped colour on the tile and the preview, then the explicit display overrides.
+    await owned("attachment.surface.colour", () => update({ paint: "rgb(32, 32, 32)", mediaPaint: "rgb(64, 64, 64)" }));
+    await owned("attachment.text.colour", () => update({ titleTint: "rgb(24, 24, 24)", descTint: "rgb(96, 96, 96)" }));
+
+    // The busy title loop keeps its live owner while the supplied state advances.
+    await owned("attachment.title.busy", () => update({ state: "uploading" }));
+
+    // Filename and description diffs keep the same spans.
+    await owned("attachment.label.replace", () => update({ title: "report-final.pdf", description: "PDF · 3 pages" }));
+    expect(view.container.querySelector('[data-slot="attachment-title"] [data-slot="attachment-text"]')).toBe(
+      titleText,
+    );
+    expect(view.container.querySelector('[data-slot="attachment-description"]')).toBe(description);
+
+    // A direct display quantity reels on its own span.
+    update({ description: 4 });
+    await owned("attachment.value.roll", () => update({ description: 6 }));
+
+    // The owned tile box follows a committed structural revision.
+    await owned("attachment.root.resize", () => update({ extra: true }));
+
+    expectMotionContract(mode, { policy: ["loop", "color"] });
+    view.unmount();
+
+    // Inherited Button ownership stays a real boundary on the adapter host.
+    const boundary = render(
+      <CadenceProvider mode={mode}>
+        <AttachmentAction aria-label="Remove" />
+      </CadenceProvider>,
+    );
+    await expectV2NativeBoundaries("attachment", { container: boundary.container });
+    boundary.unmount();
+  });
 });
