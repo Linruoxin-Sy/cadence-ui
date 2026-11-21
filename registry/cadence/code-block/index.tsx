@@ -4,18 +4,29 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
-import { motion } from "motion/react";
 import * as React from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
 import { cn } from "../lib/cn";
-import { ControlSpan, NativeControlDiv } from "../lib/control-animation";
+import { ControlSpan } from "../lib/control-animation";
+import { useStateColor } from "../lib/css-motion";
+import { createInlinePresence } from "../lib/inline-presence";
 import { createMeasuredGeometry } from "../lib/measured-geometry";
-import { scale } from "../lib/motion";
-import { usePresentationScope } from "../lib/motion-presence";
-import { useMotionHostRef } from "../lib/motion-ref";
+import { bindMotionParameters, geometryContent, layoutSelection, stateIndicator } from "../lib/motion";
+import {
+  createPresentationScope,
+  documentPresentation,
+  MotionPresentation,
+  usePresentationScope,
+} from "../lib/motion-presence";
+import { type MotionHostRef, useMotionHostRef } from "../lib/motion-ref";
 import { createMotionTransaction } from "../lib/motion-transaction";
 import { useCadenceMotion } from "../lib/provider";
+import { createSelectionProjection } from "../lib/selection-projection";
+import { createSurfacePresence } from "../lib/surface-presence";
+import { useNumberPresentation } from "../lib/use-number-presentation";
+import { useTextPresentation } from "../lib/use-text-presentation";
 
 /** How long the copy button shows its tick before returning to the copy glyph. */
 const COPIED_RESET_MS = 2000;
@@ -63,7 +74,42 @@ function useCanHover(): boolean {
 }
 
 /** `useLayoutEffect` warns on the server; the fallback keeps SSR quiet without a first-paint flash. */
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+/** Hydration is the only server snapshot here; there is no external store to poll. */
+const subscribeNoop = () => () => {};
+
+/**
+ * The two display adapters below are private hosts: they add no export and no
+ * public slot, and they hold one primitive value each so the whole label is the
+ * unit — never a per-character or per-token reveal.
+ */
+function ownedText(value: string | number) {
+  return typeof value === "string" || typeof value === "number";
+}
+
+/**
+ * A caller's own paint cannot be proven readable mid-tween, so an unverified
+ * palette settles at 0s; ordinary sizing/layout utilities stay eligible.
+ */
+function callerReadability(className: unknown, style: unknown): "verified" | "immediate" {
+  const classes = typeof className === "function" ? "" : ((className as string | undefined) ?? "");
+  const layoutClasses =
+    !classes ||
+    classes
+      .split(/\s+/)
+      .every((name) =>
+        /^(?:[\w-]+:)*(?:w-|h-|size-|min-|max-|p[xytrblse]?-|m[xytrblse]?-|gap-|flex|inline-|block|grid|shrink|grow|basis-|items-|justify-|self-|order-|relative|absolute|fixed|sticky|inset-|top-|bottom-|left-|right-|overflow-|truncate|text-(?:xs|sm|base|lg|xl)$)/.test(
+          name,
+        ),
+      );
+  const knownStyle =
+    typeof style !== "function" &&
+    !Object.keys((style as React.CSSProperties | undefined) ?? {}).some((key) =>
+      /color|background|fill|stroke|shadow|opacity|filter|blend|^--(?!motion-|cadence-|ease-)/i.test(key),
+    );
+  return layoutClasses && knownStyle ? "verified" : "immediate";
+}
 
 interface CodeBlockContextValue {
   /** The id `CodeBlockExpandButton` points `aria-controls` at. Also prefixes every tab and panel id. */
@@ -186,6 +232,7 @@ export interface CodeBlockProps extends React.ComponentProps<"div">, VariantProp
 }
 
 function CodeBlock({
+  ref: callerRef,
   className,
   variant = "default",
   size = "default",
@@ -202,11 +249,65 @@ function CodeBlock({
   onFocus,
   onBlur,
   children,
+  style,
   ...props
 }: CodeBlockProps) {
-  const cm = useCadenceMotion();
+  const { node, ref } = useMotionHostRef<HTMLDivElement>(callerRef);
+  const cm = useCadenceMotion(node);
   const canHover = useCanHover();
   const contentId = React.useId();
+  // One surface envelope on the retained root: an independent late insertion pops
+  // its composed source; a first paint, hydration or a live mode downgrade is
+  // resolved by the controller rather than by a second writer.
+  const parent = usePresentationScope();
+  const [scope] = React.useState(() => createPresentationScope(node));
+  const hydrated = React.useSyncExternalStore(
+    subscribeNoop,
+    () => false,
+    () => true,
+  );
+  const initialHydration = React.useRef(hydrated);
+  const entranceConsumed = React.useRef(false);
+  const lifecycle = React.useRef<ReturnType<typeof createSurfacePresence> | null>(null);
+  const presenceHost = React.useRef<HTMLElement | null>(null);
+  const palette = React.useRef(variant);
+  const readability = callerReadability(className, style);
+  const rootPaint = useStateColor(
+    ref,
+    cm,
+    ["border-top-color", "border-right-color", "border-bottom-color", "border-left-color", "color"],
+    { readability, immediate: palette.current !== variant },
+  );
+  useIsomorphicLayoutEffect(() => {
+    palette.current = variant;
+  });
+  React.useEffect(() => {
+    if (!parent && node.current) documentPresentation(node.current.ownerDocument).presented = true;
+  }, [parent, node]);
+  useIsomorphicLayoutEffect(() => {
+    const host = node.current;
+    const parentScope = parent ?? (host ? documentPresentation(host.ownerDocument) : null);
+    const enter =
+      !entranceConsumed.current &&
+      !initialHydration.current &&
+      Boolean(parentScope?.presented && parentScope.available());
+    if (host !== presenceHost.current) {
+      lifecycle.current?.dispose();
+      lifecycle.current = host ? createSurfacePresence(host) : null;
+      presenceHost.current = host;
+    }
+    if (host) entranceConsumed.current = true;
+    lifecycle.current?.commit({ present: true, enter, cm });
+    scope.transaction.open();
+  });
+  React.useLayoutEffect(
+    () => () => {
+      lifecycle.current?.dispose();
+      lifecycle.current = null;
+      presenceHost.current = null;
+    },
+    [],
+  );
 
   const [uncontrolledExpanded, setUncontrolledExpanded] = React.useState(defaultExpanded);
   const [uncontrolledTab, setUncontrolledTab] = React.useState(defaultTab);
@@ -253,34 +354,38 @@ function CodeBlock({
   return (
     <CodeBlockContext.Provider value={value}>
       <CodeBlockRevealContext.Provider value={revealed}>
-        <div
-          data-slot="code-block"
-          data-variant={variant}
-          data-size={size}
-          data-motion={cm.mode}
-          className={cn(codeBlockVariants({ variant, size }), className)}
-          onPointerEnter={(event) => {
-            setHovered(true);
-            onPointerEnter?.(event);
-          }}
-          onPointerLeave={(event) => {
-            setHovered(false);
-            onPointerLeave?.(event);
-          }}
-          onFocus={(event) => {
-            setFocused(true);
-            onFocus?.(event);
-          }}
-          onBlur={(event) => {
-            // Focus moving between two controls inside the block is not a blur of
-            // the block: React bubbles `focusout`, so check where focus landed.
-            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
-            onBlur?.(event);
-          }}
-          {...props}
-        >
-          {children}
-        </div>
+        <MotionPresentation scope={scope}>
+          <div
+            data-slot="code-block"
+            data-variant={variant}
+            data-size={size}
+            {...props}
+            {...rootPaint}
+            data-motion={cm.mode}
+            className={cn(codeBlockVariants({ variant, size }), className)}
+            style={{ ...rootPaint.style, ...style }}
+            onPointerEnter={(event) => {
+              setHovered(true);
+              onPointerEnter?.(event);
+            }}
+            onPointerLeave={(event) => {
+              setHovered(false);
+              onPointerLeave?.(event);
+            }}
+            onFocus={(event) => {
+              setFocused(true);
+              onFocus?.(event);
+            }}
+            onBlur={(event) => {
+              // Focus moving between two controls inside the block is not a blur of
+              // the block: React bubbles `focusout`, so check where focus landed.
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+              onBlur?.(event);
+            }}
+          >
+            {children}
+          </div>
+        </MotionPresentation>
       </CodeBlockRevealContext.Provider>
     </CodeBlockContext.Provider>
   );
@@ -299,16 +404,24 @@ export interface CodeBlockHeaderProps extends React.ComponentProps<"div"> {}
  * top padding repeats the header's bottom one, so the label and the first line sit
  * the same distance from the rule and from the block's edges.
  */
-function CodeBlockHeader({ className, ...props }: CodeBlockHeaderProps) {
+function CodeBlockHeader({ ref: callerRef, className, style, ...props }: CodeBlockHeaderProps) {
+  const { node, ref } = useMotionHostRef<HTMLDivElement>(callerRef);
+  const cm = useCadenceMotion(node);
+  const headerPaint = useStateColor(ref, cm, ["border-bottom-color", "color"], {
+    readability: callerReadability(className, style),
+  });
   return (
     <CodeBlockHeaderContext.Provider value={true}>
       <div
         data-slot="code-block-header"
+        {...props}
+        {...headerPaint}
+        data-motion={cm.mode}
         className={cn(
           "flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-4 py-3 text-muted-foreground group-data-[variant=destructive]/code-block:border-destructive/20 group-data-[variant=destructive]/code-block:text-destructive group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
           className,
         )}
-        {...props}
+        style={{ ...headerPaint.style, ...style }}
       />
     </CodeBlockHeaderContext.Provider>
   );
@@ -328,7 +441,16 @@ export interface CodeBlockTitleProps extends React.ComponentProps<"div"> {}
  * make a titled header shorter than a tabbed one, and the two would step apart
  * again the moment they sat side by side.
  */
-function CodeBlockTitle({ className, ...props }: CodeBlockTitleProps) {
+function CodeBlockTitle({ className, children, ...props }: CodeBlockTitleProps) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const plain = ownedText(children as string | number);
+  const value = plain ? String(children) : "";
+  const text = useTextPresentation(node, value, cm, value, {
+    characterStagger: false,
+    visible: true,
+    enabled: plain,
+  });
   return (
     <div
       data-slot="code-block-title"
@@ -338,7 +460,17 @@ function CodeBlockTitle({ className, ...props }: CodeBlockTitleProps) {
         className,
       )}
       {...props}
-    />
+    >
+      {plain ? (
+        // One native text node on a retained host: the changed runs are replaced
+        // in place, so an unchanged filename keeps its exact grapheme identity.
+        <span ref={ref} data-slot="code-block-title-text" data-motion={cm.mode}>
+          {text}
+        </span>
+      ) : (
+        children
+      )}
+    </div>
   );
 }
 
@@ -369,7 +501,53 @@ export interface CodeBlockTabsProps extends React.ComponentProps<"div"> {
 function CodeBlockTabs({ ref, className, label = "Language", children, onKeyDown, ...props }: CodeBlockTabsProps) {
   const block = useCodeBlockPart("CodeBlockTabs");
   const listRef = React.useRef<HTMLDivElement>(null);
+  const { node: markerRef, ref: marker } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(markerRef);
+  const [transaction] = React.useState(createMotionTransaction);
+  const selection = React.useRef<ReturnType<typeof createSelectionProjection> | null>(null);
+  const semantic = React.useRef<{ tab: string | undefined; revision: ReturnType<typeof transaction.revision> | null }>({
+    tab: undefined,
+    revision: null,
+  });
   React.useImperativeHandle(ref, () => listRef.current as HTMLDivElement, []);
+
+  useIsomorphicLayoutEffect(() => {
+    if (!markerRef.current) return;
+    const controller = createSelectionProjection(markerRef as unknown as MotionHostRef<HTMLElement>, transaction);
+    selection.current = controller;
+    return () => {
+      controller.dispose();
+      if (selection.current === controller) selection.current = null;
+    };
+  }, [markerRef, transaction]);
+
+  useIsomorphicLayoutEffect(() => {
+    const strip = listRef.current;
+    const projection = selection.current;
+    if (!strip || !projection) return;
+    // One persistent marker in the strip's own content coordinates: a reflow,
+    // scroll or viewport resize rebases it immediately, and only the committed
+    // selection is a semantic revision that may travel.
+    if (semantic.current.tab !== block.tab || !semantic.current.revision)
+      semantic.current = {
+        tab: block.tab,
+        revision: transaction.revision("layout", block.tab ?? null),
+      };
+    const revision = semantic.current.revision;
+    if (!revision) return;
+    const active = strip.querySelector<HTMLElement>('[role="tab"][data-active]');
+    const destination = active
+      ? {
+          x: active.offsetLeft,
+          y: active.offsetTop,
+          width: active.offsetWidth,
+          height: active.offsetHeight,
+        }
+      : null;
+    const parameters = cm.parameters(bindMotionParameters(layoutSelection, "layout.shared/selection"));
+    const transition = parameters.kind === "layout" ? parameters.transition : { duration: 0 };
+    projection.commit(revision, destination, transition, cm.reduced || cm.timeScale === 0 || !destination);
+  });
 
   const move = (step: number | "first" | "last") => {
     const tabs = [...(listRef.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])];
@@ -389,7 +567,7 @@ function CodeBlockTabs({ ref, className, label = "Language", children, onKeyDown
       role="tablist"
       aria-label={label}
       data-slot="code-block-tabs"
-      className={cn("flex min-w-0 items-center gap-0.5 overflow-x-auto", scrollStrip, className)}
+      className={cn("relative flex min-w-0 items-center gap-0.5 overflow-x-auto", scrollStrip, className)}
       onKeyDown={(event) => {
         onKeyDown?.(event);
         if (event.defaultPrevented) return;
@@ -408,6 +586,14 @@ function CodeBlockTabs({ ref, className, label = "Language", children, onKeyDown
       }}
       {...props}
     >
+      <span
+        ref={marker}
+        aria-hidden="true"
+        data-slot="code-block-tab-indicator"
+        data-motion={cm.mode}
+        className="pointer-events-none absolute start-0 top-0 rounded-sm bg-muted"
+        hidden
+      />
       {children}
     </div>
   );
@@ -430,11 +616,26 @@ export interface CodeBlockTabProps extends React.ComponentProps<"button"> {
  * of the slide. Raising every label above every pill makes the travel symmetric: the
  * highlight moves underneath the words, whichever direction it is going.
  */
-function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlockTabProps) {
-  const cm = useCadenceMotion();
+function CodeBlockTab({ value, className, children, style, onClick, ...props }: CodeBlockTabProps) {
+  const { node, ref } = useMotionHostRef<HTMLButtonElement>();
+  const cm = useCadenceMotion(node);
   const block = useCodeBlockPart("CodeBlockTab");
   const active = block.tab === value;
   const ids = partIds(block.contentId, value);
+  // The label is the shared marker's layer only; its foreground is its own
+  // family, so a selection repaint never borrows the strip's surface.
+  const tabPaint = useStateColor(ref, cm, ["color"], {
+    readability: callerReadability(className, style),
+  });
+  const { node: labelRef, ref: labelHost } = useMotionHostRef<HTMLSpanElement>();
+  const labelMotion = useCadenceMotion(labelRef);
+  const plain = ownedText(children as string | number);
+  const label = plain ? String(children) : "";
+  const text = useTextPresentation(labelRef, label, labelMotion, label, {
+    characterStagger: false,
+    visible: true,
+    enabled: plain,
+  });
 
   return (
     <button
@@ -444,42 +645,31 @@ function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlo
       aria-selected={active}
       aria-controls={ids.panel}
       tabIndex={active ? 0 : -1}
+      {...props}
+      {...tabPaint}
       data-slot="code-block-tab"
       data-value={value}
       data-active={active || undefined}
       data-motion={cm.mode}
       className={cn(
-        "relative inline-flex h-6 shrink-0 cursor-pointer items-center rounded-sm px-2 text-xs font-medium leading-6 text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active]:text-foreground",
+        "relative inline-flex h-6 shrink-0 cursor-pointer items-center rounded-sm px-2 text-xs font-medium leading-6 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active]:text-foreground",
         className,
       )}
-      {...props}
+      style={{ ...tabPaint.style, ...style }}
       onClick={(event) => {
         onClick?.(event);
         block.setTab(value);
       }}
     >
-      {active ? (
-        cm.reduced || cm.timeScale === 0 ? (
-          <span
-            aria-hidden="true"
-            data-slot="code-block-tab-indicator"
-            data-motion={cm.mode}
-            className="absolute inset-0 rounded-sm bg-muted"
-          />
-        ) : (
-          <motion.span
-            aria-hidden="true"
-            data-slot="code-block-tab-indicator"
-            data-motion={cm.mode}
-            // A shared element is the travel; under reduced motion there is no travel
-            // to keep, so the pill mounts where the selection landed.
-            layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}
-            transition={cm.reduced ? { duration: 0 } : cm.transition("layout.shared")}
-            className="absolute inset-0 rounded-sm bg-muted"
-          />
-        )
-      ) : null}
-      <span className="relative z-10">{children}</span>
+      {plain ? (
+        <span ref={labelHost} data-slot="code-block-tab-label" data-motion={labelMotion.mode} className="relative z-10">
+          {text}
+        </span>
+      ) : (
+        <span data-slot="code-block-tab-content" data-motion={cm.mode} className="relative z-10">
+          {children}
+        </span>
+      )}
     </button>
   );
 }
@@ -490,42 +680,74 @@ export interface CodeBlockActionsProps extends React.ComponentProps<"div"> {}
  * Holds the header's buttons. As a direct child of `CodeBlock` — no header — it
  * floats over the source's top-end corner and is revealed on hover or focus.
  */
-function CodeBlockActions({ className, children, ...props }: CodeBlockActionsProps) {
-  const cm = useCadenceMotion();
+function CodeBlockActions({ className, children, style, ...props }: CodeBlockActionsProps) {
+  const { node, ref } = useMotionHostRef<HTMLDivElement>();
+  const cm = useCadenceMotion(node);
   const inHeader = React.useContext(CodeBlockHeaderContext);
   const revealed = React.useContext(CodeBlockRevealContext);
+  const lifecycle = React.useRef<ReturnType<typeof createInlinePresence> | null>(null);
+  const presenceHost = React.useRef<HTMLElement | null>(null);
+  const revision = React.useRef(0);
+  const committedReveal = React.useRef(revealed);
+  const everRevealed = React.useRef(false);
 
-  if (inHeader) {
-    return (
-      <div
-        data-slot="code-block-actions"
-        className={cn("ms-auto flex shrink-0 items-center gap-1 -my-1 -me-1.5", className)}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
+  useIsomorphicLayoutEffect(() => {
+    const host = node.current;
+    if (!host) return;
+    if (host !== presenceHost.current) {
+      lifecycle.current?.dispose();
+      lifecycle.current = createInlinePresence(host);
+      presenceHost.current = host;
+    }
+    if (revealed !== committedReveal.current) {
+      committedReveal.current = revealed;
+      revision.current += 1;
+    }
+    if (revealed) everRevealed.current = true;
+    // One opacity channel on the retained host: a committed replacement retargets
+    // the live envelope, and a header row is simply always present.
+    lifecycle.current?.commit({
+      present: inHeader || revealed,
+      enter: false,
+      revision: revision.current,
+      cm,
+    });
+  });
+  useIsomorphicLayoutEffect(
+    () => () => {
+      lifecycle.current?.dispose();
+      lifecycle.current = null;
+      presenceHost.current = null;
+    },
+    [],
+  );
 
+  // One physical host in both placements: the header row and the floating overlay
+  // differ only in their committed layout, so the presence channel is never split
+  // between two elements.
   return (
-    <NativeControlDiv
+    <div
+      ref={ref}
       data-slot="code-block-actions"
       data-motion={cm.mode}
-      data-revealed={revealed || undefined}
-      target={{ opacity: revealed ? 1 : 0 }}
-      transition={cm.transition("data.transition")}
+      data-revealed={!inHeader && revealed ? true : undefined}
       className={cn(
-        "absolute end-3 top-3 z-10 flex shrink-0 items-center gap-1 group-data-[size=sm]/code-block:end-2 group-data-[size=sm]/code-block:top-2",
-        // A floating control needs its own surface, or it reads as part of the code.
-        "[&_button]:bg-background [&_button]:ring-1 [&_button]:ring-foreground/10",
+        inHeader
+          ? "ms-auto flex shrink-0 items-center gap-1 -my-1 -me-1.5"
+          : // A floating control needs its own surface, or it reads as part of the code.
+            "absolute end-3 top-3 z-10 flex shrink-0 items-center gap-1 group-data-[size=sm]/code-block:end-2 group-data-[size=sm]/code-block:top-2 [&_button]:bg-background [&_button]:ring-1 [&_button]:ring-foreground/10",
         // Invisible but still tabbable: focusing it reveals the row again.
-        !revealed && "pointer-events-none",
+        !inHeader && !revealed && "pointer-events-none",
         className,
       )}
+      // Until the row has been revealed once it is statically transparent: the
+      // resting state is not an animated property, and the controller owns only the
+      // envelope between committed reveal states.
+      style={{ opacity: !inHeader && !everRevealed.current && !revealed ? 0 : undefined, ...style }}
       {...props}
     >
       {children}
-    </NativeControlDiv>
+    </div>
   );
 }
 
@@ -578,8 +800,10 @@ function CodeBlockCopyButton({
     return () => window.clearTimeout(timeout);
   }, [copiedText]);
 
-  const swap = { ...cm.transition("state.morph"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) };
-  const tickOnly = cm.reduced;
+  const morph = cm.parameters(bindMotionParameters(stateIndicator, "state.morph/indicator"));
+  // The scale is decoration: only a full clock may pose it. Under reduced motion
+  // and `none` the glyphs cross-fade at their natural size.
+  const pose = morph.kind === "indicator" && cm.mode === "full" ? morph.scale : 1;
 
   return (
     <>
@@ -609,18 +833,26 @@ function CodeBlockCopyButton({
         {children ?? (
           <span aria-hidden="true" className="grid place-items-center">
             <ControlSpan
+              data-slot="code-block-copy-icon"
               data-motion={cm.mode}
               className="col-start-1 row-start-1 flex"
-              target={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}
-              transition={swap}
+              target={{ opacity: copied ? 0 : 1, scale: copied ? pose : 1 }}
+              transition={{
+                opacity: morph.kind === "indicator" ? morph.opacity : undefined,
+                scale: morph.kind === "indicator" ? morph.spatial : undefined,
+              }}
             >
               <CopyIcon />
             </ControlSpan>
             <ControlSpan
+              data-slot="code-block-copy-icon"
               data-motion={cm.mode}
               className="col-start-1 row-start-1 flex"
-              target={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}
-              transition={swap}
+              target={{ opacity: copied ? 1 : 0, scale: copied ? 1 : pose }}
+              transition={{
+                opacity: morph.kind === "indicator" ? morph.opacity : undefined,
+                scale: morph.kind === "indicator" ? morph.spatial : undefined,
+              }}
             >
               <CheckIcon />
             </ControlSpan>
@@ -746,13 +978,26 @@ function CodeBlockContent({
   useIsomorphicLayoutEffect(() => {
     latest.current = { folded, maxLines };
     // Accepted explicit source/fold props create the semantic revision here,
-    // never a render or a passive observer notification.
+    // never a render or a passive observer notification. The committed target is
+    // the fold's own content signature, so a passive resize cannot retarget it.
     const inputs = [children, folded, maxLines, wrap];
     if (!semantic.current || inputs.some((value, index) => !Object.is(value, semantic.current?.inputs[index])))
-      semantic.current = { inputs, target: {} };
+      semantic.current = {
+        inputs,
+        target: {
+          folded,
+          maxLines: maxLines ?? null,
+          wrap,
+          // The source's own line count, read once per committed revision: no
+          // per-line host, token or copy is created for it.
+          lines: typeof children === "string" ? children.replace(/\n$/, "").split("\n").length : 0,
+        },
+      };
+    const parameters = cm.parameters(bindMotionParameters(geometryContent, "geometry.resize/measured"));
+    if (parameters.kind !== "geometry") return;
     geometry.current?.commit(transaction.revision("content", semantic.current.target, preRef.current), {
       reduced: cm.reduced,
-      transition: cm.transition("geometry.resize"),
+      transition: parameters.transition,
       available: presentation?.available(),
     });
   });
@@ -881,24 +1126,38 @@ export interface CodeBlockLineProps extends React.ComponentProps<"span">, Varian
  * line is full-bleed inside the padded `pre`, which is why it pulls itself out by
  * the same padding it puts back.
  */
-function CodeBlockLine({ className, variant = "default", children, ...props }: CodeBlockLineProps) {
-  const numbered = React.useContext(CodeBlockContentContext);
-
+function CodeBlockLine({
+  ref: callerRef,
+  className,
+  style,
+  variant = "default",
+  children,
+  ...props
+}: CodeBlockLineProps) {
+  // A source line is identity paint, not an animation region: a diff or highlight
+  // tint arrives with the line that carries it, and a file can hold tens of
+  // thousands of lines. One scope, colour owner or mutation observer per line
+  // would make the file itself the cost, so the line holds no motion host and
+  // commits its own paint immediately.
   // An empty line still holds a newline, so copying a selection keeps blank lines.
   const empty =
     children === undefined || children === null || children === "" || (Array.isArray(children) && !children.length);
+  const numbered = React.useContext(CodeBlockContentContext);
+  const lineClassName = cn(
+    codeBlockLineVariants({ variant }),
+    numbered &&
+      "col-span-2 grid grid-cols-subgrid [counter-increment:line] before:min-w-6 before:select-none before:text-end before:text-muted-foreground before:content-[counter(line)]",
+    className,
+  );
 
   return (
     <span
       data-slot="code-block-line"
       data-variant={variant}
-      className={cn(
-        codeBlockLineVariants({ variant }),
-        numbered &&
-          "col-span-2 grid grid-cols-subgrid [counter-increment:line] before:min-w-6 before:select-none before:text-end before:text-muted-foreground before:content-[counter(line)]",
-        className,
-      )}
       {...props}
+      ref={callerRef}
+      className={lineClassName}
+      style={style}
     >
       <span data-slot="code-block-line-content" className="min-w-0">
         {empty ? "\n" : children}
@@ -914,16 +1173,62 @@ export interface CodeBlockFooterProps extends React.ComponentProps<"div"> {}
  * mirrors the header: a rule above it, and padding equal to the header's, so a
  * folded block has the same seam on both sides of the code.
  */
-function CodeBlockFooter({ className, ...props }: CodeBlockFooterProps) {
+function CodeBlockFooter({ ref: callerRef, className, style, children, ...props }: CodeBlockFooterProps) {
+  const { node, ref } = useMotionHostRef<HTMLDivElement>(callerRef);
+  const cm = useCadenceMotion(node);
+  const footerPaint = useStateColor(ref, cm, ["border-top-color", "color"], {
+    readability: callerReadability(className, style),
+  });
   return (
     <div
       data-slot="code-block-footer"
+      {...props}
+      {...footerPaint}
+      data-motion={cm.mode}
       className={cn(
         "flex min-w-0 shrink-0 items-center gap-2 border-t border-border px-4 py-3 text-muted-foreground group-data-[variant=destructive]/code-block:border-destructive/20 group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
         className,
       )}
-      {...props}
-    />
+      style={{ ...footerPaint.style, ...style }}
+    >
+      {typeof children === "number" ? <CodeBlockFooterNumber value={children} /> : null}
+      {typeof children === "string" ? <CodeBlockFooterText value={children} /> : null}
+      {ownedText(children as string | number) ? null : children}
+    </div>
+  );
+}
+
+/** A directly supplied quantity: the whole number is the unit, and compact place
+ * values roll on one host rather than a per-digit queue. */
+function CodeBlockFooterNumber({ value }: { value: number }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const text = useNumberPresentation(
+    node,
+    value,
+    cm,
+    value,
+    { compact: true, visible: true, cause: "independent" },
+    undefined,
+  );
+  return (
+    <span ref={ref} data-slot="code-block-footer-number" data-motion={cm.mode}>
+      {text}
+    </span>
+  );
+}
+
+function CodeBlockFooterText({ value }: { value: string }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const text = useTextPresentation(node, value, cm, value, {
+    characterStagger: false,
+    visible: true,
+  });
+  return (
+    <span ref={ref} data-slot="code-block-footer-text" data-motion={cm.mode}>
+      {text}
+    </span>
   );
 }
 
@@ -940,6 +1245,7 @@ export interface CodeBlockExpandButtonProps extends React.ComponentProps<typeof 
 function CodeBlockExpandButton({ className, children, onClick, ...props }: CodeBlockExpandButtonProps) {
   const cm = useCadenceMotion();
   const block = React.useContext(CodeBlockContext);
+  const morph = cm.parameters(bindMotionParameters(stateIndicator, "state.morph/indicator"));
 
   if (!block || block.maxLines === undefined || !block.overflowing) return null;
 
@@ -965,17 +1271,40 @@ function CodeBlockExpandButton({ className, children, onClick, ...props }: CodeB
         toggle();
       }}
     >
-      {children ?? (expanded ? "Show less" : "Show all")}
+      {children === undefined ? (
+        <CodeBlockExpandText value={expanded ? "Show less" : "Show all"} />
+      ) : ownedText(children as string | number) ? (
+        <CodeBlockExpandText value={String(children)} />
+      ) : (
+        children
+      )}
       <ControlSpan
+        data-slot="code-block-expand-icon"
         data-motion={cm.mode}
         aria-hidden="true"
         className="flex"
-        target={{ rotate: expanded ? 180 : 0 }}
-        transition={cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
+        target={{ rotate: expanded && morph.kind === "indicator" ? morph.rotation : 0 }}
+        transition={{ rotate: morph.kind === "indicator" ? morph.spatial : undefined }}
       >
         <ChevronDownIcon />
       </ControlSpan>
     </Button>
+  );
+}
+
+/** The built-in and direct plain ExpandButton label, on one retained host. It does
+ * not duplicate the Button label owner: a rich child keeps its own identity. */
+function CodeBlockExpandText({ value }: { value: string }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const text = useTextPresentation(node, value, cm, value, {
+    characterStagger: false,
+    visible: true,
+  });
+  return (
+    <span ref={ref} data-slot="code-block-expand-text" data-motion={cm.mode}>
+      {text}
+    </span>
   );
 }
 

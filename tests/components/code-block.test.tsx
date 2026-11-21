@@ -1,7 +1,9 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { PresenceContext } from "motion/react";
+import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   CodeBlock,
   CodeBlockActions,
@@ -17,8 +19,10 @@ import {
   CodeBlockTitle,
 } from "@/registry/cadence/code-block";
 import { loadHighlighter } from "@/registry/cadence/code-highlight/highlight";
+import { documentPresentation } from "@/registry/cadence/lib/motion-presence";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionAction, expectV2MotionInsertion, prepareV2MotionPlan } from "../motion-v2-contract";
 
 const SOURCE = `export function read() {
   return 1;
@@ -413,11 +417,12 @@ describe("CodeBlock", () => {
       </CadenceProvider>,
     );
 
-    // No `layoutId` means no shared-element travel: the pill is painted where the
-    // selection landed, which is information; the journey is decoration.
+    // No shared-element travel under reduced motion: the one persistent marker is
+    // committed straight to the selected tab's rectangle, which is information.
+    // The journey between tabs is decoration.
     const pill = slot(container, "code-block-tab-indicator");
     expect(pill).toBeInTheDocument();
-    expect(pill.style.transform).toBe("");
+    expect(pill.getAnimations?.() ?? []).toHaveLength(0);
   });
 
   it("folds to maxLines and reports the state on the toggle", async () => {
@@ -544,5 +549,505 @@ describe("CodeBlock", () => {
     }
 
     vi.unstubAllGlobals();
+  });
+});
+
+/** jsdom has no layout: a stable box for every host and distinct tab rectangles
+ * give the persistent marker a real destination to commit. */
+function stubLayout() {
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+    const tall = this.dataset.slot === "code-block-content" || this.dataset.slot === "code-block-code";
+    return {
+      x: 0,
+      y: 0,
+      width: 640,
+      height: tall ? 320 : 40,
+      top: 0,
+      left: 0,
+      right: 640,
+      bottom: tall ? 320 : 40,
+      toJSON: () => "",
+    } as DOMRect;
+  });
+  const offsets: Record<string, number> = { a: 0, b: 64, c: 128 };
+  Object.defineProperty(HTMLElement.prototype, "offsetLeft", {
+    configurable: true,
+    get(this: HTMLElement) {
+      return offsets[this.getAttribute("data-value") ?? ""] ?? 0;
+    },
+  });
+  for (const [name, value] of [
+    ["offsetWidth", 64],
+    ["offsetHeight", 24],
+    ["offsetTop", 0],
+  ] as const)
+    Object.defineProperty(HTMLElement.prototype, name, {
+      configurable: true,
+      get() {
+        return value;
+      },
+    });
+}
+
+/** Readable computed paint per owned token class, so a colour family commits its
+ * endpoints instead of settling every host immediately. */
+const v2Paint: Record<string, Record<string, string>> = {
+  "bg-muted": { "background-color": "rgb(244, 244, 245)" },
+  "bg-popover": { "background-color": "rgb(255, 255, 255)" },
+  "text-foreground": { color: "rgb(9, 9, 11)" },
+  "text-muted-foreground": { color: "rgb(113, 113, 122)" },
+  "text-destructive": { color: "rgb(220, 38, 38)" },
+};
+
+function stubV2Paint() {
+  const compute = window.getComputedStyle.bind(window);
+  vi.spyOn(window, "getComputedStyle").mockImplementation((element: Element) => {
+    const host = element as HTMLElement;
+    const css = compute(element);
+    const tokens: Record<string, string> = {};
+    for (const name of host.classList ?? []) Object.assign(tokens, v2Paint[name]);
+    const read = (name: string, fallback = "") =>
+      host.style?.getPropertyValue?.(name) || tokens[name] || css.getPropertyValue(name) || fallback;
+    return {
+      width: css.width,
+      height: css.height,
+      opacity: read("opacity") || "1",
+      color: read("color"),
+      backgroundColor: read("background-color"),
+      transform: read("transform") || "none",
+      display: css.display || "block",
+      visibility: css.visibility || "visible",
+      transitionProperty: read("transition-property") || "none",
+      transitionDuration: read("transition-duration") || "0s",
+      transitionDelay: read("transition-delay") || "0s",
+      transitionTimingFunction: read("transition-timing-function") || "ease",
+      animation: "",
+      animationName: "none",
+      animationDuration: "0s",
+      animationDelay: "0s",
+      animationIterationCount: "1",
+      getPropertyValue: (name: string) => read(name),
+    } as unknown as CSSStyleDeclaration;
+  });
+}
+
+function stubClipboard() {
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText: vi.fn(async () => {}) },
+  });
+}
+
+/**
+ * jsdom has no Web Animations API. Presence adapters settle immediately without
+ * it, so a test that certifies a real entrance supplies the minimal native
+ * surface the adapter calls and lets the envelope stay in flight.
+ */
+function stubNativeAnimation() {
+  const previous = HTMLElement.prototype.animate;
+  const animate = vi.fn(function (this: HTMLElement, frames: Keyframe[]) {
+    let reject: ((reason?: unknown) => void) | undefined;
+    const finished = new Promise<void>((_, no) => {
+      reject = no;
+    });
+    finished.catch(() => {});
+    return {
+      finished,
+      playState: "running",
+      effect: { getKeyframes: () => frames, getTiming: () => ({ duration: 100 }) },
+      cancel() {
+        reject?.(new Error("cancelled"));
+      },
+      finish() {},
+    } as unknown as Animation;
+  });
+  HTMLElement.prototype.animate = animate as unknown as typeof HTMLElement.prototype.animate;
+  return () => {
+    HTMLElement.prototype.animate = previous;
+  };
+}
+
+/** The floating actions only have a hidden resting state on a hovering device. */
+function stubHoverCapable() {
+  const previous = window.matchMedia;
+  window.matchMedia = vi.fn((query: string) => ({
+    matches: query === "(hover: hover)",
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(() => false),
+  })) as unknown as typeof window.matchMedia;
+  return () => {
+    window.matchMedia = previous;
+  };
+}
+
+type V2Mode = "full" | "reduced" | "none";
+const v2Modes = ["full", "reduced", "none"] as const;
+
+/** One committed tab revision: the marker travels, the labels stay. */
+function TabsScene({ mode }: { mode: V2Mode }) {
+  const [tab, setTab] = useState("a");
+  return (
+    <CadenceProvider mode={mode} timeScale={0}>
+      <CodeBlock tab={tab} onTabChange={setTab} defaultTab="a">
+        <CodeBlockHeader>
+          <CodeBlockTabs label="Variant">
+            <CodeBlockTab value="a">First</CodeBlockTab>
+            <CodeBlockTab value="b">Second</CodeBlockTab>
+            <CodeBlockTab value="c">Third</CodeBlockTab>
+          </CodeBlockTabs>
+        </CodeBlockHeader>
+        <CodeBlockPanel value="a">first source</CodeBlockPanel>
+        <CodeBlockPanel value="b">second source</CodeBlockPanel>
+        <CodeBlockPanel value="c">third source</CodeBlockPanel>
+      </CodeBlock>
+    </CadenceProvider>
+  );
+}
+
+/** A capped block whose measured content owns the fold transition. */
+function FoldScene({ mode }: { mode: V2Mode }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <CadenceProvider mode={mode} timeScale={0}>
+      <CodeBlock maxLines={2} expanded={expanded} onExpandedChange={setExpanded} defaultExpanded={false}>
+        <CodeBlockContent>{"a\nb\nc\nd\ne"}</CodeBlockContent>
+        <CodeBlockFooter>
+          <CodeBlockExpandButton />
+        </CodeBlockFooter>
+      </CodeBlock>
+    </CadenceProvider>
+  );
+}
+
+type LabelFrame = { title: string; tab: string; footer: string };
+const labelFrame: LabelFrame = { title: "index.ts", tab: "TypeScript", footer: "12 lines" };
+
+/** Four plain label hosts on one retained identity each; the fold toggle is native. */
+function LabelsScene({ mode, frame }: { mode: V2Mode; frame: LabelFrame }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <CadenceProvider mode={mode} timeScale={0}>
+      <CodeBlock maxLines={2} expanded={open} onExpandedChange={setOpen}>
+        <CodeBlockHeader>
+          <CodeBlockTitle>{frame.title}</CodeBlockTitle>
+        </CodeBlockHeader>
+        <CodeBlockTabs label="Variant">
+          <CodeBlockTab value="a">{frame.tab}</CodeBlockTab>
+        </CodeBlockTabs>
+        <CodeBlockContent>{"const answer = 42;"}</CodeBlockContent>
+        <CodeBlockFooter>{frame.footer}</CodeBlockFooter>
+        <CodeBlockFooter>
+          <CodeBlockExpandButton />
+        </CodeBlockFooter>
+      </CodeBlock>
+    </CadenceProvider>
+  );
+}
+
+/** A directly supplied quantity in the non-code Footer region. */
+function QuantityScene({ mode, count }: { mode: V2Mode; count: number }) {
+  return (
+    <CadenceProvider mode={mode} timeScale={0}>
+      <CodeBlock>
+        <CodeBlockFooter>{count}</CodeBlockFooter>
+        <CodeBlockContent>const answer = 42;</CodeBlockContent>
+      </CodeBlock>
+    </CadenceProvider>
+  );
+}
+
+type PaintFrame = { root: string; header: string; footer: string; tab: string };
+const paintFrame: PaintFrame = {
+  root: "text-muted-foreground",
+  header: "text-muted-foreground",
+  footer: "text-muted-foreground",
+  tab: "text-muted-foreground",
+};
+
+/** Four colour regions, one class change per region, no second writer. */
+function PaintScene({ mode, frame }: { mode: V2Mode; frame: PaintFrame }) {
+  return (
+    <CadenceProvider mode={mode} timeScale={0}>
+      <CodeBlock className={frame.root}>
+        <CodeBlockHeader className={frame.header}>
+          <CodeBlockTitle>index.ts</CodeBlockTitle>
+        </CodeBlockHeader>
+        <CodeBlockTabs label="Variant">
+          <CodeBlockTab value="a" className={frame.tab}>
+            First
+          </CodeBlockTab>
+        </CodeBlockTabs>
+        <CodeBlockContent>
+          <CodeBlockLine variant="added">+ added line</CodeBlockLine>
+        </CodeBlockContent>
+        <CodeBlockFooter className={frame.footer}>12 lines</CodeBlockFooter>
+      </CodeBlock>
+    </CadenceProvider>
+  );
+}
+
+type ControlFrame = { label: string | number; present: boolean; paint: boolean };
+const controlFrame: ControlFrame = { label: "Copy", present: true, paint: false };
+
+/** A plain child hands the label, quantity, surface, press and retained exit to Button. */
+function ControlScene({ mode, frame }: { mode: V2Mode; frame: ControlFrame }) {
+  return (
+    <CadenceProvider mode={mode} timeScale={0}>
+      <CodeBlock>
+        <CodeBlockActions>
+          <PresenceContext.Provider
+            value={{
+              id: "code-block-control",
+              initial: false as const,
+              isPresent: frame.present,
+              register: () => () => {},
+              onExitComplete: () => {},
+            }}
+          >
+            <CodeBlockCopyButton
+              value="const answer = 42;"
+              className={frame.paint ? "bg-muted" : "bg-popover"}
+              onClick={(event) => event.preventDefault()}
+            >
+              {frame.label}
+            </CodeBlockCopyButton>
+          </PresenceContext.Provider>
+        </CodeBlockActions>
+        <CodeBlockContent>const answer = 42;</CodeBlockContent>
+      </CodeBlock>
+    </CadenceProvider>
+  );
+}
+
+describe("Code block v2 owners", () => {
+  beforeEach(() => {
+    stubLayout();
+    stubV2Paint();
+    stubClipboard();
+  });
+  afterEach(() => vi.restoreAllMocks());
+  beforeAll(async () => {
+    await prepareV2MotionPlan();
+  });
+
+  it.each(["full", "reduced", "none"] as const)("pops an independently inserted block in %s", async (mode) => {
+    const stub = stubNativeAnimation();
+    try {
+      const view = render(
+        <CadenceProvider mode={mode}>
+          <div data-testid="scene" />
+        </CadenceProvider>,
+      );
+      // A page that already painted presents its successors: only an independent
+      // late insertion owns the entrance.
+      documentPresentation(document).presented = true;
+      await expectV2MotionInsertion("code-block", "code-block.root.enter", mode, () =>
+        act(() => {
+          view.rerender(
+            <CadenceProvider mode={mode}>
+              <CodeBlock>
+                <CodeBlockContent>{"const answer = 42;\nconsole.log(answer);"}</CodeBlockContent>
+              </CodeBlock>
+            </CadenceProvider>,
+          );
+        }),
+      );
+      view.unmount();
+    } finally {
+      stub();
+    }
+  });
+
+  it.each(["full", "reduced", "none"] as const)("reveals and hides the floating actions in %s", async (mode) => {
+    const hover = stubHoverCapable();
+    try {
+      const view = render(
+        <CadenceProvider mode={mode} timeScale={0}>
+          <CodeBlock>
+            <CodeBlockActions>
+              <CodeBlockCopyButton value="const answer = 42;" />
+            </CodeBlockActions>
+            <CodeBlockContent>{"const answer = 42;\nconsole.log(answer);"}</CodeBlockContent>
+          </CodeBlock>
+        </CadenceProvider>,
+      );
+      const block = document.querySelector('[data-slot="code-block"]') as HTMLElement;
+      await expectV2MotionAction("code-block", "code-block.actions.enter", mode, () =>
+        act(() => {
+          fireEvent.pointerEnter(block);
+        }),
+      );
+      await expectV2MotionAction("code-block", "code-block.actions.exit", mode, () =>
+        act(() => {
+          fireEvent.pointerLeave(block);
+        }),
+      );
+      view.unmount();
+    } finally {
+      hover();
+    }
+  });
+
+  it.each(["full", "reduced", "none"] as const)(
+    "morphs both copy glyphs and the expand chevron in %s",
+    async (mode) => {
+      stubMeasurement();
+      const view = render(
+        <CadenceProvider mode={mode} timeScale={0}>
+          <CodeBlock maxLines={2}>
+            <CodeBlockActions>
+              <CodeBlockCopyButton value="const answer = 42;" />
+              <CodeBlockExpandButton />
+            </CodeBlockActions>
+            <CodeBlockContent>{"const answer = 42;\nconsole.log(answer);\nreturn answer;"}</CodeBlockContent>
+          </CodeBlock>
+        </CadenceProvider>,
+      );
+      const copy = document.querySelector('[data-slot="code-block-copy-button"]') as HTMLButtonElement;
+      await expectV2MotionAction("code-block", "code-block.copy.change", mode, () =>
+        act(() => {
+          fireEvent.click(copy);
+        }),
+      );
+      const expand = document.querySelector('[data-slot="code-block-expand-button"]') as HTMLButtonElement;
+      expect(expand).toBeTruthy();
+      await expectV2MotionAction("code-block", "code-block.expand.change", mode, () =>
+        act(() => {
+          fireEvent.click(expand);
+        }),
+      );
+      view.unmount();
+    },
+  );
+
+  it.each(v2Modes)("moves one marker to the committed tab in %s", async (mode) => {
+    const view = render(<TabsScene mode={mode} />);
+    const second = document.querySelector('[data-value="b"]') as HTMLButtonElement;
+    await expectV2MotionAction("code-block", "code-block.indicator.select", mode, () =>
+      act(() => {
+        fireEvent.click(second);
+      }),
+    );
+    view.unmount();
+  });
+
+  it.each(v2Modes)("folds the measured viewport in %s", async (mode) => {
+    stubMeasurement();
+    const view = render(<FoldScene mode={mode} />);
+    const expand = document.querySelector('[data-slot="code-block-expand-button"]') as HTMLButtonElement;
+    expect(expand).toBeTruthy();
+    await expectV2MotionAction(
+      "code-block",
+      "code-block.viewport.resize",
+      mode,
+      () =>
+        act(() => {
+          fireEvent.click(expand);
+        }),
+      { properties: ["height"] },
+    );
+    view.unmount();
+  });
+
+  it.each(v2Modes)("replaces owned plain labels in %s", async (mode) => {
+    stubMeasurement();
+    let frame = labelFrame;
+    let view: ReturnType<typeof render>;
+    const draw = () => <LabelsScene mode={mode} frame={frame} />;
+    view = render(draw());
+    const update = (next: Partial<LabelFrame>) =>
+      act(() => {
+        frame = { ...frame, ...next };
+        view.rerender(draw());
+      });
+    await expectV2MotionAction("code-block", "code-block.title.change", mode, () => update({ title: "index.tsx" }));
+    await expectV2MotionAction("code-block", "code-block.tab-label.change", mode, () =>
+      update({ tab: "TypeScript React" }),
+    );
+    await expectV2MotionAction("code-block", "code-block.footer-label.change", mode, () =>
+      update({ footer: "14 lines" }),
+    );
+    const expand = document.querySelector('[data-slot="code-block-expand-button"]') as HTMLButtonElement;
+    expect(expand).toBeTruthy();
+    await expectV2MotionAction("code-block", "code-block.expand-label.change", mode, () =>
+      act(() => {
+        fireEvent.click(expand);
+      }),
+    );
+    view.unmount();
+  });
+
+  it.each(v2Modes)("rolls one Footer quantity in %s", async (mode) => {
+    let count = 3;
+    let view: ReturnType<typeof render>;
+    const draw = () => <QuantityScene mode={mode} count={count} />;
+    view = render(draw());
+    await expectV2MotionAction("code-block", "code-block.value.change", mode, () =>
+      act(() => {
+        count = 9;
+        view.rerender(draw());
+      }),
+    );
+    view.unmount();
+  });
+
+  it.each(v2Modes)("owns each colour region without a second writer in %s", async (mode) => {
+    let frame = paintFrame;
+    let view: ReturnType<typeof render>;
+    const draw = () => <PaintScene mode={mode} frame={frame} />;
+    view = render(draw());
+    const update = (next: Partial<PaintFrame>) =>
+      act(() => {
+        frame = { ...frame, ...next };
+        view.rerender(draw());
+      });
+    await expectV2MotionAction("code-block", "code-block.surface.colour", mode, () =>
+      update({ root: "text-foreground" }),
+    );
+    await expectV2MotionAction("code-block", "code-block.header.colour", mode, () =>
+      update({ header: "text-foreground" }),
+    );
+    await expectV2MotionAction("code-block", "code-block.footer.colour", mode, () =>
+      update({ footer: "text-foreground" }),
+    );
+    await expectV2MotionAction("code-block", "code-block.tab.colour", mode, () => update({ tab: "text-foreground" }));
+    view.unmount();
+  });
+
+  it.each(v2Modes)("keeps Button's own owners inside a block composition in %s", async (mode) => {
+    let frame = controlFrame;
+    let view: ReturnType<typeof render>;
+    const draw = () => <ControlScene mode={mode} frame={frame} />;
+    view = render(draw());
+    const update = (next: Partial<ControlFrame>) =>
+      act(() => {
+        frame = { ...frame, ...next };
+        view.rerender(draw());
+      });
+    const button = document.querySelector('[data-slot="code-block-copy-button"]') as HTMLButtonElement;
+    await expectV2MotionAction("code-block", "code-block.control-label.replace", mode, () =>
+      update({ label: "Copy code" }),
+    );
+    update({ label: 7 });
+    await expectV2MotionAction("code-block", "code-block.control-quantity.roll", mode, () => update({ label: 8 }));
+    await expectV2MotionAction("code-block", "code-block.control-surface.colour", mode, () => update({ paint: true }));
+    await expectV2MotionAction("code-block", "code-block.control.press", mode, () => {
+      fireEvent.pointerDown(button.querySelector('[data-slot="button-feedback"]') ?? button, {
+        button: 0,
+        pointerId: 1,
+        isPrimary: true,
+      });
+    });
+    await expectV2MotionAction("code-block", "code-block.control-resize.resize", mode, () =>
+      update({ label: "Copy the whole snippet" }),
+    );
+    await expectV2MotionAction("code-block", "code-block.control-exit.exit", mode, () => update({ present: false }));
+    await expectV2MotionAction("code-block", "code-block.control-enter.enter", mode, () => update({ present: true }));
+    view.unmount();
   });
 });

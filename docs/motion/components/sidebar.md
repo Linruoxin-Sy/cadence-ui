@@ -1,6 +1,6 @@
 # Sidebar motion contract
 
-Status: target design; desktop offcanvas/icon size-linked projection and a safe completion-gated plain-label envelope are implemented. The remaining capabilities/acceptance are pending; migration remains legacy.
+Status: target design; desktop offcanvas/icon size-linked projection and a safe completion-gated plain-label envelope are implemented. The desktop container/gap geometry is proven on both sides, on the icon rail, on every variant, on an in-flight reversal, on a live downgrade and across a breakpoint change (`tests/e2e/sidebar-s1-geometry.spec.ts`). The remaining capabilities/acceptance are pending; migration remains legacy.
 
 Sidebar preserves spatial orientation while changing how much navigation is exposed. Offcanvas mode moves the existing desktop container; icon mode changes the occupied width and reveals labels only when space is usable. Mobile delegates to its existing Sheet composition. Route changes do not replay the sidebar.
 
@@ -148,11 +148,19 @@ Navigation labels lay out at their destination inline-size before the separate s
   Also acquire editor focus midway through an otherwise eligible collapse and verify cancellation
   of all dependent geometry without delaying that focus or clearing the native interaction.
 
-- Pending: reverse offcanvas/icon transitions for both sides and all variants; inspect matching container and page gap geometry.
-- Pending: resize across the mobile breakpoint during motion, reopen Sheet and navigate a route; no double entrance or stale transform remains.
+- Proven for the desktop container/gap pair: reverse offcanvas transitions on both sides and the icon
+  transition on the left rail, inspect the three variants (sidebar/floating/inset) at
+  `--sidebar-width: 12rem`, and inspect matching container and page gap geometry.
+  `tests/e2e/sidebar-s1-geometry.spec.ts` records the paired projection frame by frame (reserved gap
+  width and panel offset obey one value), the in-flight reversal through that shell's own trigger, the
+  icon rail resized from the same scalar, a width-token change issued mid-collapse that lands on the
+  new extent, a live downgrade to reduced/none mid-collapse, and a
+  breakpoint change that retires the desktop projection before the Sheet mounts. Screenshots for the
+  matrix (both sides × light/dark × narrow/wide × three modes) are written to `.cache/sidebar-s1/`.
+- Pending: resize across the mobile breakpoint during motion, reopen Sheet and navigate a route; no double entrance or stale transform remains. The desktop half is proven above: the panel unmounts and no running animation survives into the Sheet.
 - Pending: change a plain badge/label, use sidebar-input and keyboard navigation while collapsed, and verify accessibility/hit regions.
-- Pending: verify all modes, zero clock, live downgrade, SSR initial state and unmount during desktop/mobile exit.
-- Pending: change side, width tokens or available space during a toggle, including floating/inset variants. Inspect coupled gap/translation progress rather than only matching completion times; no old-direction write or temporary page overlap may survive.
+- Pending: verify all modes, zero clock, live downgrade, SSR initial state and unmount during desktop/mobile exit. Live downgrade of the coupled geometry itself is proven above; the SSR and mobile-exit halves remain open.
+- Partly proven: change side, width tokens or available space during a toggle, including floating/inset variants. Both sides and the three variants resolve from the actual variables, and a `--sidebar-width` change issued mid-collapse retires the running projection, lands on the new extent without a stale transform, and is the extent a later toggle resolves (above). Still open: changing the available page space under a constrained shell, and proving no temporary page overlap survives it.
 
 - Pending: update string and numeric badges, showOnHover actions and inherited menu skeletons while collapsing or changing theme/mode; no duplicate colour/pulse, invisible focused action or stale hover completion survives.
 - Pending: switch to reduced during collapse plus label/action/text feedback, and edit a positive clock mid-toggle. Coupled geometry stays coherent, permitted short paint remains eligible, collapsed content stays hidden and no owner restarts from an old target. None/zero settles one-shot work without breaking native Sheet completion or substituting the recipe clock for Skeleton's theme clock.

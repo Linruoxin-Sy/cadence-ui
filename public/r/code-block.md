@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/code-block`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: data.transition, layout.shared, state.morph, geometry.resize
+- Motion recipes: enter.pop, data.transition, exit.fade, geometry.resize, layout.shared, state.morph, text.change, number.roll, feedback.press, state.color
 
 ## Installation
 
@@ -37,10 +37,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/code-highlight](https://cadence.dev/r/code-highlight.json) — direct registry dependency.
+- [@cadence/cadence-selection](https://cadence.dev/r/cadence-selection.json) — direct registry dependency.
+- [@cadence/cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -78,6 +80,9 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | code-highlight | `@components/cadence/code-highlight/highlight.tsx` | [JSON files[].content](https://cadence.dev/r/code-highlight.json) |
 | code-highlight | `@components/cadence/code-highlight/use-highlighted-code.tsx` | [JSON files[].content](https://cadence.dev/r/code-highlight.json) |
+| cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-selection | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | code-block | `@components/cadence/code-block/index.tsx` | [JSON files[].content](https://cadence.dev/r/code-block.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -97,6 +102,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 [Source files: button](https://cadence.dev/r/button.json)
 
 [Source files: code-highlight](https://cadence.dev/r/code-highlight.json)
+
+[Source files: cadence-selection](https://cadence.dev/r/cadence-selection.json)
+
+[Source files: cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json)
 
 [Source files: code-block](https://cadence.dev/r/code-block.json)
 
@@ -975,12 +984,17 @@ Authored intensity is **medium**: Code switching, active tab highlight and measu
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/one-shot` | yes (a second click retargets the spring) |
-| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition/one-shot` | yes |
-| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph/one-shot` | yes |
+| independent insertion | root `opacity` entry, `presence.surface` | `enter.pop/one-shot` | yes (a rerender keeps the current visibility) |
+| floating actions in / out | `opacity` on the retained row | `data.transition/one-shot`, `exit.fade/one-shot` | yes |
+| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/measured` | yes (a second click retargets from the current size) |
+| tab indicator | one persistent marker travelling between the committed tab rectangles | `layout.shared/selection` | yes (a third tab pressed mid-travel retargets it) |
+| copy | glyph cross-fade + `scale` 0.96 → 1 in one stacked cell | `state.morph/one-shot` | yes |
 | fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph/one-shot` | yes |
-| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared/one-shot` | yes (a third tab pressed mid-travel retargets it) |
-| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize/one-shot` resolves to `{ duration: 0 }` | – |
+| plain labels | changed graphemes on the title, tab label, Footer text and expand label, `stagger: none` | `text.change/changed-runs` | yes (a revision replaces the changed runs) |
+| Footer quantity | changed places reel on the slot only | `number.roll/reels` | yes |
+| paint | root/Header/Footer/active tab/diff line colour families | `state.color/css-transition` | yes (focus and invalid settle that region) |
+| inherited controls | Button keeps its own press, paint, presence, size, label and reel | `feedback.press/one-shot` and Button's own forms | yes |
+| reduced | opacity and colour stay; the chevron, height, marker and copy scale settle immediately, and changed text commits per unit | `geometry.resize/measured` resolves to `{ duration: 0 }` | – |
 | none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
 
 Three notes on the choices:
@@ -989,11 +1003,14 @@ Three notes on the choices:
   per line count, and it would break the moment a line wraps. The spring is the token's, and the rendered height is
   clamped to the content so it can never settle above or below the real size.
 - Under reduced motion the height change is a jump on purpose. Unfolding is information — the reader asked to see
-  more lines — and a 200 ms layout tween is exactly the motion the reduced mode exists to remove.
+  more lines — and a layout tween is exactly the motion the reduced mode exists to remove.
 - Explicit source and fold commits may resize in full mode. Font arrival, viewport reflow and unknown observer changes use current natural layout immediately. Hidden content establishes a fresh baseline when measurable; focus inside the source exposes its full height immediately. The source tree is never cloned for measurement, and completed expansion releases the temporary height to `auto`.
-- The tab pill is a shared element only in full mode. Reduced motion drops the `layoutId`, so the pill is painted
-  where the selection landed: which tab is current is information, the travel between them is not. A panel change
-  never animates its height for the same reason.
+- The tab marker is a shared element only in full mode. Reduced motion paints it where the selection landed: which
+  tab is current is information, the travel between them is not. A panel change never animates its height for the
+  same reason.
+- A source revision is one identity. A plain direct source stays one text node, so every revision — removed,
+  inserted, highlighted or line-numbered — commits the exact new source immediately rather than splitting the
+  streaming source into per-line hosts.
 
 ## Keyboard interactions
 
