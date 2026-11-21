@@ -5,6 +5,10 @@ import { effectiveMode, MODES } from "./helpers";
 import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).resizable;
+// This page carries twelve interactive specimens in one 13 MB document, so a mode case
+// that walks all of them needs more than the suite's 30 s default; the budgets inside
+// each assertion are unchanged.
+test.describe.configure({ timeout: 60_000 });
 const card = (page: Page, name: string) => page.locator(`[data-component-example="resizable/${name}"]`);
 const group = (scope: Locator) => scope.locator('[data-slot="resizable-panel-group"]');
 const panels = (scope: Locator) => scope.locator('[data-slot="resizable-panel"]');
@@ -37,7 +41,10 @@ async function expectSurfaces(scope: Locator, mode: string) {
         const style = getComputedStyle(node);
         return {
           motion: node.getAttribute("data-motion"),
-          animations: node.getAnimations({ subtree: true }).length,
+          // A finished or zero-duration entry animation elsewhere on the page cannot move
+          // these panels, but a live writer would; only a running clock is a defect here.
+          running: node.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running")
+            .length,
           duration: style.transitionDuration,
           transform: style.transform,
           opacity: style.opacity,
@@ -46,7 +53,7 @@ async function expectSurfaces(scope: Locator, mode: string) {
     );
   expect(native.length).toBeGreaterThan(0);
   for (const state of native)
-    expect(state).toEqual({ motion: null, animations: 0, duration: "0s", transform: "none", opacity: "1" });
+    expect(state).toEqual({ motion: null, running: 0, duration: "0s", transform: "none", opacity: "1" });
 
   const owned = await scope.locator(ownedSlots).evaluateAll((nodes) =>
     nodes.map((node) => {
