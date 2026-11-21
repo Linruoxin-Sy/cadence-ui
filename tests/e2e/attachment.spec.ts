@@ -50,6 +50,8 @@ for (const os of [false, true])
       for (const state of ["idle", "uploading", "processing", "error", "done"]) {
         const r = card(page, "upload-state").locator(`[data-slot="attachment"][data-state="${state}"]`);
         await expect(r).toHaveAttribute("data-motion", actual);
+        // The shared loop policy pauses an offscreen owner, so the sample needs the tile in view.
+        await r.scrollIntoViewIfNeeded();
         const f = await frames(r.locator('[data-slot="attachment-title"]'));
         await info.attach(`native-${state}-frames`, { body: JSON.stringify(f), contentType: "application/json" });
         expect(f.every((s) => s.transform === "none")).toBe(true);
