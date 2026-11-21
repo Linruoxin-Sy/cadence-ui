@@ -204,20 +204,25 @@ for (const os of [false, true])
     const title = root(c).locator('[data-slot="attachment-title"]'),
       saved = await title.elementHandle(),
       savedInput = await input.elementHandle();
-    await title.evaluate((el) => {
-      // The loop owns opacity; the colour clock is a separate CSS transition on the same host.
-      (window as unknown as { attachmentAnimation: Animation | undefined }).attachmentAnimation = el
-        .getAnimations()
-        .find((animation) => !("transitionProperty" in animation));
-    });
+    // Only the OS-preference-free run starts a loop to cancel; with `reducedMotion: reduce` at load
+    // the loop never begins, so that run proves the never-started half instead.
+    const startedLoop = !os;
+    if (startedLoop)
+      await title.evaluate((el) => {
+        // The loop owns opacity; the colour clock is a separate CSS transition on the same host.
+        (window as unknown as { attachmentAnimation: Animation | undefined }).attachmentAnimation = el
+          .getAnimations()
+          .find((animation) => !("transitionProperty" in animation));
+      });
     await c.getByRole("button", { name: "Process locally", exact: true }).click();
-    expect(
-      await title.evaluate(
-        (el) =>
-          el.getAnimations().find((animation) => !("transitionProperty" in animation)) ===
-          (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation,
-      ),
-    ).toBe(true);
+    if (startedLoop)
+      expect(
+        await title.evaluate(
+          (el) =>
+            el.getAnimations().find((animation) => !("transitionProperty" in animation)) ===
+            (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation,
+        ),
+      ).toBe(true);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(title).toHaveAttribute("data-motion", "reduced");
     // A live downgrade cancels the loop that was already running under `full`; it must not survive
@@ -225,11 +230,12 @@ for (const os of [false, true])
     await expect
       .poll(() => title.evaluate((el) => el.getAnimations().filter((a) => !("transitionProperty" in a)).length))
       .toBe(0);
-    expect(
-      await title.evaluate(
-        () => (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation.playState,
-      ),
-    ).not.toBe("running");
+    if (startedLoop)
+      expect(
+        await title.evaluate(
+          () => (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation.playState,
+        ),
+      ).not.toBe("running");
     const mode = page.getByRole("group", { name: "Motion mode" });
     for (const requested of ["none", "reduced", "full"] as const) {
       await mode.getByRole("button", { name: requested, exact: true }).click();
