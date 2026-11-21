@@ -1836,6 +1836,8 @@
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
         "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
         "@cadence/button",
         "@cadence/cadence-content"
       ],
@@ -1854,6 +1856,18 @@
           {
             "recipe": "data.transition",
             "form": "month-grid"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
           }
         ],
         "intensity": "medium",
@@ -1867,7 +1881,7 @@
           "scope": "collection",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Month navigation shifts the bounded month grid; day selection retains its existing local feedback."
+          "reason": "Month navigation shifts the bounded month grid and its own week-count height; each real day and navigation button owns its scoped paint."
         },
         "motionCoverage": {
           "schema": 1,
@@ -1876,7 +1890,28 @@
               {
                 "relationship": "default",
                 "owner": "calendar",
-                "reason": "Calendar integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "Calendar's own month-grid adapter owns opacity and permitted signed travel on the actual table; no enclosing owner contributes a second paint."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "calendar",
+                "reason": "The month's own size shell owns the clamped block-size continuity for a single displayed month; the table dimensions stay native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "calendar",
+                "reason": "Each real day and navigation button owns one scoped background/foreground family, so a large grid gains no table-wide colour clock."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "calendar",
+                "reason": "The retained caption label replaces only changed graphemes in place; native dropdown options are never rewritten."
               }
             ]
           }
@@ -2987,11 +3022,6 @@
               }
             ],
             "data.transition/one-shot": [
-              {
-                "relationship": "inherited",
-                "owner": "calendar",
-                "reason": "Date Picker mounts calendar for the existing content/data/status phase; that installed component remains the integration owner."
-              },
               {
                 "relationship": "inherited",
                 "owner": "button",
