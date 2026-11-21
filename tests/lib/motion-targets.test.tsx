@@ -216,6 +216,7 @@ describe("current registry inventory and real part references", () => {
         "scroll-area",
         "resizable",
         "table",
+        "calendar",
         "toc",
       ].sort(),
     );

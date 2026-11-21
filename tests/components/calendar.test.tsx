@@ -3,15 +3,17 @@ import userEvent from "@testing-library/user-event";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
 import { CalendarDay, type DateRange, type DayButtonProps } from "react-day-picker";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar, CalendarDayButton } from "@/registry/cadence/calendar";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 beforeEach(visibleEngineViewport);
 
 const month = new Date(2026, 10, 1);
+const modes = ["full", "reduced", "none"] as const;
 describe("Calendar", () => {
   it("keeps the standalone day button slot and non-submit default", async () => {
     const submit = vi.fn((e) => e.preventDefault());
@@ -166,6 +168,108 @@ describe("Calendar", () => {
       />,
     );
     expect(screen.getAllByText("Custom day")).toHaveLength(30);
+  });
+});
+
+const november = new Date(2026, 10, 1);
+const december = new Date(2026, 11, 1);
+
+describe("Calendar v2 owners", () => {
+  // A cold catalogue-wide source/contract audit; a hang guard, not a performance budget.
+  beforeAll(() => prepareV2MotionPlan(), 300_000);
+
+  it.each(modes)("executes every owned action on the real parts in %s", async (mode) => {
+    const owned = (binding: string, exercise: () => void | Promise<void>, container?: ParentNode) =>
+      expectV2MotionAction("calendar", binding, mode, exercise, container ? { container } : {}).catch((error) => {
+        throw new Error(`${binding} in ${mode}: ${(error as Error).message}`);
+      });
+
+    // A zero clock keeps the three-mode matrix about ownership and mode policy; the
+    // shipped positive clocks are proven by the owner tests below and in a real engine.
+    const draw = (shown: Date) => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Calendar mode="single" month={shown} className="w-72" />
+      </CadenceProvider>
+    );
+    const view = render(draw(november));
+    const grid = screen.getByRole("grid");
+
+    // One committed month change paints the retained table and commits one shell height.
+    await owned("calendar.grid.change", () => view.rerender(draw(december)));
+    expect(screen.getByRole("grid")).toBe(grid);
+    expect(grid).toHaveAttribute("aria-label", "December 2026");
+    await owned("calendar.month.resize", () => view.rerender(draw(new Date(2027, 0, 1))));
+    expect(screen.getByRole("grid")).toBe(grid);
+
+    // The retained caption replaces only the runs that changed with the month.
+    await owned("calendar.caption.replace", () => view.rerender(draw(new Date(2027, 1, 1))));
+    const caption = view.container.querySelector('[data-slot="calendar-caption-label"]') as HTMLElement;
+    expect(caption).toHaveTextContent("February 2027");
+
+    // Each real navigation button owns one scoped paint family on its own host; the
+    // committed palette arrives on that host, not through a shared parent class.
+    const previousButton = view.container.querySelector('[data-slot="calendar-nav-previous"]') as HTMLElement;
+    const nextButton = view.container.querySelector('[data-slot="calendar-nav-next"]') as HTMLElement;
+    await owned("calendar.navigation-previous.colour", () => {
+      previousButton.style.backgroundColor = "#eef2ff";
+    });
+    await owned("calendar.navigation-next.colour", () => {
+      nextButton.style.backgroundColor = "#f8fafc";
+    });
+
+    // Navigation keeps its native activation: no second transform writer on its box.
+    expect(view.container.querySelector('[data-slot="calendar-nav-next-feedback"]')).toBeNull();
+
+    // The exported day button keeps its own surface/foreground owner for a real cell.
+    const day = (paint: string) => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <CalendarDayButton day={new CalendarDay(november, november)} modifiers={{}} style={{ backgroundColor: paint }}>
+          12
+        </CalendarDayButton>
+      </CadenceProvider>
+    );
+    const cell = render(day("#ffffff"));
+    await owned("calendar.day.colour", () => cell.rerender(day("#eef2ff")), cell.container);
+    expect(cell.container.querySelector('[data-slot="button"]')).toHaveAttribute(
+      "data-cadence-color",
+      "background-color, color",
+    );
+    cell.unmount();
+
+    await expectV2NativeBoundaries("calendar", { container: view.container });
+    expectMotionContract(mode, { root: view.container, policy: ["color"] });
+    view.unmount();
+  });
+
+  it.each(modes)("keeps one scoped paint family per real day and navigation owner in %s", async (mode) => {
+    const view = render(
+      <CadenceProvider mode={mode} timeScale={1}>
+        <Calendar mode="single" defaultMonth={november} className="w-72" />
+      </CadenceProvider>,
+    );
+    const days = [...view.container.querySelectorAll<HTMLElement>('[data-slot="button"][data-cadence-color]')];
+    expect(days.length).toBeGreaterThan(27);
+    const previous = view.container.querySelector<HTMLElement>('[data-slot="calendar-nav-previous"]');
+    const next = view.container.querySelector<HTMLElement>('[data-slot="calendar-nav-next"]');
+    for (const node of [days[0] as HTMLElement, previous as HTMLElement, next as HTMLElement]) {
+      expect(node).toHaveAttribute("data-cadence-color", "background-color, color");
+      expect(node.style.transitionProperty).toBe("background-color, color");
+      expect(node.style.transitionDelay).toBe("0s");
+      if (mode === "none") expect(parseFloat(node.style.transitionDuration)).toBe(0);
+      else expect(parseFloat(node.style.transitionDuration)).toBeGreaterThan(0);
+    }
+    // The month shell is the only height owner; the grid keeps its native dimensions.
+    const shell = view.container.querySelector<HTMLElement>('[data-slot="calendar-month"]');
+    expect(shell).toHaveAttribute("data-motion", mode);
+    expect(shell?.style.height).toBe("");
+    expect(view.container.querySelector('[data-slot="calendar-month"] > [data-slot="calendar-month-grid"]')).toBeNull();
+
+    // Real DOM focus settles that owner's whole declared paint, and leaving restores it.
+    act(() => (days[0] as HTMLElement).focus());
+    await vi.waitFor(() => expect(parseFloat((days[0] as HTMLElement).style.transitionDuration)).toBe(0));
+    act(() => (days[0] as HTMLElement).blur());
+    if (mode !== "none")
+      await vi.waitFor(() => expect(parseFloat((days[0] as HTMLElement).style.transitionDuration)).toBeGreaterThan(0));
   });
 });
 
