@@ -17,6 +17,18 @@ async function frames(track: Locator, count = 18) {
     return values;
   }, count);
 }
+/** Engine position only: Embla may paint `none` or an identity matrix before init. */
+async function offsets(track: Locator, count = 18) {
+  return track.evaluate(async (el, n) => {
+    const values: string[] = [];
+    for (let i = 0; i < n; i++) {
+      await new Promise(requestAnimationFrame);
+      const matrix = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+      values.push(`${matrix.m41},${matrix.m42}`);
+    }
+    return values;
+  }, count);
+}
 async function aligned(root: Locator, slide: number, axis: "x" | "y" | "rtl" = "x") {
   await expect
     .poll(() =>
@@ -49,6 +61,67 @@ async function drag(page: Page, root: Locator, end = 0.15) {
   await page.mouse.move(box.x + box.width * end, box.y + 60, { steps: 20 });
   await page.mouse.up();
 }
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`carousel direct display content ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/carousel?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const effective = effectiveMode(mode, os === "reduce");
+      const card = page.locator(selector("content")),
+        root = card.getByRole("region"),
+        track = trackOf(root);
+      await expect(root).toHaveAttribute("data-motion", effective);
+      // The insertion envelope owns no resting opacity and finishes before the first
+      // native interaction.
+      await expect.poll(() => root.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+      expect(await root.evaluate((node) => node.getAnimations().length)).toBe(0);
+      const text = root.locator('[data-slot="carousel-item-text"]'),
+        number = root.locator('[data-slot="carousel-item-number"]');
+      await expect(text).toHaveText("Kickoff");
+      await expect(number).toHaveText("3");
+      const before = await track.evaluate((node) => {
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(node).transform);
+        return [matrix.m41, matrix.m42];
+      });
+      await page.evaluate(() => {
+        (window as unknown as { carouselShift: number }).carouselShift = 0;
+        new PerformanceObserver((list) => {
+          for (const entry of list.getEntries() as (PerformanceEntry & { value?: number; hadRecentInput?: boolean })[])
+            if (!entry.hadRecentInput)
+              (window as unknown as { carouselShift: number }).carouselShift += entry.value ?? 0;
+        }).observe({ type: "layout-shift" });
+      });
+      await card.getByRole("button", { name: "Update slide content" }).click();
+      // The visible slide plays its owned display change; the offscreen slide reaches
+      // its latest value without replaying a revision nobody saw.
+      await expect(text).toHaveText("Review");
+      await expect(number).toHaveText("7");
+      expect(
+        await track.evaluate((node) => {
+          const matrix = new DOMMatrixReadOnly(getComputedStyle(node).transform);
+          return [matrix.m41, matrix.m42];
+        }),
+      ).toEqual(before);
+      const host = await text.elementHandle();
+      await card.getByRole("button", { name: "Update slide content" }).click();
+      await expect(text).toHaveText("Release");
+      await expect(number).toHaveText("12");
+      expect(
+        await root.locator('[data-slot="carousel-item-text"]').evaluate((node, saved) => node === saved, host),
+      ).toBe(true);
+      expect(
+        await track.evaluate((node) => {
+          const matrix = new DOMMatrixReadOnly(getComputedStyle(node).transform);
+          return [matrix.m41, matrix.m42];
+        }),
+      ).toEqual(before);
+      await expect.poll(() => root.evaluate((node) => node.getAnimations().length)).toBe(0);
+      const shift = await page.evaluate(() => (window as unknown as { carouselShift: number }).carouselShift);
+      // Display changes paint in place: they may not move the track or the page.
+      expect(shift).toBeLessThan(0.02);
+    });
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
@@ -220,9 +293,9 @@ test("carousel fixed drag policies and geometric alignment", async ({ page }) =>
   await page.goto("/components/carousel?motion=none");
   await page.waitForLoadState("networkidle");
   const disabled = page.locator(selector("drag")).getByRole("region", { name: "Buttons only" });
-  const before = await trackOf(disabled).evaluate((n) => getComputedStyle(n).transform);
+  const before = await offsets(trackOf(disabled), 1);
   await drag(page, disabled);
-  expect(new Set(await frames(trackOf(disabled)))).toEqual(new Set([before]));
+  expect(new Set(await offsets(trackOf(disabled)))).toEqual(new Set(before));
   const free = page.locator(selector("drag")).getByRole("region", { name: "Free drag" });
   await drag(page, free, 0.55);
   const samples = await frames(trackOf(free));
