@@ -75,21 +75,28 @@ async function expectSurfaces(scope: Locator, mode: string) {
 }
 
 /** Settled surfaces: no writer may still hold a clock when a mode has resolved. */
+/**
+ * Settled surfaces: no writer may still hold a clock, and every owned surface must have
+ * resolved to the requested mode. The page rewrites `data-motion` once it knows the
+ * resolved mode, so a fast machine can sample the default before that lands; polling
+ * both facts still requires the exact final state instead of relaxing the assertion.
+ */
 async function settleSurfaces(scope: Locator, mode: string) {
   await expect
     .poll(
       async () =>
-        scope
-          .locator(ownedSlots)
-          .evaluateAll(
-            (nodes) =>
-              nodes.filter((node) =>
-                node.getAnimations({ subtree: true }).some((animation) => animation.playState === "running"),
-              ).length,
-          ),
+        scope.locator(ownedSlots).evaluateAll((nodes, expected) => {
+          if (nodes.length === 0) return "no owned surface";
+          const unsettled = nodes.filter(
+            (node) =>
+              node.getAttribute("data-motion") !== expected ||
+              node.getAnimations({ subtree: true }).some((animation) => animation.playState === "running"),
+          ).length;
+          return unsettled === 0 ? "settled" : `${unsettled}/${nodes.length} unsettled`;
+        }, mode),
       { timeout: 15_000 },
     )
-    .toBe(0);
+    .toBe("settled");
   await expectSurfaces(scope, mode);
 }
 
