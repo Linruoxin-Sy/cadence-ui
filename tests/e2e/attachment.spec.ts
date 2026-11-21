@@ -134,8 +134,9 @@ for (const os of [false, true])
         page,
         '[data-component-example="attachment/trigger-and-actions"] [data-slot="attachment-action"]',
       );
-      if (actual === "full") expect(scale).toBeLessThan(1);
-      else expect(scale).toBe(1);
+      // The action host owns no press scale in any mode: the overlay hit area is the whole tile, so
+      // the contract's documented fallback omits it and press feedback belongs to Button.
+      expect(scale).toBe(1);
       await expect(actions.locator("output")).toHaveText("Downloads requested: 0; saved.");
       await expect(actions.getByRole("button", { name: "Delete locked review notes" })).toBeDisabled();
       await actions.getByRole("button", { name: "Saved", exact: true }).press(" ");
@@ -219,13 +220,16 @@ for (const os of [false, true])
     ).toBe(true);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(title).toHaveAttribute("data-motion", "reduced");
+    // A live downgrade cancels the loop that was already running under `full`; it must not survive
+    // as a detached animation still driving opacity on the same host.
+    await expect
+      .poll(() => title.evaluate((el) => el.getAnimations().filter((a) => !("transitionProperty" in a)).length))
+      .toBe(0);
     expect(
       await title.evaluate(
-        (el) =>
-          el.getAnimations().find((animation) => !("transitionProperty" in animation)) ===
-          (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation,
+        () => (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation.playState,
       ),
-    ).toBe(true);
+    ).not.toBe("running");
     const mode = page.getByRole("group", { name: "Motion mode" });
     for (const requested of ["none", "reduced", "full"] as const) {
       await mode.getByRole("button", { name: requested, exact: true }).click();
