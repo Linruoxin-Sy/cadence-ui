@@ -2,15 +2,15 @@
 title: Code block
 description: Install commands, source snippets, and tool output.
 category: ai
-motion: [data.transition, layout.shared, state.morph, geometry.resize]
+motion: [{"recipe":"enter.pop","form":"one-shot"},{"recipe":"data.transition","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"layout.shared","form":"selection"},{"recipe":"state.morph","form":"one-shot"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"},{"recipe":"feedback.press","form":"one-shot"},{"recipe":"state.color","form":"css-transition"}]
 intensity: medium
 motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"Code switching, active tab highlight and measured block geometry coordinate within one code surface."}
-motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates the existing content/data/status phase at its own parts, using the reached installed executor."},{"relationship":"inherited","owner":"button","reason":"The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."}],"layout.shared/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates selected-indicator continuity at its own parts, using the reached installed executor."}],"state.morph/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates local state/glyph feedback at its own parts, using the reached installed executor."}],"geometry.resize/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates owned size transitions at its own parts, using the reached installed executor."}]}}
+motionCoverage: {"schema":1,"effects":{"enter.pop/one-shot":[{"relationship":"default","owner":"code-block","reason":"The block's own root keeps one surface envelope, so an independent late insertion pops the composed source while a first paint or hydration commits visible."}],"data.transition/one-shot":[{"relationship":"default","owner":"code-block","reason":"The floating actions keep one inline opacity channel on their own retained host; a plain source revision stays one text identity and owns no per-line entry."},{"relationship":"inherited","owner":"button","reason":"Copy and expand controls render Button, which keeps its own returned entrance on its own host instead of replaying the block's envelope."}],"exit.fade/one-shot":[{"relationship":"default","owner":"code-block","reason":"Unrevealed floating actions fade out on their own retained channel; a plain source revision is one text identity and commits immediately by design."},{"relationship":"inherited","owner":"button","reason":"A composed control keeps Button's own retained exit; the block adds no second removal fade over it."}],"geometry.resize/measured":[{"relationship":"default","owner":"code-block","reason":"The visible viewport owns the clamped block-size transition to the committed fold target with SSR reservation and no-JS readability."},{"relationship":"inherited","owner":"button","reason":"A composed control keeps Button's own intrinsic dimension owner; the block never follows interpolated button size."}],"layout.shared/selection":[{"relationship":"default","owner":"code-block","reason":"One persistent marker travels between committed tab rectangles in the strip's own coordinates and rebases immediately on reflow."}],"state.morph/one-shot":[{"relationship":"default","owner":"code-block","reason":"The copy glyph pair and the expand chevron change state on their own stacked hosts without resizing the button."}],"text.change/changed-runs":[{"relationship":"default","owner":"code-block","reason":"Plain title, tab label, Footer text and expand label each replace changed graphemes in place on one retained host without stagger."},{"relationship":"inherited","owner":"button","reason":"A direct plain control label keeps Button's own changed-run owner; the block never reads or rescores it."}],"number.roll/reels":[{"relationship":"default","owner":"code-block","reason":"A direct quantity in the non-code Footer region reels only its changed places; line numbers and identifiers stay identity text."},{"relationship":"inherited","owner":"button","reason":"A numeric control child keeps Button's own reel owner together with its own box retargeting."}],"feedback.press/one-shot":[{"relationship":"inherited","owner":"button","reason":"Copy and expand controls press through Button's safe visual layer; rich children render no feedback layer and omit scale."}],"state.color/css-transition":[{"relationship":"default","owner":"code-block","reason":"Root, Header, Footer and native tab foreground each own one scoped family; a diff/highlight line tint, pseudo-element markers and syntax tokens stay immediate identity paint."},{"relationship":"inherited","owner":"button","reason":"A composed control keeps Button's single surface and foreground family with immediate focus/invalid priority."}]}}
 complexity: M
 tier: T5
 since: 0.5.0
 deps: ["class-variance-authority", "lucide-react", "motion"]
-registryDeps: ["@cadence/button", "@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/code-highlight", "@cadence/cadence-geometry"]
+registryDeps: ["@cadence/button", "@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/code-highlight", "@cadence/cadence-geometry", "@cadence/cadence-selection", "@cadence/cadence-surface-presence", "@cadence/cadence-text", "@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -750,12 +750,17 @@ Authored intensity is **medium**: Code switching, active tab highlight and measu
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/one-shot` | yes (a second click retargets the spring) |
-| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition/one-shot` | yes |
-| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph/one-shot` | yes |
+| independent insertion | root `opacity` entry, `presence.surface` | `enter.pop/one-shot` | yes (a rerender keeps the current visibility) |
+| floating actions in / out | `opacity` on the retained row | `data.transition/one-shot`, `exit.fade/one-shot` | yes |
+| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/measured` | yes (a second click retargets from the current size) |
+| tab indicator | one persistent marker travelling between the committed tab rectangles | `layout.shared/selection` | yes (a third tab pressed mid-travel retargets it) |
+| copy | glyph cross-fade + `scale` 0.96 → 1 in one stacked cell | `state.morph/one-shot` | yes |
 | fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph/one-shot` | yes |
-| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared/one-shot` | yes (a third tab pressed mid-travel retargets it) |
-| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize/one-shot` resolves to `{ duration: 0 }` | – |
+| plain labels | changed graphemes on the title, tab label, Footer text and expand label, `stagger: none` | `text.change/changed-runs` | yes (a revision replaces the changed runs) |
+| Footer quantity | changed places reel on the slot only | `number.roll/reels` | yes |
+| paint | root/Header/Footer/active tab/diff line colour families | `state.color/css-transition` | yes (focus and invalid settle that region) |
+| inherited controls | Button keeps its own press, paint, presence, size, label and reel | `feedback.press/one-shot` and Button's own forms | yes |
+| reduced | opacity and colour stay; the chevron, height, marker and copy scale settle immediately, and changed text commits per unit | `geometry.resize/measured` resolves to `{ duration: 0 }` | – |
 | none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
 
 Three notes on the choices:
@@ -764,11 +769,14 @@ Three notes on the choices:
   per line count, and it would break the moment a line wraps. The spring is the token's, and the rendered height is
   clamped to the content so it can never settle above or below the real size.
 - Under reduced motion the height change is a jump on purpose. Unfolding is information — the reader asked to see
-  more lines — and a 200 ms layout tween is exactly the motion the reduced mode exists to remove.
+  more lines — and a layout tween is exactly the motion the reduced mode exists to remove.
 - Explicit source and fold commits may resize in full mode. Font arrival, viewport reflow and unknown observer changes use current natural layout immediately. Hidden content establishes a fresh baseline when measurable; focus inside the source exposes its full height immediately. The source tree is never cloned for measurement, and completed expansion releases the temporary height to `auto`.
-- The tab pill is a shared element only in full mode. Reduced motion drops the `layoutId`, so the pill is painted
-  where the selection landed: which tab is current is information, the travel between them is not. A panel change
-  never animates its height for the same reason.
+- The tab marker is a shared element only in full mode. Reduced motion paints it where the selection landed: which
+  tab is current is information, the travel between them is not. A panel change never animates its height for the
+  same reason.
+- A source revision is one identity. A plain direct source stays one text node, so every revision — removed,
+  inserted, highlighted or line-numbered — commits the exact new source immediately rather than splitting the
+  streaming source into per-line hosts.
 
 ## Keyboard interactions
 
@@ -859,3 +867,4 @@ that estimate; provide a suitable SSR layout if overriding those metrics.
   `CodeBlockTabs` / `CodeBlockTab` / `CodeBlockPanel`, and give the header's `CodeBlockCopyButton` `values` so it
   copies the variant on screen. Do not stack two blocks with a hand-rolled toggle, and do not put unrelated files
   behind tabs: a tab is the same snippet in another form, not a second snippet.
+
