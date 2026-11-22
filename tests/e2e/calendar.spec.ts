@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
-import { effectiveMode, MODES } from "./helpers";
+import { effectiveMode, MODES, openComponent } from "./helpers";
 import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).calendar;
@@ -21,6 +21,19 @@ async function open(page: Page, mode = "none") {
         .evaluate((node) => getComputedStyle(node).clipPath),
     )
     .toBe("none");
+  // `networkidle` can settle before this page's client chunk parses, and the SSR
+  // markup already carries `data-motion`; the inline colour family only exists once
+  // the real owner has connected, so it is the readiness signal these cases need.
+  await expect
+    .poll(
+      () =>
+        page
+          .locator('[data-preview="calendar"] [data-slot="button"]')
+          .first()
+          .evaluate((node) => getComputedStyle(node).transitionProperty),
+      { timeout: 30_000 },
+    )
+    .toBe("background-color, color");
 }
 async function setHeader(page: Page, mode: string) {
   await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: mode, exact: true }).click();
@@ -568,4 +581,184 @@ test("Calendar no-JS retains actual dates, fixed shapes and initial caller value
   } finally {
     await context.close();
   }
+});
+
+/**
+ * Real-engine evidence for the calendar motion contract. jsdom can time a hook but
+ * cannot answer what the browser paints: these cases read the committed month shell,
+ * the actual month grid and the real day/navigation buttons in all three modes under
+ * both OS preferences. `?motion=` drives the requested mode and `reducedMotion` drives
+ * the OS preference the provider honours, so each cell names both.
+ */
+const PREFERENCES = [false, true] as const;
+const SCHEMES = ["light", "dark"] as const;
+const WIDTHS = [
+  { label: "wide", width: 1440, height: 1000 },
+  { label: "narrow", width: 720, height: 900 },
+] as const;
+const preferenceName = (prefersReduced: boolean) =>
+  prefersReduced ? "prefers-reduced-motion: reduce" : "prefers-reduced-motion: no-preference";
+const single = (page: Page) => page.locator('[data-component-example="calendar/single-selection"]');
+const weekRows = (page: Page) => page.locator('[data-component-example="calendar/week-row-height"]');
+
+async function openMotion(page: Page, requested: (typeof MODES)[number], mode: (typeof MODES)[number]) {
+  await openComponent(page, "calendar", requested, "calendar", mode);
+  await expect
+    .poll(
+      () =>
+        page
+          .locator("[data-document-entrance]")
+          .first()
+          .evaluate((node) => getComputedStyle(node).clipPath),
+      { timeout: 60_000 },
+    )
+    .toBe("none");
+}
+
+/** The declared paint family and its effective clock on one real owner. */
+async function paintClock(page: Page, selector: string) {
+  return page
+    .locator(selector)
+    .first()
+    .evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        mode: element.getAttribute("data-motion"),
+        property: style.transitionProperty,
+        duration: style.transitionDuration.split(",").map((time) => Number.parseFloat(time)),
+        delay: style.transitionDelay,
+      };
+    });
+}
+
+/**
+ * Sample the week-row-height example's month shell across its own next-month commit.
+ * The click happens in the page, after a few pre-roll frames, so the samples after
+ * `CLICK_FRAME` are the committed heights rather than a race from the test side.
+ * December 2026 is five rows and January 2027 is six, so the second step is the one
+ * that has to change the shell's block size.
+ */
+const CLICK_FRAME = 4;
+async function committedHeights(page: Page) {
+  const samples = await page.evaluate(async (clickFrame) => {
+    const scope = document.querySelector('[data-component-example="calendar/week-row-height"]') as HTMLElement | null;
+    const shell = scope?.querySelector('[data-slot="calendar-month"]') as HTMLElement | null;
+    const next = scope?.querySelector('[data-slot="calendar-nav-next"]') as HTMLElement | null;
+    if (!shell || !next) throw new Error("week-row-height calendar is not rendered");
+    const heights: number[] = [];
+    for (let index = 0; index < 96; index++) {
+      if (index === clickFrame) next.click();
+      await new Promise(requestAnimationFrame);
+      heights.push(shell.getBoundingClientRect().height);
+    }
+    return heights;
+  }, CLICK_FRAME);
+  return samples.slice(CLICK_FRAME + 4);
+}
+
+for (const prefersReduced of PREFERENCES) {
+  test.describe(preferenceName(prefersReduced), () => {
+    test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+    for (const requested of MODES) {
+      const mode = effectiveMode(requested, prefersReduced);
+
+      test(`paints the real day, navigation, month and caption owners for ?motion=${requested}`, async ({ page }) => {
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        await openMotion(page, requested, mode);
+        const scope = single(page);
+
+        for (const slot of [
+          "calendar",
+          "calendar-month",
+          "calendar-month-grid",
+          "calendar-caption-label",
+          "calendar-nav-previous",
+          "calendar-nav-next",
+        ])
+          await expect(scope.locator(`[data-slot="${slot}"]`).first()).toHaveAttribute("data-motion", mode);
+
+        // Every real date cell and navigation button is one scoped paint owner. The
+        // owner connects after this example's own client chunk arrives, so poll for
+        // its declared family rather than sampling one arbitrary frame.
+        const daySelector = '[data-component-example="calendar/single-selection"] [data-slot="button"]';
+        await expect
+          .poll(async () => (await paintClock(page, daySelector)).property, { timeout: 20_000 })
+          .toBe("background-color, color");
+        const day = await paintClock(page, daySelector);
+        expect(day.mode).toBe(mode);
+        expect(day.property).toBe("background-color, color");
+        expect(day.delay).toBe("0s");
+        expect(day.duration.every((time) => (mode === "none" ? time === 0 : time > 0))).toBe(true);
+        for (const selector of [
+          '[data-component-example="calendar/single-selection"] [data-slot="calendar-nav-previous"]',
+          '[data-component-example="calendar/single-selection"] [data-slot="calendar-nav-next"]',
+        ]) {
+          await expect
+            .poll(async () => (await paintClock(page, selector)).property, { timeout: 20_000 })
+            .toBe("background-color, color");
+          const owner = await paintClock(page, selector);
+          expect(owner.property).toBe("background-color, color");
+          expect(owner.duration.every((time) => (mode === "none" ? time === 0 : time > 0))).toBe(true);
+        }
+
+        // Navigation keeps DayPicker's native activation and owns no press layer.
+        await expect(scope.locator('[data-slot="calendar-nav-next-feedback"]')).toHaveCount(0);
+
+        // Keyboard navigation keeps the semantic day focused on the same table.
+        const day12 = scope.getByRole("button", { name: /November 12th/i });
+        await day12.focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(scope.getByRole("button", { name: /November 13th/i })).toBeFocused();
+
+        // A committed month change paints the same grid table.
+        const grid = scope.getByRole("grid");
+        await scope.getByRole("button", { name: /next month/i }).click();
+        await expect(grid).toHaveAttribute("aria-label", /December 2026/);
+        await expect(grid).toHaveAttribute("data-motion", mode);
+
+        // The month shell follows the committed week count: animated in full,
+        // immediate under reduced and none.
+        const rowScope = weekRows(page);
+        await rowScope.getByRole("button", { name: /next month/i }).click();
+        await expect(rowScope).toContainText("Committed month: December 2026");
+        const samples = await committedHeights(page);
+        await expect(rowScope).toContainText("Committed month: January 2027");
+        expect(samples.at(-1)).toBeGreaterThan(0);
+        if (mode === "full") expect(new Set(samples).size).toBeGreaterThan(1);
+        else expect(new Set(samples).size).toBe(1);
+      });
+    }
+
+    test("captures the committed calendar in every mode and scheme", async ({ page }) => {
+      for (const scheme of SCHEMES) {
+        await page.emulateMedia({ colorScheme: scheme });
+        for (const viewport of WIDTHS) {
+          await page.setViewportSize({ width: viewport.width, height: viewport.height });
+          for (const requested of MODES) {
+            await openMotion(page, requested, effectiveMode(requested, prefersReduced));
+            const preference = prefersReduced ? "reduce" : "no-preference";
+            await weekRows(page).screenshot({
+              path: `.cache/calendar/${requested}-${preference}-${scheme}-${viewport.label}.png`,
+            });
+            await single(page).screenshot({
+              path: `.cache/calendar/${requested}-${preference}-${scheme}-${viewport.label}-selection.png`,
+            });
+          }
+        }
+      }
+    });
+  });
+}
+
+test("keeps the first month readable without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 1000 } });
+  const page = await context.newPage();
+  await page.goto("/components/calendar");
+  const grid = page.locator('[data-component-example="calendar/single-selection"]').getByRole("grid").first();
+  await expect(grid).toBeVisible();
+  expect(await grid.locator("tbody tr").count()).toBeGreaterThan(3);
+  expect(await grid.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
+  await expect(page.getByRole("button", { name: /November 12th/i }).first()).toBeVisible();
+  await context.close();
 });

@@ -262,6 +262,8 @@ function CalendarCaptionText({ value, ...props }: Omit<CaptionLabelProps, "child
   );
 }
 const navImmediate = (gate: boolean, style?: React.CSSProperties) => gate || painted(undefined, style);
+/** A full-clock geometry transition resolves to spring physics and carries no `duration`; only a zeroed clock has one. */
+const clocked = (transition: { duration?: number }) => transition.duration === undefined || transition.duration > 0;
 /** Navigation keeps its native button surface, action timing and hit geometry. */
 function CalendarPreviousButton({ className, children, ...props }: PreviousMonthButtonProps) {
   const gate = React.useContext(PaintGateContext);
@@ -386,7 +388,7 @@ function CalendarMonth({
       changed &&
       (scope.months.size ?? 0) === 1 &&
       !scope.callerAnimated &&
-      (parameters.transition.duration ?? 0) !== 0 &&
+      clocked(parameters.transition) &&
       (scope.available(true) ?? true);
     geometry.commit(scope.transaction.revision("content", month, geometry), {
       reduced: cm.reduced,

@@ -1071,21 +1071,20 @@ Authored intensity is **medium**: Month navigation shifts the bounded month grid
 | Week-row count changes | clamped block size of the month shell | `geometry.resize/measured` | Yes; the next committed month retargets from the displayed height. |
 | Day and navigation state | background-color and color of the real button | `state.color/css-transition` | Yes; focus, an invalid owner or a caller palette settles that owner's whole paint. |
 | Caption revisions | opacity of changed graphemes on the retained label | `text.change/changed-runs` | Yes; retained runs stay put and the newest label wins. |
-| Reduced | opacity-only grid fade, immediate height and press, eligible colour | `data.transition/month-grid` reduced | Mode changes settle running motion. |
-| None | Immediate grid, height, colour, caption and press | zero duration | No animation is started. |
+| Reduced | opacity-only grid fade, immediate height, eligible colour | `data.transition/month-grid` reduced | Mode changes settle running motion. |
+| None | Immediate grid, height, colour and caption | zero duration | No animation is started. |
 
 The same grid responds to buttons, native dropdowns, keyboard navigation and external controlled
 month updates. Caller transform/opacity styles take precedence over the corresponding animation property.
-No outgoing duplicate steals focus. Each actual grid retains its local token scope. Equal policies share
-the phase; incompatible per-grid clocks use native paint together. A grid-local zero cancels the group
-before paint. Changing month count or replacing a host establishes a current baseline. Same-count reorder
-with unknown direction fades changed grids without invented travel.
-All actual month slots share one bounded scalar phase for opacity and signed translation, including RTL.
+No outgoing duplicate steals focus. Each displayed month-grid table owns its own paint phase and commits
+it under the Calendar root's one committed-change transaction, so a newer month replaces the older target
+instead of queueing and a grid-local zero settles that table before paint. Replacing a month or grid host
+establishes a current baseline. Same-count reorder with unknown direction fades without invented travel.
 A missing safe root-padding corridor uses opacity only. Focus-driven month crossings stay immediately
-visible. The known month set is preflighted before per-grid reads; over 50 visuals use native paint.
-Any live clock edit cancels the current grid effects; the next month change uses the new local token
-clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the owned WAAPI
-handle, and restoring visibility or full motion does not replay the current month.
+visible. Participating nodes are counted before their layout or paint is read, and an over-bound collection
+keeps native paint. Any live clock edit cancels the current grid effects; the next month change uses the
+new local token clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the
+owned WAAPI handle, and restoring visibility or full motion does not replay the current month.
 
 Height, colour and caption keep their own owners: a mode or clock downgrade settles the grid
 adapter without clearing an independent caption replacement or an eligible day/navigation colour, and a
