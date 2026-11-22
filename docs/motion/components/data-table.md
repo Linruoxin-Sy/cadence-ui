@@ -121,23 +121,28 @@ region's natural height is read from the table container and its border/padding 
 
 ## Acceptance scenarios
 
-- Pending: sorting, filtering, column visibility and data revisions move retained rows to their committed boxes,
-  including when the filter is applied while the table sits at the end of a scrolled page; the scroll range follows
-  the current native content and no stored box is replayed after shrinking growth.
-- Pending: filtering removes a row that contains a named checkbox and an id-linked label; the removal is immediate,
-  ids stay unique, and exactly the original component/ref lifecycle runs.
-- Pending: typing and clearing the email filter while a selection count rolls; the derived result total reaches its
-  exact final output immediately while a separately identified amount keeps its own eligibility, repeated with equal
-  counts and a newly visible page in all three modes.
-- Pending: repeated sort by email, rapid filter typing, pagination and column-visibility toggles while rows move;
-  results and focus update immediately and no obsolete row host keeps a transform.
-- Pending: changing an amount and status for a stable payment id, removing a selected row and reinserting it mid
-  transition; counts, currency formatting and text identity stay correct.
-- Pending: replacing the whole `data` prop while a filter, a selected row and an actions menu are active, and revisiting
-  a page; identity follows payment and column ids and inherited Table effects never run twice.
-- Pending: switching to `reduced`, then `none`, during concurrent row movement, a frame shrink, status text and count
-  changes; travel, measured height and reels settle while permitted opacity reconciles, and unmounting cancels every
-  remaining writer.
-- Pending: filter and paginate while editing the filter input and activating header/pagination buttons during
+`tests/components/data-table.test.tsx` executes the three modes on the real parts, and
+`tests/e2e/data-table.spec.ts` executes the page paths in a real engine, for the rows marked executed. A row that
+still lacks evidence says so; it is not claimed by the headings above.
+
+- Not yet exercised: sorting, filtering, column visibility and data revisions move retained rows to their committed
+  boxes while the table sits at the end of a scrolled page, and no stored box is replayed after shrinking growth.
+- Not yet exercised: filtering removes a row that contains a named checkbox and an id-linked label with unique ids and
+  exactly the original component/ref lifecycle.
+- Executed: typing and clearing the email filter while the selection count rolls; the derived result total reaches its
+  exact final output immediately while a separately identified amount keeps its own eligibility, in all three modes.
+- Not yet exercised: repeated sort by email, rapid filter typing, pagination and column-visibility toggles while rows
+  move, asserting that no obsolete row host keeps a transform.
+- Executed in the component suite: changing an amount and status for a stable payment id, removing a selected row and
+  reinserting it mid transition; counts, currency formatting and text identity stay correct.
+- Not yet exercised: replacing the whole `data` prop while a filter, a selected row and an actions menu are active, and
+  revisiting a page, asserting that inherited Table effects never run twice.
+- Executed: switching to `reduced`, then `none`, during concurrent row movement, status text and count changes; travel,
+  measured height and reels settle while permitted opacity reconciles, and unmounting cancels every remaining writer.
+- Executed: filter and paginate while editing the filter input and activating header/pagination buttons during
   inherited colour feedback; native input updates and filter semantics stay immediate and never acquire cell text or
   reel decoration.
+
+The frame's shrink-only commitment, the entrance of a never-seen payment and the immediate removal of an outgoing row
+are asserted by the component suite; a measuring engine's box replay after growth and a scrolled-page filter range are
+the rows still open above.
