@@ -2681,6 +2681,10 @@
       "@cadence/input",
       "@cadence/table",
       "@cadence/cadence-utils",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-geometry",
+      "@cadence/cadence-number",
+      "@cadence/cadence-text",
       "@cadence/cadence-provider"
     ],
     "since": "0.5.0",
@@ -2696,6 +2700,20 @@
       {
         "recipe": "exit.fade",
         "form": "one-shot"
+      },
+      "data.transition",
+      "layout.move",
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
       }
     ],
     "intensity": "medium",
@@ -2708,10 +2726,10 @@
       "guide": "apps/v4/content/docs/components/base/data-table.mdx"
     },
     "motionProfile": {
-      "scope": "surface",
+      "scope": "collection",
       "travel": "compact",
-      "coordination": "independent",
-      "reason": "Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates."
+      "coordination": "group",
+      "reason": "Committed sorting, filtering, visibility and data revisions move retained payments by one local box, newly inserted rows take a short opacity entrance, the bounded frame animates its committed shrink, and owned cell strings and quantities replace or roll in place."
     },
     "motionCoverage": {
       "schema": 1,
@@ -2757,6 +2775,86 @@
             "relationship": "inherited",
             "owner": "table",
             "reason": "Data Table mounts Table, whose surface-presence runtime implements the same retained exit form; Table remains that independent integration owner."
+          }
+        ],
+        "data.transition/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "data-table",
+            "reason": "A genuinely inserted payment row takes one opacity entrance on its own retained tr host; rows already visible at first paint and rows revisited by pagination take no entrance."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input",
+            "reason": "Data Table mounts input, whose migrated owner reaches this installed form inside the composition; input remains that independent integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "checkbox",
+            "reason": "Data Table mounts checkbox, whose migrated owner reaches this installed form inside the composition; checkbox remains that independent integration owner."
+          }
+        ],
+        "layout.move/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "data-table",
+            "reason": "Retained visible payments move to their committed native boxes on the same tr hosts after a sort, filter, visibility or data revision; no cell, region or page replacement supplies a second transform owner."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "data-table",
+            "reason": "The bounded frame around the native table owns one measured block-size transition for a committed shrink; growth, a focused or pointer-held row and reduced/none resolve to native layout immediately."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "dropdown-menu",
+            "reason": "Data Table mounts dropdown-menu, whose migrated owner reaches this installed form inside the composition; dropdown-menu remains that independent integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input",
+            "reason": "Data Table mounts input, whose migrated owner reaches this installed form inside the composition; input remains that independent integration owner."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "data-table",
+            "reason": "Owned status and email cell strings replace only their changed graphemes on the retained cell host; Table delegates cell text to this caller, so no second text layer exists."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "dropdown-menu",
+            "reason": "Data Table mounts dropdown-menu, whose migrated owner reaches this installed form inside the composition; dropdown-menu remains that independent integration owner."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "data-table",
+            "reason": "Known payment amounts roll with the existing currency formatter and the selected count rolls on a known selection revision; the filter-derived result total and every query-derived count resolve directly."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
           }
         ]
       }

@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/data-table`
 - Type: registry:block
 - Since: 0.5.0
-- Motion recipes: feedback.press, state.morph, popup.anchored, exit.fade
+- Motion recipes: feedback.press, state.morph, popup.anchored, exit.fade, data.transition, layout.move, geometry.resize, text.change, number.roll
 
 ## Installation
 
@@ -34,14 +34,14 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
-- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/checkbox](https://cadence.dev/r/checkbox.json) — direct registry dependency.
 - [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
@@ -93,6 +93,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | table | `@components/cadence/table/index.tsx` | [JSON files[].content](https://cadence.dev/r/table.json) |
 | data-table | `@components/cadence/data-table/index.tsx` | [JSON files[].content](https://cadence.dev/r/data-table.json) |
+| data-table | `@components/cadence/lib/button-group-layout.ts` | [JSON files[].content](https://cadence.dev/r/data-table.json) |
+| data-table | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/data-table.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -277,8 +279,10 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all 14 target files, including every `cadence-motion` and
-`cadence-provider` helper. Keep the relative imports, sibling `cadence/`
+Copy every target file listed in the Manual panel, including the shared
+`cadence-motion`, `cadence-geometry`, `cadence-number`, `cadence-text` and
+`cadence-provider` helpers plus `lib/button-group-layout.ts`,
+`lib/label-layout.ts` and `lib/inline-entrance.ts`. Keep the relative imports, sibling `cadence/`
 directories and shipped `"use client"` directives. Complete the linked manual
 base setup with Cadence theme CSS and ensure Tailwind CSS v4 scans the copied
 files. No additional Data Table stylesheet is required. Apply
@@ -322,8 +326,10 @@ shrinkable parent (`min-w-0`). Columns remain available at narrow widths; the
 toolbar lets the filter input shrink beside Columns, and the footer can wrap.
 The caller-owned minimum height in Usage reserves room
 for ten rows, so filtering does not move the footer; retune or omit it for your
-page size and typography. This is layout space, not a height animation. Table
-data, row order and geometry update immediately in every mode. The installed
+page size and typography. While that reserve holds, the measured frame height
+has not changed, so there is nothing to animate. Row order, cell strings and
+quantities follow the committed result in every mode, and the frame springs only
+its committed shrink. The installed
 Button, Checkbox and Dropdown Menu retain their own press, indicator and popup
 recipes: full uses their authored motion, reduced drops scale and retains fades,
 and none settles immediately.
@@ -560,7 +566,7 @@ export function RowSelection() {
 
 ## Updating rows
 
-The caller updates the first amount, reverses record order, removes that record, or restores the collection. Surviving rows keep stable keys and selection; filter drafts and the table node survive updates. Removing a record also removes its stale selection in this caller. These operations demonstrate data ownership, not a built-in editing or fetching API. Updates and row reordering are immediate in every motion mode.
+The caller updates the first amount, reverses record order, removes that record, or restores the collection. Surviving rows keep stable keys and selection; filter drafts and the table node survive updates. Removing a record also removes its stale selection in this caller. These operations demonstrate data ownership, not a built-in editing or fetching API. Reversing the records moves retained rows to their committed boxes, the changed amount rolls its own digits, and removing a row commits the shorter result immediately: a rich row supplies no safe paint-only outgoing copy. A page replacement moves no retained row, and rows revisited by pagination take no entrance.
 
 <ComponentExample name="updating-rows" />
 
@@ -706,25 +712,60 @@ arbitrary columns to `DataTableDemo`.
 
 ## Motion contract
 
-Authored intensity is **medium**: Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates.
+Authored intensity is **medium**: Committed sorting, filtering, visibility and data revisions move retained payments by one local box, newly inserted rows take a short opacity entrance, the bounded frame animates its committed shrink, and owned cell strings and quantities replace or roll in place.
 
-No row entrance, reorder, resize or layout motion. Sorting, filtering, pagination
-and visibility update native markup immediately without keying the table or input
-by state. Surviving rows use stable IDs; off-page rows unmount normally.
-T2 describes the composed controls; there is no separate table animation runtime.
+Only a committed change animates. A sort, filter, visibility toggle, page change or
+data revision is classified once at commit time; drafts, typing inside the filter,
+pointer capture and any native editing stay immediate. Table keeps every column
+width, row height and wrap decision, so this block adds one frame height owner, one
+transform owner per surviving row, one opacity owner per arriving row, and one
+display owner per owned cell string or quantity. No per-cell observer, layout read
+during render or second geometry writer is introduced.
 
-| Recipe / cause | full | reduced | none |
+Arriving rows: only a payment id that was not already present at first paint takes
+the entrance. Rows already on screen during SSR and hydration, and rows revisited by
+pagination, take no entrance. Row removal is immediate by design: a row carries a
+checkbox, a menu trigger and named cells, so no safe paint-only outgoing copy exists,
+and filtering must leave the semantic result immediately.
+
+Retained movement: surviving rows move to their committed native boxes by exactly one
+local transform after a sort, filter, visibility or data revision. A selection change,
+a page replacement or an ancestor that already carries a transform settles instead of
+borrowing a source box. Repeated commits retarget the same row hosts and drop the
+obsolete ones.
+
+Frame height: the bounded frame around the native table owns the measured block-size
+transition. It animates a committed shrink only. Growth would clip newly committed
+required rows inside this region's existing overflow, so growth, a focused control
+inside the table and an active pointer capture all resolve to native layout
+immediately. Native cells never rewrap during the transition.
+
+Owned readouts: status and email are this composition's own strings, so changed
+graphemes replace in place; the existing currency formatter stays attached to the
+original numeric value for payment amounts. The filter-derived result total and any
+query-derived count resolve directly, and only a known independent or selection
+revision rolls. Text and digits keep their exact identity: the amount keeps its
+"en-US" currency formatter, and no tabular-nums is added to make reels easier.
+
+| Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| `feedback.press/one-shot` / Button press | token spring scale | no scale | immediate |
-| `state.morph/one-shot` / checkbox or menu check | opacity and scale | opacity only | zero duration |
-| `popup.anchored/one-shot` / Columns or Actions opens | opacity and a short anchor-side approach | opacity only | visible on first frame |
-| `exit.fade/one-shot` / menu closes | opacity exit, no anchor movement | opacity only | immediate |
+| A genuinely inserted payment row appears | row opacity only, no travel | `data.transition/one-shot` / `duration.base`, `ease.out` | yes, the same row host retargets |
+| Surviving rows after a sort, filter, visibility or data revision | one local `transform` per surviving row | `layout.move/one-shot` / `spring.layoutCompact` | yes, a newer commit retargets surviving rows and drops obsolete ones |
+| Committed shrink of the bounded frame | measured frame `height` | `geometry.resize/measured` / `spring.sizeCompact` | yes, the latest destination wins |
+| Owned status and email strings | changed graphemes only, opacity | `text.change/changed-runs` / `duration.instant` out, `duration.fast` in | yes, the newest diff replaces the old target |
+| Payment amount and selected count | place-value reels on changed digits | `number.roll/reels` / `spring.smooth`; the count shares `spring.snappy` | yes, bounded retarget without a queue |
+| Button press | token spring scale | `feedback.press/one-shot` | yes |
+| Checkbox or menu check | opacity and scale | `state.morph/one-shot` | yes |
+| Columns or Actions opening | opacity and a short anchor-side approach | `popup.anchored/one-shot` | yes |
+| Menu closing | opacity exit, no anchor movement | `exit.fade/one-shot` | yes |
+| reduced | row and menu opacity, no row travel, no reels, no measured frame height | the same recipes, zero travel | live cancellation |
+| none | every declared property, delay and loop at zero, colour included; the semantic result is immediate | the same recipes, zero clock | cancels active work |
 
-Recipes and timing tokens belong to the installed controls. Dropdown Menu uses
-its local `duration.fast` clock, including timeScale and reducedDurationScale,
-even through a portal inside a differently configured provider. Live downgrade
-drops transforms and `none` removes all motion transitions. No measured geometry,
-loop, timer, stagger, or permanent `will-change` is introduced by this block.
+Recipes and timing tokens belong to the installed runtime: presets come from
+`lib/motion.ts` and are never restated here as literal durations. Dropdown Menu keeps
+its local clock, including timeScale and reducedDurationScale, even through a portal
+inside a differently configured provider. This block adds no loop, timer, stagger or
+permanent `will-change`, and it writes no local motion literal.
 
 ## Keyboard and accessibility
 
@@ -752,18 +793,21 @@ SSR-compatible with deterministic example data. Keep caller arrays stable where
 possible; TanStack recomputes client row models when data/state change. This
 block is intended for paginated collections, not an unbounded dataset benchmark.
 
-Without a caller-owned minimum, the result region follows the visible row count. Filtering or changing application
-data can therefore move content below the table, even with motion set to none.
-Updates without recent user input can contribute to CLS; the absence of row
-animation does not guarantee layout stability. Reserve space in the surrounding
-application layout when background updates must keep neighbouring content still.
+With the caller-owned minimum removed, the result region follows the visible row
+count. The frame animates a committed shrink; growth settles to native layout at
+once, so content below the table moves immediately when a background update adds
+rows. Under none both directions are immediate. Only the frame reflows nearby
+controls: native cells keep their destination width and never continuously rewrap.
+The block measures the frame once per committed change and reads no layout during
+render. Reserve space in the surrounding application layout when background updates
+must keep neighbouring content still.
 
 ## Notes for AI
 
 - Keep Base UI `render`, Dropdown Menu groups, native table markup and stable row IDs.
 - Register v9 features, row models, sorting and filtering functions explicitly.
 - Keep data fetching, validation, stale selection cleanup and URL state caller-owned.
-- Preserve all three modes of the composed controls; do not animate table geometry.
+- Preserve all three modes of the composed controls. Table still owns row height, column width and wrapping; this block owns only the frame height, one transform per surviving row, the arriving row's opacity and the owned readouts.
 - Related: [Table](/components/table), [Checkbox](/components/checkbox),
   [Dropdown Menu](/components/dropdown-menu), [Pagination](/components/pagination).
 
