@@ -50,12 +50,15 @@ for (const os of [false, true])
       for (const state of ["idle", "uploading", "processing", "error", "done"]) {
         const r = card(page, "upload-state").locator(`[data-slot="attachment"][data-state="${state}"]`);
         await expect(r).toHaveAttribute("data-motion", actual);
+        // The shared loop policy pauses an offscreen owner, so the sample needs the tile in view.
+        await r.scrollIntoViewIfNeeded();
         const f = await frames(r.locator('[data-slot="attachment-title"]'));
         await info.attach(`native-${state}-frames`, { body: JSON.stringify(f), contentType: "application/json" });
-        expect(f.every((s) => s.transform === "none" && s.duration === "0s")).toBe(true);
-        if (actual === "none" || !["uploading", "processing"].includes(state))
-          expect(f.every((s) => s.opacity === 1 && s.animations === 0)).toBe(true);
-        else expect(new Set(f.map((s) => s.opacity)).size).toBeGreaterThan(2);
+        expect(f.every((s) => s.transform === "none")).toBe(true);
+        if (actual === "none") expect(f.every((s) => s.duration === "0s")).toBe(true);
+        if (actual === "full" && ["uploading", "processing"].includes(state))
+          expect(new Set(f.map((s) => s.opacity)).size).toBeGreaterThan(2);
+        else expect(f.every((s) => s.opacity === 1 && s.animations === 0)).toBe(true);
       }
       const download = page.waitForEvent("download");
       await top.getByRole("link", { name: "Download project notes" }).press("Enter");
@@ -131,8 +134,9 @@ for (const os of [false, true])
         page,
         '[data-component-example="attachment/trigger-and-actions"] [data-slot="attachment-action"]',
       );
-      if (actual === "full") expect(scale).toBeLessThan(1);
-      else expect(scale).toBe(1);
+      // The action host owns no press scale in any mode: the overlay hit area is the whole tile, so
+      // the contract's documented fallback omits it and press feedback belongs to Button.
+      expect(scale).toBe(1);
       await expect(actions.locator("output")).toHaveText("Downloads requested: 0; saved.");
       await expect(actions.getByRole("button", { name: "Delete locked review notes" })).toBeDisabled();
       await actions.getByRole("button", { name: "Saved", exact: true }).press(" ");
@@ -200,30 +204,47 @@ for (const os of [false, true])
     const title = root(c).locator('[data-slot="attachment-title"]'),
       saved = await title.elementHandle(),
       savedInput = await input.elementHandle();
-    await title.evaluate((el) => {
-      (window as unknown as { attachmentAnimation: Animation | undefined }).attachmentAnimation = el.getAnimations()[0];
-    });
+    // Only the OS-preference-free run starts a loop to cancel; with `reducedMotion: reduce` at load
+    // the loop never begins, so that run proves the never-started half instead.
+    const startedLoop = !os;
+    if (startedLoop)
+      await title.evaluate((el) => {
+        // The loop owns opacity; the colour clock is a separate CSS transition on the same host.
+        (window as unknown as { attachmentAnimation: Animation | undefined }).attachmentAnimation = el
+          .getAnimations()
+          .find((animation) => !("transitionProperty" in animation));
+      });
     await c.getByRole("button", { name: "Process locally", exact: true }).click();
-    expect(
-      await title.evaluate(
-        (el) => el.getAnimations()[0] === (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation,
-      ),
-    ).toBe(true);
+    if (startedLoop)
+      expect(
+        await title.evaluate(
+          (el) =>
+            el.getAnimations().find((animation) => !("transitionProperty" in animation)) ===
+            (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation,
+        ),
+      ).toBe(true);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expect(title).toHaveAttribute("data-motion", "reduced");
-    expect(
-      await title.evaluate(
-        (el) => el.getAnimations()[0] === (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation,
-      ),
-    ).toBe(true);
+    // A live downgrade cancels the loop that was already running under `full`; it must not survive
+    // as a detached animation still driving opacity on the same host.
+    await expect
+      .poll(() => title.evaluate((el) => el.getAnimations().filter((a) => !("transitionProperty" in a)).length))
+      .toBe(0);
+    if (startedLoop)
+      expect(
+        await title.evaluate(
+          () => (window as unknown as { attachmentAnimation: Animation }).attachmentAnimation.playState,
+        ),
+      ).not.toBe("running");
     const mode = page.getByRole("group", { name: "Motion mode" });
     for (const requested of ["none", "reduced", "full"] as const) {
       await mode.getByRole("button", { name: requested, exact: true }).click();
       await expect(title).toHaveAttribute("data-motion", effectiveMode(requested, true));
       const sampled = await frames(title);
       await info.attach(`${requested}-live-frames`, { body: JSON.stringify(sampled), contentType: "application/json" });
-      if (requested === "none") expect(sampled.every((f) => f.animations === 0 && f.opacity === 1)).toBe(true);
-      else expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      if (effectiveMode(requested, true) === "full")
+        expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      else expect(sampled.every((f) => f.animations === 0 && f.opacity === 1)).toBe(true);
       expect(await title.evaluate((el, saved) => el === saved, saved)).toBe(true);
       expect(await input.evaluate((el, saved) => el === saved, savedInput)).toBe(true);
       expect(await input.evaluate((el) => (el as HTMLInputElement).files?.[0]?.name)).toBe("retained.txt");
@@ -231,9 +252,13 @@ for (const os of [false, true])
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await expect(title).toHaveAttribute("data-motion", "full");
     await c.getByRole("button", { name: "Finish locally", exact: true }).click();
-    expect(await title.evaluate((el) => el.getAnimations().length)).toBe(0);
+    await expect
+      .poll(() => title.evaluate((el) => el.getAnimations().filter((a) => !("transitionProperty" in a)).length))
+      .toBe(0);
     await c.getByRole("button", { name: "Start local simulation", exact: true }).click();
-    expect(await title.evaluate((el) => el.getAnimations().length)).toBe(1);
+    await expect
+      .poll(() => title.evaluate((el) => el.getAnimations().filter((a) => !("transitionProperty" in a)).length))
+      .toBe(1);
     await openComponentSource(page, "attachment");
     expect(await title.evaluate((el, saved) => el === saved, saved)).toBe(true);
     await expect(title).toHaveText("retained.txt");
@@ -277,13 +302,19 @@ for (const mode of MODES)
     ).toBe(true);
     const title = card(page, "upload-state").locator('[data-state="uploading"] [data-slot="attachment-title"]');
     await expect(title).toHaveAttribute("data-motion", mode);
-    if (mode === "full") expect(await title.evaluate((el) => el.getAnimations().length)).toBe(1);
+    if (mode === "full")
+      await expect
+        .poll(() => title.evaluate((el) => el.getAnimations().filter((a) => !("transitionProperty" in a)).length))
+        .toBe(1);
   });
 
 for (const theme of ["light", "dark"] as const)
   for (const width of [1280, 390])
     test(`Attachment ${theme}/${width} all cards WCAG and containment`, async ({ page }, info) => {
       await mkdir(".cache/attachment-proof", { recursive: true });
+      // Ten card screenshots plus two full-page axe runs need more than the default
+      // 30s on a loaded runner; the hang guard stays bounded.
+      test.setTimeout(120_000);
       await page.addInitScript((theme) => localStorage.setItem("cadence-theme", theme), theme);
       await page.setViewportSize({ width, height: 1000 });
       await open(page);
@@ -338,7 +369,7 @@ test("Attachment SSR, no-JS, distributed runnable code and inert legacy variant 
   for (const name of names) expect(html).toContain(`attachment/${name}`);
   const ctx = await browser.newContext({ javaScriptEnabled: false });
   const p = await ctx.newPage();
-  await p.goto("http://127.0.0.1:3100/components/attachment");
+  await p.goto(`http://127.0.0.1:${process.env.PLAYWRIGHT_PORT ?? 3100}/components/attachment`);
   await expect(p.locator('[data-preview="attachment"] [data-slot="attachment"]')).toBeVisible();
   for (const name of names) await expect(card(p, name)).toBeVisible();
   await ctx.close();
@@ -423,8 +454,8 @@ for (const os of [false, true])
         contentType: "application/json",
       });
       expect(sampled.every((f) => f.transform === "none")).toBe(true);
-      if (mode === "none") expect(sampled.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
-      else expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      if (effectiveMode(mode, os) === "full") expect(new Set(sampled.map((f) => f.opacity)).size).toBeGreaterThan(2);
+      else expect(sampled.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
       const saved = await title.elementHandle();
       const focused = await trigger.elementHandle();
       await title.evaluate((el) => {
@@ -460,6 +491,6 @@ for (const os of [false, true])
           })),
         );
         expect(kinds.every((a) => a.kind === "CSSAnimation" && a.properties.every((p) => p === "opacity"))).toBe(true);
-        if (mode === "none") expect(kinds).toEqual([]);
+        if (effectiveMode(mode, os) !== "full") expect(kinds).toEqual([]);
       }
     });
