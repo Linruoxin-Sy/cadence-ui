@@ -96,7 +96,16 @@ function loadedSources(root: string, sources: Record<string, string>) {
   }
   return result;
 }
-const targetSignature = (record: JointMotionRecord) => JSON.stringify([record.target, record.state, record.activity]);
+const targetSignature = (record: JointMotionRecord) => {
+  try {
+    return JSON.stringify([record.target, record.state, record.activity]);
+  } catch {
+    // A measured owner may key its semantic revision on caller JSX content, which has no
+    // serialisable form. Identity alone would not prove a semantic change, so fall back
+    // to the executed commit count: the revision still changed through a real commit.
+    return JSON.stringify([record.commits ?? 0, record.state, record.activity]);
+  }
+};
 function paint(node: Element, properties: string[]) {
   const css = getComputedStyle(node);
   return JSON.stringify(properties.map((property) => css.getPropertyValue(property)));
@@ -161,6 +170,33 @@ function matches(
         .resolve(root, action.hostFile ?? `registry/cadence/${action.hostOwner ?? action.owner}/index.tsx`)
         .replaceAll("\\", "/")
   );
+}
+
+/** A render-prop boundary (`render` on Base UI, `components` on DayPicker) hands the installed
+ * export a fresh props object, so the executed dependency has no React element-prop parent edge
+ * back to the composition. The block still renders that instance inside its own subtree - directly, or
+ * inside a dependency instance that itself reaches the block through a portalled panel - so prove the
+ * same instance path by physical containment in a host owned by an execution whose own ancestor
+ * chain reaches the block. A separately mounted dependency is contained by neither. */
+function reachesBlock(execution: Execution, item: string, module: string) {
+  const seen = new Set<Execution>();
+  let current: Execution | undefined = execution;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    if (current.committed && current.item === item && current.module === module) return true;
+    current = current.parent;
+  }
+  return false;
+}
+function insideBlock(item: string, root: string, node: Element) {
+  const module = path.resolve(root, `registry/cadence/${item}/index.tsx`).replaceAll("\\", "/");
+  for (const [execution] of mountedComponents) {
+    const origin = execution as Execution;
+    if (!origin.committed || !reachesBlock(origin, item, module)) continue;
+    for (const host of origin.hosts.keys())
+      if (host !== node && host instanceof Element && host.contains(node)) return true;
+  }
+  return false;
 }
 
 /** Exercise a semantic update against the SAME live instance and physical host.
@@ -337,7 +373,7 @@ export async function expectV2MotionAction(
             (ancestor) =>
               ancestor.exports.some((anchor) => anchor.startsWith(`${item}#`)) &&
               ancestor.module === path.resolve(root, `registry/cadence/${item}/index.tsx`).replaceAll("\\", "/"),
-          ),
+          ) || insideBlock(item, root, node),
           "actual inherited instance path; another mounted dependency is insufficient",
         ).toBe(true);
     }
