@@ -224,6 +224,35 @@ function LiveData() {
   );
 }
 
+function LaterInsertion() {
+  const [shown, setShown] = useState(false);
+  return (
+    <div className="grid w-full min-w-0 gap-3" data-later-chart="surface">
+      <Button variant="outline" className="justify-self-start" onClick={() => setShown(true)}>
+        Add chart
+      </Button>
+      {shown ? (
+        <figure className="grid w-full min-w-0 gap-2">
+          <figcaption className="text-sm font-medium">Monthly desktop visits</figcaption>
+          <ChartContainer
+            role="group"
+            config={config}
+            className="h-64 w-full min-w-0"
+            aria-label="Monthly desktop visits, later insertion"
+          >
+            <BarChart accessibilityLayer data={baseline}>
+              <XAxis dataKey="month" />
+              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} isAnimationActive />
+            </BarChart>
+          </ChartContainer>
+        </figure>
+      ) : (
+        <p className="text-sm text-muted-foreground">No chart yet.</p>
+      )}
+    </div>
+  );
+}
+
 const examples = {
   bar: BarExample,
   line: LineExample,
@@ -232,6 +261,7 @@ const examples = {
   legends: Legends,
   tooltips: Tooltips,
   "live-data": LiveData,
+  "later-insertion": LaterInsertion,
 };
 
 export function ChartPreview({ example }: { example?: string }) {
