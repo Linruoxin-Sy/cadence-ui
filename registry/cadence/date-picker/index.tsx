@@ -97,6 +97,9 @@ export function DatePickerDemo(props: DatePickerDemoProps) {
             <Button
               variant="outline"
               {...triggerProps}
+              // The trigger element is composed: Popover owns the slot it exposes,
+              // Button is the export that registers its measured box and paint.
+              data-slot="popover-trigger"
               disabled={disabled || triggerProps?.disabled}
               data-empty={!selected}
               className={
@@ -116,7 +119,9 @@ export function DatePickerDemo(props: DatePickerDemoProps) {
         >
           <CalendarIcon data-icon="inline-start" />
           <span className="sr-only">{label}: </span>
-          <span className="truncate">{text}</span>
+          <span data-slot="date-picker-label" className="truncate">
+            {text}
+          </span>
         </PopoverTrigger>
         <PopoverContent
           align="start"
