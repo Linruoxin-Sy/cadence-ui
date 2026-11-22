@@ -1109,19 +1109,56 @@
       "description": "Displays conversational content with variants, grouping, reactions, and polymorphic surfaces.",
       "categories": ["ai"],
       "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/bubble/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/bubble/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/button-group-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/button-group-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/label-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/label-layout.ts"
         }
       ],
       "meta": {
         "since": "0.5.0",
         "tier": "T5",
         "batch": "B9",
-        "motion": ["data.transition"],
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          "layout.move",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "M",
         "upstream": {
@@ -1133,7 +1170,7 @@
           "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "The pending indicator pulses locally; message content remains caller-owned."
+          "reason": "One message introduces itself and then limits motion to the fragments, own box, overlay anchors and reactions that actually change."
         },
         "motionCoverage": {
           "schema": 1,
@@ -1142,7 +1179,49 @@
               {
                 "relationship": "default",
                 "owner": "bubble",
-                "reason": "Bubble integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "Bubble owns the message, group and reaction-overlay insertion envelopes at their own retained hosts; a parent entrance consumes the same cause instead of adding a second one."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble fades a retained reaction overlay on removal; the message itself leaves with its caller-owned parent, so no separate outgoing copy is produced."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble composes one bounded displacement for its own message box and for the reaction overlay between two committed anchors; the resting reaction placement translate stays the positional writer."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble measures its content block size and its independent reaction-overlay box once per committed revision; a caller-fixed axis and a composed child stay native."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble replaces changed runs in a direct plain message display and a direct plain reaction display; composed rich children keep their own owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble reels a direct numeric display value in the message content and the reaction overlay in its existing format; identifiers, timestamps and dates stay text."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble owns the content surface paint and the reaction overlay surface paint, with the explicit display foreground on each retained text span."
               }
             ]
           }
