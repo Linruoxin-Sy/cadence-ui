@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/bubble`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: data.transition
+- Motion recipes: data.transition, exit.fade, layout.move, geometry.resize, text.change, number.roll, state.color
 
 ## Installation
 
@@ -38,6 +38,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -60,13 +64,35 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | bubble | `@components/cadence/bubble/index.tsx` | [JSON files[].content](https://cadence.dev/r/bubble.json) |
+| bubble | `@components/cadence/lib/button-group-layout.ts` | [JSON files[].content](https://cadence.dev/r/bubble.json) |
+| bubble | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/bubble.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: bubble](https://cadence.dev/r/bubble.json)
 
@@ -223,15 +249,15 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all 9 target files, including every shared motion and provider helper.
-Keep the sibling `cadence/` tree, relative imports and shipped `"use client"`
-directives. Complete the linked manual base setup with Cadence theme CSS,
-including `ease-cadence-out`, ensure Tailwind CSS v4 scans the copied files,
-and apply `bg-background text-foreground` to your application root. No
-additional item-specific stylesheet is required. The provider files are
-required imports; wrapping the application is optional. Standalone parts
-follow the system motion preference; a provider selects a local mode or
-recipe clock.
+Copy all 32 target files, including every shared motion, presence, geometry,
+text, quantity and provider helper. Keep the sibling `cadence/` tree, relative
+imports and shipped `"use client"` directives. Complete the linked manual base
+setup with Cadence theme CSS, including `ease-cadence-out`, ensure Tailwind CSS
+v4 scans the copied files, and apply `bg-background text-foreground` to your
+application root. No additional item-specific stylesheet is required. The
+provider files are required imports; wrapping the application is optional.
+Standalone parts follow the system motion preference; a provider selects a
+local mode or recipe clock.
 
 Updating text and Custom parts additionally use Button. For a fully manual
 installation, copy its complete `files[].content` from the JSON below to
@@ -269,17 +295,24 @@ with `href` or a native button with an explicit `type`, preserve supplied
 props and refs in render functions, and avoid nested interactive controls.
 Name reaction buttons and keep their pressed state in the caller. Keep
 parents shrinkable and leave vertical space for overlapping reactions;
-their offsets are static positioning in every mode. Bubble caps at 80% of
+their offsets stay the only resting placement, so a side or align change moves
+the overlay once instead of chasing its size. Bubble caps at 80% of
 its parent by default; ghost permits full width and rich content owns its
 overflow treatment.
 
-New Bubble nodes use the one-shot `data.transition` opacity entry on the
-local recipe clock. Full and reduced fade; reduced shortens the duration,
-and none removes the starting opacity and transition. Existing text,
-variants, alignment, reaction positions and resize update immediately on
-stable nodes. Removal unmounts immediately without an exit animation; there
-is no measured resize animation. Optional
-Button actions retain Button's separate `feedback.press` contract.
+New Bubble nodes use one opacity entrance on the local recipe clock: full and
+reduced fade, reduced shortens it, and none paints the resting opacity
+immediately. A BubbleGroup fades its initial messages once and suppresses their
+individual entrances; a later reply inside a presented group enters on its own.
+The message root, the group envelope and the reaction overlay each own that one
+envelope, so an align or variant revision never replays it. Direct plain strings
+replace changed runs only, and a direct number rolls its changed places; rich
+children keep their own structure and paint. Content height and the independent
+reaction overlay box are measured once per committed revision, an align revision
+reflows the message box once, and both stop immediately under reduced or none.
+Removal of a message unmounts with its caller-owned parent; a retained reaction
+overlay fades out instead. Optional Button actions retain Button's separate
+`feedback.press` contract.
 
 ## Usage
 
@@ -395,7 +428,7 @@ export function LinksAndButtons() {
 
 ## Reactions
 
-Side defaults to bottom and align to end. These four fixed positions use static transforms, with enough space for the overlapping row. Label decorative emoji rows as an image; interactive reactions use named buttons and caller-owned pressed state. Position changes do not animate.
+Side defaults to bottom and align to end. These four positions are the resting placement of the overlapping row, so a side or align change settles there and is bounded by one displacement on the same node. Label decorative emoji rows as an image; interactive reactions use named buttons and caller-owned pressed state.
 
 <ComponentExample name="reactions" />
 
@@ -429,7 +462,7 @@ export function Reactions() {
 
 ## Updating text
 
-Keep stable message IDs when adding text. Add reply inserts a new Bubble; Append text updates the first existing node without replaying entry or animating height. The first message also handles F2 so you can append while preserving its focus. Updates and announcements are local to this example; no transport or streaming runtime runs. The application owns chunking, IDs, cancellation, retry, history limits and scroll anchoring.
+Keep stable message IDs when adding text. Add reply inserts a new Bubble; Append text updates the first existing node without replaying entry, keeps the unchanged prefix and grows the measured block height once. The first message also handles F2 so you can append while preserving its focus. Updates and announcements are local to this example; no transport or streaming runtime runs. The application owns chunking, IDs, cancellation, retry, history limits and scroll anchoring.
 
 <ComponentExample name="updating-text" />
 
@@ -552,21 +585,41 @@ and data-align. No additional message-state or validation API is introduced.
 
 ## Motion contract
 
-Authored intensity is **subtle**: The pending indicator pulses locally; message content remains caller-owned.
+Authored intensity is **subtle**: One message introduces itself and then limits motion to the fragments, own box, overlay anchors and reactions that actually change.
 
-| Cause | Recipe | Full | Reduced | None |
+| Cause / owner | Recipe / form | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
-| Later client insertion | `data.transition/one-shot` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Current resting opacity immediately |
+| Message insertion, Bubble | `data.transition/one-shot`, `exit.fade/one-shot` | One message opacity entrance; a retained reaction overlay fades out | Short opacity | Immediate |
+| Initial group insertion, BubbleGroup | `data.transition/one-shot` | One opacity envelope; member entrances are suppressed | Short opacity | Immediate |
+| Plain message string, BubbleContent display span | `text.change/changed-runs` | Changed runs only, no stagger, prefix kept | Short changed-text opacity | Final text immediately |
+| Direct numeric message value, BubbleContent display span | `number.roll/reels` | Compact place-value reels | Immediate | Immediate |
+| Content block size, BubbleContent | `geometry.resize/measured` | Measured block growth at the final text width | Immediate | Immediate |
+| Reaction overlay presence, BubbleReactions | `data.transition/one-shot`, `exit.fade/one-shot` | One overlay opacity entrance or retained exit | Short opacity | Immediate |
+| Reaction overlay size, BubbleReactions | `geometry.resize/measured` | Independent overlay box | Immediate | Immediate |
+| Reaction side or align, BubbleReactions | `layout.move/one-shot` | One bounded displacement from the safe position | Immediate | Immediate |
+| Message align, Bubble | `layout.move/one-shot` | One bounded message-box reflow | Immediate | Immediate |
+| Plain reaction string, reaction display span | `text.change/changed-runs` | Changed runs only on the retained span | Short changed-text opacity | Final text immediately |
+| Direct numeric reaction value, reaction display span | `number.roll/reels` | Compact place-value reels | Immediate | Immediate |
+| Variant or surface state, BubbleContent and BubbleReactions | `state.color/css-transition` | Scoped background and border transition | Short colour | Immediate |
+| Display foreground, message and reaction display spans | `state.color/css-transition` | Scoped text-colour transition | Short colour | Immediate |
 
-Server HTML, hydration and the first client presentation retain natural paint. A later
-client insertion may use one native opacity animation. A known entering parent consumes
-only that shared entrance cause; a later independent insertion remains eligible.
-The duration resolves locally through cm.transition("data.transition"), including provider timeScale, so an inner full
-scope restores its clock inside outer none. Reduced drops animated transforms;
-this recipe uses opacity in full too. Focus, activation, selection or a live none/zero
-clock cancels the owned entry to the current cascade without remounting content.
-Existing text, variants, alignment, reactions and resize update immediately. Removal
-is immediate; there is no exit or layout animation. Caller-provided motion is caller-owned.
+Message, group and reaction presence, the content block size, the overlay box,
+both changed-text owners and both quantity owners are default capabilities, and
+each host writes only its own properties: the root owns opacity and its own
+placement, the content host owns surface paint and block size, the display span
+owns foreground, changed text or the quantity, and the overlay owns its
+envelope, surface, box and position. Rich children are never decomposed, so a
+caller's Markdown, links and embedded media keep their own owners. A caller
+palette that cannot be verified settles its colour immediately instead of
+passing through unreadable paint.
+
+Mount a message inside `AnimatePresence` to retain its exit; without a surviving
+owner, removal is immediate. A live mode change settles the pending entrance,
+measured height, placement and quantity on the same nodes, and reduced/none
+reach the semantic target with zero duration, including colour. Cycling a plain
+message between text and a direct number establishes the current display as the
+baseline instead of inventing a quantity source, and a focused, selected or
+composing message cancels presentation that would disturb the caret or copy.
 
 ## Keyboard interactions
 
@@ -586,9 +639,11 @@ status region when needed; announcing every chunk can overwhelm assistive techno
 
 Long words wrap within a shrinking container. Reactions overlap vertically; give
 rows sufficient space and keep reaction collections compact. Rich content can use
-ghost with its own overflow treatment. Entry changes only opacity; no layout reads,
-per-frame JavaScript, timers or forced remounts. Application pagination or virtualization
-owns very large histories. No @shadcn/react dependency is needed for this pinned API.
+ghost with its own overflow treatment. Entry changes only opacity; a text revision
+reads one final-width content box and the current reaction box, never the full history,
+and nothing runs per frame, on a timer or in a forced remount. Application pagination or
+virtualization owns very large histories. No @shadcn/react dependency is needed for this
+pinned API.
 
 ## AI usage notes
 

@@ -177,6 +177,7 @@ describe("current registry inventory and real part references", () => {
         "code-block",
         "aspect-ratio",
         "attachment",
+        "bubble",
         "avatar",
         "skeleton",
         "alert",
