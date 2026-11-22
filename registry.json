@@ -5852,6 +5852,14 @@
           {
             "recipe": "data.transition",
             "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "one-shot"
           }
         ],
         "intensity": "medium",
@@ -5934,6 +5942,65 @@
                 "relationship": "inherited",
                 "owner": "input",
                 "reason": "SidebarInput renders the installed Input control, so the reached entrance opacity belongs to input; Sidebar adds no second writer to the field."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "Sidebar owns the actual item/action/rail paint clock and the shell/inset/submenu/label/badge paint clock, each gated by its own focus or invalid region."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "SidebarTrigger renders the installed Button, whose own state.color clock stays its owner; Sidebar adds no second paint writer to that control."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "SidebarInput renders the installed Input control, whose own state.color clock remains its owner; the sidebar adds no second writer to the field."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "SidebarSeparator reaches Separator's installed colour clock; the sidebar adds no second writer to that rule."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "skeleton",
+                "reason": "SidebarMenuSkeleton renders the installed Skeleton, whose own paint and theme clock stay its owner; no sidebar writer is added."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "sheet",
+                "reason": "The mobile composition renders the installed Sheet, whose panel surface paint belongs to Sheet; the sidebar adds no mobile paint writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "tooltip",
+                "reason": "SidebarMenuButton's optional hint renders the installed Tooltip, whose own surface paint stays its owner; Sidebar adds no writer to that popup."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "SidebarMenuAction owns one opacity channel: a pointer hide fades out on the action host while focus, open state and collapse keep their authority."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "SidebarTrigger reaches Button's installed exit phase for its own removal; Sidebar adds no second exit writer to that control."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "SidebarSeparator keeps Separator's own exit phase for a removed rule; the sidebar adds no second opacity writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "sheet",
+                "reason": "The mobile composition delegates its edge exit to the installed Sheet; the sidebar keeps its separate desktop presentation."
               }
             ]
           }
