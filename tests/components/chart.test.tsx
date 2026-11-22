@@ -1,11 +1,14 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createContext, createRef } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { Bar, BarChart, JavascriptAnimation } from "recharts";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChartContainer, ChartLegendContent, ChartStyle, ChartTooltipContent } from "@/registry/cadence/chart";
+import { documentPresentation } from "@/registry/cadence/lib/motion-presence";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionInsertion, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 beforeEach(visibleEngineViewport);
 
@@ -296,4 +299,155 @@ it("uses Recharts legend formatter and entry callback signatures with keyboard a
   fireEvent.keyDown(entry, { key: " " });
   expect(click).toHaveBeenCalledTimes(2);
   expect(click).toHaveBeenLastCalledWith(item, 0, expect.objectContaining({ type: "click" }));
+});
+
+/**
+ * jsdom has no Web Animations API, so the presence envelope would settle
+ * immediately. Supply the minimal native surface it calls and leave the
+ * envelope in flight so an entrance is observable.
+ */
+function stubNativeAnimation() {
+  const handles: { cancel: ReturnType<typeof vi.fn>; playState: string }[] = [];
+  Object.defineProperty(HTMLElement.prototype, "animate", {
+    configurable: true,
+    value: (frames: Keyframe[]) => {
+      let reject: ((reason?: unknown) => void) | undefined;
+      const finished = new Promise<void>((_, no) => {
+        reject = no;
+      });
+      finished.catch(() => {});
+      const handle = {
+        finished,
+        playState: "running",
+        effect: { getKeyframes: () => frames, getTiming: () => ({ duration: 100 }) },
+        cancel: vi.fn(() => reject?.(new Error("cancelled"))),
+        finish: vi.fn(),
+      };
+      handles.push(handle);
+      return handle as unknown as Animation;
+    },
+  });
+  return {
+    handles,
+    restore: () => {
+      Reflect.deleteProperty(HTMLElement.prototype, "animate");
+    },
+  };
+}
+
+describe("Chart v2 owners", () => {
+  beforeAll(async () => {
+    await prepareV2MotionPlan();
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  const page = (mode: "full" | "reduced" | "none", content: React.ReactNode) => (
+    <CadenceProvider mode={mode}>
+      <ChartContainer config={config}>{content}</ChartContainer>
+    </CadenceProvider>
+  );
+
+  for (const mode of ["full", "reduced", "none"] as const) {
+    it(`owns one entrance for a chart surface inserted after the baseline in ${mode}`, async () => {
+      const stub = stubNativeAnimation();
+      try {
+        const view = render(
+          <CadenceProvider mode={mode}>
+            <div />
+          </CadenceProvider>,
+        );
+        // A page that already painted presents its successors; only a later
+        // insertion owns the entrance.
+        documentPresentation(document).presented = true;
+        await expectV2MotionInsertion(
+          "chart",
+          "chart.surface.enter",
+          mode,
+          () =>
+            act(() => {
+              view.rerender(page(mode, <Content />));
+            }),
+          {
+            // The owned writer is a raw WAAPI opacity envelope, not a Motion prop.
+            behavior: () => {
+              const host = view.container.querySelector('[data-slot="chart"]');
+              expect(host).toHaveAttribute("data-motion", mode);
+            },
+          },
+        );
+      } finally {
+        stub.restore();
+      }
+    });
+
+    it(`fades tooltip and legend introduced after the chart baseline in ${mode}`, async () => {
+      const stub = stubNativeAnimation();
+      try {
+        const view = render(page(mode, <div />));
+        documentPresentation(document).presented = true;
+        await expectV2MotionInsertion(
+          "chart",
+          "chart.annotation.enter",
+          mode,
+          () =>
+            act(() => {
+              view.rerender(page(mode, <Content />));
+            }),
+          {
+            // The owned writer is a raw WAAPI opacity envelope, not a Motion prop.
+            behavior: () => {
+              const host = view.container.querySelector('[data-slot="chart-tooltip"]');
+              expect(host).toHaveAttribute("data-motion", mode);
+            },
+          },
+        );
+      } finally {
+        stub.restore();
+      }
+    });
+  }
+
+  it("cancels the live surface entrance when the same chart downgrades to none", () => {
+    const stub = stubNativeAnimation();
+    try {
+      const view = render(
+        <CadenceProvider mode="full">
+          <div />
+        </CadenceProvider>,
+      );
+      documentPresentation(document).presented = true;
+      act(() => {
+        view.rerender(page("full", <Content />));
+      });
+      const surface = view.container.querySelector('[data-slot="chart"]') as HTMLElement;
+      expect(surface.dataset.motion).toBe("full");
+      const running = stub.handles.filter((handle) => handle.playState === "running");
+      expect(running.length).toBeGreaterThan(0);
+      act(() => {
+        view.rerender(page("none", <Content />));
+      });
+      expect(surface.dataset.motion).toBe("none");
+      for (const handle of running) expect(handle.cancel).toHaveBeenCalled();
+    } finally {
+      stub.restore();
+    }
+  });
+
+  it("keeps server markup and first paint natural without a hidden entrance", () => {
+    const markup = renderToStaticMarkup(
+      <CadenceProvider mode="full">
+        <ChartContainer config={config}>
+          <Content />
+        </ChartContainer>
+      </CadenceProvider>,
+    );
+    expect(markup).toContain('data-slot="chart"');
+    expect(markup).toContain('data-motion="full"');
+    expect(markup).not.toMatch(/opacity:0|opacity="0"|style="[^"]*opacity: 0/);
+  });
+
+  it("certifies native and not-applicable capability boundaries on their actual hosts", async () => {
+    const view = render(page("full", <Content />));
+    await expectV2NativeBoundaries("chart", { container: view.container });
+  });
 });

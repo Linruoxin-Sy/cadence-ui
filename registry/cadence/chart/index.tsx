@@ -1,18 +1,24 @@
 "use client";
 
-import { cubicBezier } from "motion/react";
 import * as React from "react";
-import type { TooltipValueType } from "recharts";
 import * as RechartsPrimitive from "recharts";
-import { cn } from "../lib/cn";
-import { motionLimits, motionMilliseconds } from "../lib/motion";
+import { ResponsiveContainer, type TooltipValueType } from "recharts";
 import {
-  createMotionTransaction,
-  type MotionLease,
-  type MotionRevision,
-  type MotionSettlement,
-} from "../lib/motion-transaction";
-import { useCadenceMotionScope, useEngineEnvironment, withCadenceScope } from "../lib/provider";
+  type ChartController,
+  type ChartPhase,
+  chartClock,
+  chartInstantProps,
+  createChartController,
+  type SeriesInterpolator,
+} from "../lib/chart-recharts";
+import { cn } from "../lib/cn";
+import { createInlinePresence } from "../lib/inline-presence";
+import { motionLimits } from "../lib/motion";
+import { documentPresentation } from "../lib/motion-presence";
+import { useMotionHostRef } from "../lib/motion-ref";
+import { createMotionTransaction, type MotionRevision } from "../lib/motion-transaction";
+import { type CadenceMotion, useCadenceMotionScope, useEngineEnvironment, withCadenceScope } from "../lib/provider";
+import { createSurfacePresence } from "../lib/surface-presence";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -30,6 +36,7 @@ export type ChartConfig = Record<
 
 type ChartContextProps = {
   config: ChartConfig;
+  cm: CadenceMotion;
 };
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
@@ -54,14 +61,6 @@ const animatedSeries = new Set<unknown>([
   RechartsPrimitive.RadialBar,
   RechartsPrimitive.Funnel,
 ]);
-function terminalItems(items: ReadonlyArray<RechartsPrimitive.AnimationItem<unknown>> | null) {
-  return items?.flatMap((item) => (item.status === "removed" ? [] : [item.next])) ?? [];
-}
-type SeriesInterpolator = (
-  items: ReadonlyArray<RechartsPrimitive.AnimationItem<unknown>> | null,
-  progress: number,
-  layout: unknown,
-) => ReadonlyArray<unknown>;
 const chartTargetProps = [
   "data",
   "dataKey",
@@ -187,21 +186,6 @@ function stableChartTree(previous: React.ReactNode, next: React.ReactNode): Reac
     return previous;
   return children === next.props.children ? next : React.cloneElement(next, { children });
 }
-type ChartPhase = {
-  progress: number;
-  previous?: number;
-  easing?: (progress: number) => number;
-  started: boolean;
-  completed: boolean;
-  work?: number;
-  entity?: object;
-  target?: object;
-  alive?: boolean;
-  dispose?: () => void;
-};
-type ChartController = (
-  ...args: [...Parameters<RechartsPrimitive.AnimationController>, ChartPhase?]
-) => ReturnType<RechartsPrimitive.AnimationController>;
 type SeriesRegistration = { type: unknown; entity: object };
 type SeriesOwner = {
   controller: ChartController;
@@ -281,15 +265,11 @@ function ChartSeriesOwner({
     [controller, phase],
   );
   const authored = element.props.animationInterpolateFn as SeriesInterpolator | undefined;
-  const terminal = React.useMemo<SeriesInterpolator>(
-    () => (authored ? (items, _progress, layout) => authored(items, 1, layout) : terminalItems),
-    [authored],
-  );
   return (
     <RechartsPrimitive.AnimationControllerProvider value={nativeController}>
       {React.cloneElement(element, {
         ...callbacks,
-        ...(instant ? { animationInterpolateFn: terminal, isAnimationActive: false } : {}),
+        ...(instant ? chartInstantProps(authored) : {}),
       })}
     </RechartsPrimitive.AnimationControllerProvider>
   );
@@ -402,9 +382,8 @@ function ChartContainer({
   };
 }) {
   const { cm, ref: scopeRef, element } = useCadenceMotionScope(props.ref);
-  const clock = cm.transition("data.transition");
-  const curve = cm.scope.tokens.ease.out;
-  const current = React.useRef({ reduced: cm.reduced, duration: clock.duration ?? 0, easing: cubicBezier(...curve) });
+  const clock = chartClock(cm);
+  const current = React.useRef({ reduced: cm.reduced, duration: clock.duration, easing: clock.easing });
   const running = React.useRef(new Set<() => void>());
   const [transaction] = React.useState(createMotionTransaction);
   const series = React.useRef(new Map<string, SeriesRegistration>());
@@ -415,7 +394,6 @@ function ChartContainer({
       if (series.current.get(identity) === registration) series.current.delete(identity);
     };
   }, []);
-  const registrations = React.useRef(new WeakMap<ChartPhase, ReturnType<typeof transaction.register>>());
   const committedTarget = React.useRef<{ target: object; revision: MotionRevision } | null>(null);
   const settle = React.useCallback(() => {
     for (const finish of [...running.current]) finish();
@@ -457,127 +435,59 @@ function ChartContainer({
     cached.current = { source, instant, tree, target };
   }, [source, instant, tree, target]);
   React.useLayoutEffect(() => {
-    current.current = { reduced: cm.reduced, duration: clock.duration ?? 0, easing: cubicBezier(...curve) };
+    current.current = { reduced: cm.reduced, duration: clock.duration, easing: clock.easing };
     if (cm.reduced || clock.duration === 0 || environment.blocked.current) settle();
-  }, [cm.reduced, clock.duration, curve, environment.blocked, settle]);
-  const controller = React.useCallback<ChartController>(
-    (_timeout, handle, listener, phase) => {
-      let frame = 0;
-      let done = false;
-      const playback: ChartPhase = phase ?? { progress: 0, started: false, completed: false };
-      const revision = phase?.target
-        ? transaction.revision("content", phase.target, phase)
-        : committedTarget.current?.revision;
-      if (!revision) return () => {};
-      const currentPhase = () => revision.current() && (!phase || phase.alive);
-      let registration = registrations.current.get(playback);
-      if (!registration) {
-        registration = transaction.register(playback, playback.entity ?? playback);
-        registrations.current.set(playback, registration);
-        const owned = registration;
-        playback.dispose = () => {
-          owned.dispose();
-          registrations.current.delete(playback);
-        };
-      }
-      let lease: MotionLease | null;
-      let finish: () => void = () => {};
-      const retire = (settle = false, terminal?: MotionSettlement) => {
-        done = true;
-        cancelAnimationFrame(frame);
-        running.current.delete(finish);
-        if (!settle) return;
-        if (!terminal?.current()) return;
-        playback.progress = 1;
-        listener(handle.getTo());
-        if (terminal.current() && currentPhase()) handle.complete();
-      };
-      const immediateNative = !phase || playback.work === undefined;
-      lease = registration.begin(
-        revision,
-        ["chart-geometry"],
-        immediateNative ? {} : { chartSamples: playback.work },
-        retire,
-      );
-      const overflow = !lease;
-      if (!lease) lease = registration.begin(revision, ["chart-geometry"], {}, retire);
-      if (!lease?.current()) return () => {};
-      // Required native callbacks remain synchronous. They can themselves replace
-      // data or unmount the chart, so recheck authority after every callout.
-      handle.tick(0);
-      if (!lease.current()) {
-        lease.cancel();
-        return () => {};
-      }
-      handle.tick(handle.getAnimationBegin());
-      if (!lease.current()) {
-        lease.cancel();
-        return () => {};
-      }
-      const origin = playback.progress;
-      finish = () => {
-        if (done || !lease?.current()) return;
-        done = true;
-        playback.progress = 1;
-        cancelAnimationFrame(frame);
-        running.current.delete(finish);
-        listener(handle.getTo());
-        if (lease.current() && currentPhase()) handle.complete();
-        lease.finish();
-      };
-      running.current.add(finish);
-      if (
-        overflow ||
-        immediateNative ||
-        current.current.reduced ||
-        current.current.duration === 0 ||
-        environment.blocked.current ||
-        playback.progress === 1 ||
-        typeof handle.getFrom() !== "number"
-      ) {
-        finish();
-        const completed = lease;
-        return () => completed.cancel();
-      }
-      let progress = playback.progress;
-      const tick = (now: number) => {
-        if (done || !lease?.current()) return;
-        // The first visual frame follows committed local-token resolution.
-        // Later frames and replacement handles retain this action's curve.
-        if (!playback.easing) playback.easing = current.current.easing;
-        const easing = playback.easing;
-        const startPaint = easing(origin);
-        const duration = motionMilliseconds(current.current.duration);
-        if (duration === 0) return finish();
-        progress = Math.min(1, progress + (playback.previous === undefined ? 0 : now - playback.previous) / duration);
-        playback.previous = now;
-        playback.progress = progress;
-        if (progress === 1) {
-          finish();
-          return;
-        }
-        const from = Number(handle.getFrom());
-        // A recreated native handle interpolates from current geometry. Continue
-        // the original curve's remaining segment rather than easing from rest again.
-        const endPaint = easing(1);
-        if (endPaint === startPaint) return finish();
-        const remaining = (easing(progress) - startPaint) / (endPaint - startPaint);
-        listener(from + (Number(handle.getTo()) - from) * remaining);
-        if (lease.current()) frame = requestAnimationFrame(tick);
-      };
-      frame = requestAnimationFrame(tick);
+  }, [cm, clock.duration, clock.easing, environment.blocked, settle]);
+  const controller = React.useMemo(
+    () => createChartController({ transaction, committedTarget, current, running, blocked: environment.blocked }),
+    [transaction, environment.blocked],
+  );
+  const host = useMotionHostRef<HTMLDivElement>();
+  const mergedRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      const releaseHost = host.ref(node);
+      const releaseScope = scopeRef(node);
       return () => {
-        lease?.cancel();
+        if (typeof releaseHost === "function") releaseHost();
+        else host.ref(null);
+        if (typeof releaseScope === "function") releaseScope();
+        else scopeRef(null);
       };
     },
-    [environment.blocked, transaction],
+    [host, scopeRef],
   );
+  const surface = React.useRef<ReturnType<typeof createSurfacePresence> | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mount cause only; later policy changes are committed below.
+  React.useLayoutEffect(() => {
+    const node = host.node.current;
+    if (!node) return;
+    const scope = documentPresentation(node.ownerDocument);
+    // SSR, hydration and the first document presentation stay natural; only a
+    // genuinely later inserted chart surface consumes one entrance.
+    if (!scope.presented) return;
+    const presence = createSurfacePresence(node);
+    surface.current = presence;
+    presence.commit({ present: true, enter: true, cm });
+    return () => {
+      presence.dispose();
+      if (surface.current === presence) surface.current = null;
+    };
+    // Mount cause only; later policy changes are committed below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  React.useEffect(() => {
+    const node = host.node.current;
+    if (node) documentPresentation(node.ownerDocument).presented = true;
+  });
+  React.useLayoutEffect(() => {
+    surface.current?.commit({ present: true, enter: false, cm });
+  }, [cm]);
   const uniqueId = React.useId();
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, "")}`;
 
   return withCadenceScope(
     cm,
-    <ChartContext.Provider value={{ config }}>
+    <ChartContext.Provider value={{ config, cm }}>
       <div
         data-slot="chart"
         data-motion={cm.mode}
@@ -587,14 +497,12 @@ function ChartContainer({
           className,
         )}
         {...props}
-        ref={scopeRef}
+        ref={mergedRef}
       >
         <ChartStyle id={chartId} config={config} />
         <SeriesController.Provider value={{ controller, target, register: registerSeries }}>
           <RechartsPrimitive.AnimationControllerProvider value={controller}>
-            <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
-              {tree}
-            </RechartsPrimitive.ResponsiveContainer>
+            <ResponsiveContainer initialDimension={initialDimension}>{tree}</ResponsiveContainer>
           </RechartsPrimitive.AnimationControllerProvider>
         </SeriesController.Provider>
       </div>
@@ -699,7 +607,51 @@ function ChartTooltipContent({
     nameKey?: string;
     labelKey?: string;
   } & Omit<RechartsPrimitive.DefaultTooltipContentProps<TooltipValueType, TooltipNameType>, "accessibilityLayer">) {
-  const { config } = useChart();
+  const { config, cm } = useChart();
+  const host = useMotionHostRef<HTMLDivElement>();
+  // Static text hosts stay reachable for mode boundaries without owning a writer.
+  const labelHost = useMotionHostRef<HTMLDivElement>();
+  const valueHost = useMotionHostRef<HTMLSpanElement>();
+  const presence = React.useRef<ReturnType<typeof createInlinePresence> | null>(null);
+  const presenceNode = React.useRef<HTMLDivElement | null>(null);
+  // A host that was part of the first document paint must never consume a later
+  // rerender as an entrance; only a genuinely later insertion owns one.
+  const atBaseline = React.useRef<boolean | undefined>(undefined);
+  React.useLayoutEffect(() => {
+    const node = host.node.current;
+    if (!node) {
+      presence.current?.dispose();
+      presence.current = null;
+      presenceNode.current = null;
+      return;
+    }
+    if (presence.current && presenceNode.current !== node) {
+      presence.current.dispose();
+      presence.current = null;
+    }
+    const presented = documentPresentation(node.ownerDocument).presented;
+    atBaseline.current ??= !presented;
+    if (atBaseline.current) return;
+    if (!presence.current) {
+      // A tooltip or legend appearing after the document baseline is one later
+      // interaction cause; first paint and SSR content stay natural.
+      if (!presented) return;
+      const controller = createInlinePresence(node);
+      presence.current = controller;
+      presenceNode.current = node;
+      controller.commit({ present: true, enter: true, cm });
+      return;
+    }
+    presence.current.commit({ present: true, enter: false, cm });
+  });
+  React.useLayoutEffect(
+    () => () => {
+      presence.current?.dispose();
+      presence.current = null;
+      presenceNode.current = null;
+    },
+    [],
+  );
 
   const tooltipLabel = React.useMemo(() => {
     if (hideLabel || !payload?.length) {
@@ -711,16 +663,16 @@ function ChartTooltipContent({
     const itemConfig = getPayloadConfigFromPayload(config, item, key);
     const value = !labelKey && typeof label === "string" ? (config[label]?.label ?? label) : itemConfig?.label;
 
-    if (labelFormatter) {
-      return <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>;
-    }
-
-    if (!value) {
+    if (!labelFormatter && !value) {
       return null;
     }
 
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
-  }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
+    return (
+      <div ref={labelHost.ref} data-slot="chart-tooltip-label" className={cn("font-medium", labelClassName)}>
+        {labelFormatter ? labelFormatter(value, payload) : value}
+      </div>
+    );
+  }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey, labelHost.ref]);
 
   if (!active || !payload?.length) {
     return null;
@@ -730,6 +682,9 @@ function ChartTooltipContent({
 
   return (
     <div
+      ref={host.ref}
+      data-slot="chart-tooltip"
+      data-motion={cm.mode}
       className={cn(
         "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
         className,
@@ -789,7 +744,11 @@ function ChartTooltipContent({
                         <span className="text-muted-foreground">{itemConfig?.label ?? item.name}</span>
                       </div>
                       {item.value != null && (
-                        <span className="font-mono font-medium text-foreground tabular-nums">
+                        <span
+                          ref={valueHost.ref}
+                          data-slot="chart-tooltip-value"
+                          className="font-mono font-medium text-foreground tabular-nums"
+                        >
                           {typeof item.value === "number" ? item.value.toLocaleString() : String(item.value)}
                         </span>
                       )}
@@ -821,7 +780,49 @@ function ChartLegendContent({
   hideIcon?: boolean;
   nameKey?: string;
 } & RechartsPrimitive.DefaultLegendContentProps) {
-  const { config } = useChart();
+  const { config, cm } = useChart();
+  const host = useMotionHostRef<HTMLDivElement>();
+  // The static label host stays reachable for mode boundaries without a writer.
+  const labelHost = useMotionHostRef<HTMLSpanElement>();
+  const presence = React.useRef<ReturnType<typeof createInlinePresence> | null>(null);
+  const presenceNode = React.useRef<HTMLDivElement | null>(null);
+  // A legend present at first paint never turns a later rerender into an entrance.
+  const atBaseline = React.useRef<boolean | undefined>(undefined);
+  React.useLayoutEffect(() => {
+    const node = host.node.current;
+    if (!node) {
+      presence.current?.dispose();
+      presence.current = null;
+      presenceNode.current = null;
+      return;
+    }
+    if (presence.current && presenceNode.current !== node) {
+      presence.current.dispose();
+      presence.current = null;
+    }
+    const presented = documentPresentation(node.ownerDocument).presented;
+    atBaseline.current ??= !presented;
+    if (atBaseline.current) return;
+    if (!presence.current) {
+      // The legend's first paint is already part of the chart surface; only a
+      // legend appearing after that baseline consumes one local entrance.
+      if (!presented) return;
+      const controller = createInlinePresence(node);
+      presence.current = controller;
+      presenceNode.current = node;
+      controller.commit({ present: true, enter: true, cm });
+      return;
+    }
+    presence.current.commit({ present: true, enter: false, cm });
+  });
+  React.useLayoutEffect(
+    () => () => {
+      presence.current?.dispose();
+      presence.current = null;
+      presenceNode.current = null;
+    },
+    [],
+  );
 
   if (!payload?.length) {
     return null;
@@ -829,6 +830,9 @@ function ChartLegendContent({
 
   return (
     <div
+      ref={host.ref}
+      data-slot="chart-legend"
+      data-motion={cm.mode}
       className={cn("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}
       {...contentDivProps(divProps)}
     >
@@ -866,7 +870,13 @@ function ChartLegendContent({
                   }}
                 />
               )}
-              {formatter ? formatter(itemConfig?.label ?? item.value, item, index) : itemConfig?.label}
+              {formatter ? (
+                formatter(itemConfig?.label ?? item.value, item, index)
+              ) : (
+                <span ref={labelHost.ref} data-slot="chart-legend-label">
+                  {itemConfig?.label}
+                </span>
+              )}
             </div>
           );
         })}

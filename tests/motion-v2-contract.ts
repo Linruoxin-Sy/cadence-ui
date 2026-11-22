@@ -423,6 +423,7 @@ export async function expectV2MotionInsertion(
   binding: string,
   mode: Mode,
   insert: () => void | Promise<void>,
+  options: { behavior?: () => void } = {},
 ) {
   const root = process.cwd(),
     plan = await planFor(root);
@@ -460,7 +461,10 @@ export async function expectV2MotionInsertion(
       for (const property of action.properties) expect(record.propertyWrites?.[property] ?? 0).toBeGreaterThan(0);
       expect(record.writes ?? 0).toBeGreaterThan(0);
     }
-    expectMotionContract(mode, { ownerLocal: node ? [node] : [] });
+    expectMotionContract(mode, {
+      ownerLocal: node ? [node] : [],
+      ...(options.behavior ? { behavior: options.behavior } : {}),
+    });
     rows.push({
       item,
       binding,
