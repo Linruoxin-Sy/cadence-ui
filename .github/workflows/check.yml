@@ -136,7 +136,11 @@ jobs:
     # the slowest file no longer waits behind doc-template or motion-docs.
     needs: prepare
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Hang guard, not a performance budget (ADR-023). Each case spawns the whole
+    # registry check, so the ceiling tracks how many components are migrated and how
+    # large each installation closure is; doc-template grew past 20 minutes as the
+    # catalogue reached 63 items even with no regression in per-run cost.
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:

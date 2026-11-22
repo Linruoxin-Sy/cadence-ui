@@ -379,6 +379,9 @@ test("Bubble SSR, no-JS, distributed code and inert legacy URLs retain local sta
 // The early B9 item has mode tests in motion-matrix; add the complete-page visual gate here.
 for (const colorScheme of ["light", "dark"] as const)
   test.describe(`code-block B9 ${colorScheme}`, () => {
+    // One full-page axe pass over a long highlighted page exceeds the 30 s default on a
+    // loaded runner; the assertion is unchanged, only its wall-clock deadline is.
+    test.setTimeout(90_000);
     test.use({ colorScheme });
     test("responsive full page axe and screenshots", async ({ page }) => {
       await page.goto("/components/code-block?motion=none");
