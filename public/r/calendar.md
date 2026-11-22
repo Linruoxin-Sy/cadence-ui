@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/calendar`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: data.transition
+- Motion recipes: data.transition, geometry.resize, state.color, text.change
 
 ## Installation
 
@@ -32,9 +32,9 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
 - [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — direct registry dependency.
@@ -285,17 +285,25 @@ localized accessible dates; preserve that composition when changing formatters.
 Keep the complete DayPicker props on a custom day component, including its
 events, disabled state, children and focus modifiers. The Custom day example
 wraps `CalendarDayButton` and passes its locale explicitly. Replacing
-`Month` or `MonthGrid` also replaces the default month motion owner;
-caller-provided grid opacity/transform styles take precedence over the
-corresponding animation property.
+`Month`, `MonthGrid` or `CaptionLabel` also replaces that part's default motion
+owner: a caller `Month` owns its own height shell, a caller `MonthGrid` owns the
+grid paint target, and a caller `CaptionLabel` owns its own text. Caller-provided
+grid opacity/transform styles take precedence over the corresponding animation
+property.
 
 Provider imports are required; wrapping is optional. Standalone Calendar
 respects the system preference. Month changes fade and translate the existing
 grid in full mode, fade only in reduced, and update immediately in none.
-First paint and selection/range styles are static, and week-count height
-changes immediately. A fixed `CadenceProvider mode="none"` also disables
-month animation under a full-mode parent. Do not key/remount Calendar by month
-to animate it; keep focus and caller drafts in the existing tree.
+A committed month whose week-row count differs animates the month shell's own
+height from the displayed size to the new natural size in full mode, and sets
+it immediately in reduced and none. First paint is static. Several displayed
+months, `fixedWeeks`, a caller-replaced `Month` part and a caller `animate`
+prop keep immediate native geometry. Selection, range and caption colours
+transition on the actual day/navigation buttons unless that owner has DOM
+focus, an invalid state or a caller-provided palette. A fixed
+`CadenceProvider mode="none"` also disables month animation under a full-mode
+parent. Do not key/remount Calendar by month to animate it; keep focus and
+caller drafts in the existing tree.
 
 Cells default to 32px; allow space for larger cells, week numbers and multiple
 months. Months stack below `md` and form a row at `md`. Server-rendered
@@ -520,6 +528,43 @@ export function MultipleMonthsExample() {
       numberOfMonths={2}
       pagedNavigation
       fixedWeeks
+    />
+  );
+}
+```
+
+## Week-row height
+
+A month that needs six week rows is taller than a five-row month. Calendar moves the month's own size shell
+to the committed grid height, so surrounding layout follows one bounded size change instead of jumping; the
+table, its rows and every date cell keep their native dimensions. Reduced mode and `none` set the height
+immediately, and `fixedWeeks`, several displayed months or a caller-replaced `Month` part keep immediate
+native geometry. The footer names the committed month so the change is visible without inspecting pixels.
+
+<ComponentExample name="week-row-height" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { enUS } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+
+const start = new Date(2026, 10, 1);
+
+export function WeekRowHeightExample() {
+  const [month, setMonth] = useState(start);
+  return (
+    <Calendar
+      defaultMonth={start}
+      today={new Date(2026, 10, 4)}
+      locale={enUS}
+      className="min-w-64 rounded-md border"
+      aria-label="Week row height"
+      labels={{ labelNav: () => "Week row height navigation" }}
+      mode="single"
+      month={month}
+      onMonthChange={setMonth}
+      footer={`Committed month: ${month.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`}
     />
   );
 }
@@ -994,7 +1039,7 @@ All DayPicker 9.13.2 props and discriminated selection types are preserved.
 | numberOfMonths / fixedWeeks / showWeekNumber | number / boolean / boolean | 1 / false / false | Grid layout options. |
 | className / classNames / style / styles | DayPicker styles | — | Caller overrides win. |
 | formatters / labels / components | DayPicker overrides | — | Override individual formatters, accessible labels or entire parts. |
-| animate | boolean | false | Forwarded upstream API; selecting it yields Cadence grid paint to the caller-owned DayPicker animation stylesheet. |
+| animate | boolean | false | Forwarded upstream API; selecting it yields Cadence grid paint, month height and caption replacement to the caller-owned DayPicker animation stylesheet. |
 
 ### `CalendarDayButton`
 
@@ -1002,32 +1047,50 @@ Accepts DayPicker's DayButton props (`day`, `modifiers`, native button attribute
 `locale?: Partial<Locale>`. Preserves native events, disabled state, classes, styles and
 focus management. Selection and range modifiers have the upstream data attributes.
 Custom components replace default parts completely and must maintain the same accessibility
-and motion contract. A custom Month or MonthGrid also takes ownership of month motion.
+and motion contract. A custom Month, MonthGrid or CaptionLabel also takes ownership of that
+part's month motion, and a caller palette on `day_button`/`button_previous`/`button_next`
+commits those colours immediately.
+
+### `CalendarMonth`, `CalendarMonthGrid`, `CalendarCaptionLabel`, `CalendarPreviousButton` and `CalendarNextButton`
+
+The shipped DayPicker part implementations, exported so a caller can wrap or extend one part
+instead of rebuilding it. `CalendarMonth` renders the caller's month layout inside one size
+shell and owns the week-row height; `CalendarMonthGrid` renders the real `<table>` and owns the
+month-change paint; `CalendarCaptionLabel` owns the changed caption runs; the two navigation
+buttons keep DayPicker's props (`type`, `className`, `aria-disabled`, `aria-label`, `onClick`)
+and own their scoped colour. Passing any of them through `components` keeps that part's motion
+owner; replacing one with a different component hands the part's motion to the caller.
 
 ## Motion contract
 
-Authored intensity is **medium**: Month navigation shifts the bounded month grid; day selection retains its existing local feedback.
+Authored intensity is **medium**: Month navigation shifts the bounded month grid and its own week-count height; each real day and navigation button owns its scoped paint.
 
-| Phase | Properties | Token | Interruptible |
+| Phase | Properties | Recipe / form | Interruptible |
 | --- | --- | --- | --- |
 | Month changes | opacity and signed horizontal transform on the actual grid | `data.transition/month-grid`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |
-| Reduced | opacity only | `data.transition/month-grid` reduced | Mode changes settle running motion. |
-| None | Immediate grid update | zero duration | No animation is started. |
-| Selection / enter / exit | Static selection and range styles | none | No decoration on mount. |
+| Week-row count changes | clamped block size of the month shell | `geometry.resize/measured` | Yes; the next committed month retargets from the displayed height. |
+| Day and navigation state | background-color and color of the real button | `state.color/css-transition` | Yes; focus, an invalid owner or a caller palette settles that owner's whole paint. |
+| Caption revisions | opacity of changed graphemes on the retained label | `text.change/changed-runs` | Yes; retained runs stay put and the newest label wins. |
+| Reduced | opacity-only grid fade, immediate height, eligible colour | `data.transition/month-grid` reduced | Mode changes settle running motion. |
+| None | Immediate grid, height, colour and caption | zero duration | No animation is started. |
 
 The same grid responds to buttons, native dropdowns, keyboard navigation and external controlled
-month updates. Week-count height changes immediately. Caller transform/opacity styles take
-precedence over the corresponding animation property. No outgoing duplicate steals focus.
-Each actual grid retains its local token scope. Equal policies share the phase; incompatible
-per-grid clocks use native paint together. A grid-local zero cancels the group before paint.
-Changing month count or replacing a host establishes a current baseline. Same-count reorder with
-unknown direction fades changed grids without invented travel.
-All actual month slots share one bounded scalar phase for opacity and signed translation, including RTL.
+month updates. Caller transform/opacity styles take precedence over the corresponding animation property.
+No outgoing duplicate steals focus. Each displayed month-grid table owns its own paint phase and commits
+it under the Calendar root's one committed-change transaction, so a newer month replaces the older target
+instead of queueing and a grid-local zero settles that table before paint. Replacing a month or grid host
+establishes a current baseline. Same-count reorder with unknown direction fades without invented travel.
 A missing safe root-padding corridor uses opacity only. Focus-driven month crossings stay immediately
-visible. The known month set is preflighted before per-grid reads; over 50 visuals use native paint.
-Any live clock edit cancels the current grid effects; the next month change uses the new local token
-clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the owned WAAPI
-handle, and restoring visibility or full motion does not replay the current month.
+visible. Participating nodes are counted before their layout or paint is read, and an over-bound collection
+keeps native paint. Any live clock edit cancels the current grid effects; the next month change uses the
+new local token clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the
+owned WAAPI handle, and restoring visibility or full motion does not replay the current month.
+
+Height, colour and caption keep their own owners: a mode or clock downgrade settles the grid
+adapter without clearing an independent caption replacement or an eligible day/navigation colour, and a
+caller-owned `animate` prop, `Month`, `MonthGrid` or `CaptionLabel` component removes only its own
+Cadence owner. Day and navigation colours never delay roving focus, selection or action timing, and the
+focus ring itself stays immediate.
 
 ## Accessibility
 
@@ -1064,13 +1127,15 @@ customizing cells, week numbers or month counts. The preview is checked at 390px
 
 ## Performance
 
-Committed navigation reads only the actual root/grid paint corridor after bounded preflight; there
-are no render/frame layout reads, duplicate month trees or animation timers. One shared phase drives
-the changing grids; dates and keyboard focus remain managed by DayPicker. The dependency is pinned to
-9.13.2 with date-fns 4.1.0. Pass an explicit defaultMonth/today/timeZone when server and client
-must agree across timezone or date boundaries. For SSR dropdown captions, pass an explicit locale
-(e.g. enUS from date-fns/locale): the pinned upstream formatter uses the environment locale
-when locale is omitted, which can differ between server and browser.
+Committed navigation reads only the actual root/grid paint corridor after bounded preflight, plus one
+natural box for the destination month shell; there are no render/frame layout reads, duplicate month
+trees, per-date-cell observers or animation timers. One shared phase drives the changing grids and one
+geometry transaction owns the month height. Each day and navigation button owns a CSS colour family, so a
+large grid adds no per-cell controller beyond its own paint. Dates and keyboard focus remain managed by
+DayPicker. The dependency is pinned to 9.13.2 with date-fns 4.1.0. Pass an explicit
+defaultMonth/today/timeZone when server and client must agree across timezone or date boundaries. For SSR
+dropdown captions, pass an explicit locale (e.g. enUS from date-fns/locale): the pinned upstream
+formatter uses the environment locale when locale is omitted, which can differ between server and browser.
 
 ## Notes for AI
 

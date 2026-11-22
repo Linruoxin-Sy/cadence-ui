@@ -325,11 +325,27 @@ export function WithoutMotionExample() {
   );
 }
 
+export function WeekRowHeightExample() {
+  const [month, setMonth] = useState<Date>(november);
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Week row height"
+      labels={{ ...stable.labels, labelNav: () => "Week row height navigation" }}
+      mode="single"
+      month={month}
+      onMonthChange={setMonth}
+      footer={`Committed month: ${month.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`}
+    />
+  );
+}
+
 const examples = {
   "single-selection": SingleSelectionExample,
   "multiple-dates": MultipleDatesExample,
   "date-ranges": DateRangesExample,
   "multiple-months": MultipleMonthsExample,
+  "week-row-height": WeekRowHeightExample,
   "navigation-button-variants": NavigationButtonVariantsExample,
   "caption-layouts": CaptionLayoutsExample,
   "localized-navigation": LocalizedNavigationExample,
