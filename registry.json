@@ -2221,19 +2221,38 @@
       "description": "Responsive data charts with themed tooltips and legends.",
       "categories": ["collection"],
       "dependencies": ["recharts@3.10.1", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/chart/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/chart/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/chart-recharts.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/chart-recharts.ts"
         }
       ],
       "meta": {
         "since": "0.4.0",
         "tier": "T4",
         "batch": "B7",
-        "motion": ["data.transition"],
+        "motion": [
+          {
+            "recipe": "enter.pop",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -2250,6 +2269,13 @@
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "chart",
+                "reason": "A later inserted ChartContainer owns one local opacity entrance on its own root; initial and hydrated surfaces stay at their first-paint state."
+              }
+            ],
             "data.transition/one-shot": [
               {
                 "relationship": "default",

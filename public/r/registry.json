@@ -1619,7 +1619,14 @@
         "tier": "T4",
         "batch": "B7",
         "motion": [
-          "data.transition"
+          {
+            "recipe": "enter.pop",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          }
         ],
         "intensity": "medium",
         "complexity": "M",
@@ -1637,6 +1644,13 @@
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "chart",
+                "reason": "A later inserted ChartContainer owns one local opacity entrance on its own root; initial and hydrated surfaces stay at their first-paint state."
+              }
+            ],
             "data.transition/one-shot": [
               {
                 "relationship": "default",
