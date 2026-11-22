@@ -16,6 +16,8 @@ import { useMotionHostRef } from "../lib/motion-ref";
 import { useCadenceMotion } from "../lib/provider";
 import { useSidebarGeometry } from "../lib/sidebar-geometry";
 import { SidebarLabels, useSidebarLabel } from "../lib/sidebar-labels";
+import { useNumberPresentation } from "../lib/use-number-presentation";
+import { useTextPresentation } from "../lib/use-text-presentation";
 import { Separator } from "../separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../sheet";
 import { Skeleton } from "../skeleton";
@@ -68,6 +70,179 @@ function regionSettles(host: HTMLElement | null, region: (node: Element) => Elem
 }
 
 const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+/**
+ * Whether a label lane is semantically usable. A collapsed desktop panel and a
+ * closed mobile Sheet hide their labels, so a changed run or reel may establish
+ * the current value there but must not start visual work.
+ */
+const SidebarLabelLane = React.createContext(true);
+
+type LabelSpan = React.ReactElement<
+  { children?: React.ReactNode; ref?: React.Ref<HTMLSpanElement> } & Record<string, unknown>
+>;
+const primitive = (value: React.ReactNode) => typeof value === "string" || typeof value === "number";
+
+/** A direct primitive, or the caller's final plain span behind an optional icon.
+ * Anything else is a composed label tree and keeps its native text. */
+function plainLabel(children: React.ReactNode): { value: string; span?: LabelSpan } | null {
+  const rows = React.Children.toArray(children);
+  const last = rows.at(-1);
+  if (rows.length === 1 && primitive(last)) return { value: String(last) };
+  if (!React.isValidElement(last) || last.type !== "span") return null;
+  // Leading decoration is a raw <svg> or a component the caller marked
+  // aria-hidden; either way it carries no label text of its own.
+  if (
+    !rows.slice(0, -1).every((row) => {
+      if (!React.isValidElement(row)) return false;
+      const hidden = (row.props as { "aria-hidden"?: unknown })["aria-hidden"];
+      return row.type === "svg" || hidden === true || hidden === "true";
+    })
+  )
+    return null;
+  const inner = React.Children.toArray((last.props as { children?: React.ReactNode }).children);
+  if (inner.length !== 1 || !primitive(inner[0])) return null;
+  return { value: String(inner[0]), span: last as LabelSpan };
+}
+
+/** A caller span keeps its element, props and ref; only its text moves to the
+ * controller, so the label lane keeps the same physical node. */
+function composeLabel(
+  span: LabelSpan,
+  ref: (node: HTMLSpanElement | null) => void,
+  text: string,
+  mode: string,
+  lane: boolean,
+  slot: string,
+) {
+  return React.cloneElement(
+    span,
+    {
+      "data-slot": (span.props as { "data-slot"?: string })["data-slot"] ?? slot,
+      "data-motion": mode,
+      "data-motion-lane": lane ? "usable" : "hidden",
+      ref,
+    },
+    text,
+  );
+}
+
+/**
+ * One stable ref for a caller-owned span. A fresh closure each render would make React
+ * re-run the ref, replace the motion host identity and retire the controller on every
+ * update, so the current value would only ever be a baseline.
+ */
+function useSpanRef(attach: (node: HTMLSpanElement | null) => (() => void) | undefined, caller: unknown) {
+  const latest = React.useRef({ attach, caller });
+  latest.current.attach = attach;
+  latest.current.caller = caller;
+  return React.useRef((host: HTMLSpanElement | null) => {
+    const { attach: connect, caller: external } = latest.current;
+    const releases: (() => void)[] = [];
+    const attached = connect(host);
+    if (typeof attached === "function") releases.push(attached);
+    if (typeof external === "function") {
+      const returned: unknown = external(host);
+      if (typeof returned === "function") releases.push(returned as () => void);
+    } else if (external) (external as React.RefObject<HTMLSpanElement | null>).current = host;
+    return () => {
+      for (const release of releases) release();
+    };
+  }).current;
+}
+
+/** One owned plain label: a direct primitive or the caller's final plain span. */
+function SidebarGroupLabelText({ value, span, lane }: { value: string; span?: LabelSpan; lane: boolean }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const [entity] = React.useState(() => ({}));
+  const initial = React.useRef(value);
+  const text = useTextPresentation(node, value, cm, entity, {
+    characterStagger: false,
+    visible: lane,
+    initialText: initial.current,
+  });
+  const composed = useSpanRef(ref, span?.props.ref);
+  if (span) return composeLabel(span, composed, text, cm.mode, lane, "sidebar-group-label-text");
+  return (
+    <span
+      ref={ref}
+      data-slot="sidebar-group-label-text"
+      data-motion={cm.mode}
+      data-motion-lane={lane ? "usable" : "hidden"}
+    >
+      {text}
+    </span>
+  );
+}
+
+function SidebarMenuButtonText({ value, span, lane }: { value: string; span?: LabelSpan; lane: boolean }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const [entity] = React.useState(() => ({}));
+  const initial = React.useRef(value);
+  const text = useTextPresentation(node, value, cm, entity, {
+    characterStagger: false,
+    visible: lane,
+    initialText: initial.current,
+  });
+  const composed = useSpanRef(ref, span?.props.ref);
+  if (span) return composeLabel(span, composed, text, cm.mode, lane, "sidebar-menu-button-label");
+  return (
+    <span
+      ref={ref}
+      data-slot="sidebar-menu-button-label"
+      data-motion={cm.mode}
+      data-motion-lane={lane ? "usable" : "hidden"}
+    >
+      {text}
+    </span>
+  );
+}
+
+function SidebarMenuBadgeText({ value, lane }: { value: string; lane: boolean }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const [entity] = React.useState(() => ({}));
+  const initial = React.useRef(value);
+  const text = useTextPresentation(node, value, cm, entity, {
+    characterStagger: false,
+    visible: lane,
+    initialText: initial.current,
+  });
+  return (
+    <span
+      ref={ref}
+      data-slot="sidebar-menu-badge-text"
+      data-motion={cm.mode}
+      data-motion-lane={lane ? "usable" : "hidden"}
+    >
+      {text}
+    </span>
+  );
+}
+
+/** A plain numeric badge is a quantity, so it rolls changed places only. */
+function SidebarMenuBadgeCount({ value, lane }: { value: number | bigint; lane: boolean }) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const [entity] = React.useState(() => ({}));
+  const text = useNumberPresentation(node, value, cm, entity, {
+    compact: true,
+    cause: "independent",
+    visible: lane,
+  });
+  return (
+    <span
+      ref={ref}
+      data-slot="sidebar-menu-badge-count"
+      data-motion={cm.mode}
+      data-motion-lane={lane ? "usable" : "hidden"}
+    >
+      {text}
+    </span>
+  );
+}
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed";
@@ -289,7 +464,9 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <SidebarLabelLane.Provider value={openMobile}>
+            <div className="flex h-full w-full flex-col">{children}</div>
+          </SidebarLabelLane.Provider>
         </SheetContent>
       </Sheet>
     );
@@ -344,7 +521,9 @@ function Sidebar({
           {...innerSurface}
           className="flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
         >
-          <SidebarLabels.Provider value={labels}>{children}</SidebarLabels.Provider>
+          <SidebarLabels.Provider value={labels}>
+            <SidebarLabelLane.Provider value={state === "expanded"}>{children}</SidebarLabelLane.Provider>
+          </SidebarLabels.Provider>
         </div>
       </div>
     </div>
@@ -539,6 +718,8 @@ function SidebarGroupLabel({
 }: useRender.ComponentProps<"div"> & React.ComponentProps<"div">) {
   const labelHost = useMotionHostRef<HTMLDivElement>(ref);
   const label = useSidebarLabel(labelHost.ref, true);
+  const lane = React.useContext(SidebarLabelLane);
+  const plain = plainLabel(children);
   // `surface.colour` owns this non-item label paint; the group is its actual region.
   const paint = useStateColor(label.ref, label.cm, ["color"], {
     readability: "verified",
@@ -551,12 +732,7 @@ function SidebarGroupLabel({
     props: mergeProps<"div">(
       {
         ...paint,
-        children:
-          typeof children === "string" || typeof children === "number" ? (
-            <span data-motion={label.cm.mode}>{children}</span>
-          ) : (
-            children
-          ),
+        children: plain ? <SidebarGroupLabelText value={plain.value} span={plain.span} lane={lane} /> : children,
         className: cn(
           "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
           "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
@@ -674,6 +850,7 @@ function SidebarMenuButton({
   tooltip,
   className,
   ref,
+  children,
   ...props
 }: useRender.ComponentProps<"button"> &
   React.ComponentProps<"button"> & {
@@ -683,6 +860,8 @@ function SidebarMenuButton({
   const { isMobile, state } = useSidebar();
   const labelHost = useMotionHostRef<HTMLElement>(ref);
   const label = useSidebarLabel(labelHost.ref);
+  const lane = React.useContext(SidebarLabelLane);
+  const plain = plainLabel(children);
   // `item.colour` owns the menu interaction region, including the outline shadow.
   const paint = useStateColor(label.ref, label.cm, ["background-color", "color", "box-shadow"], {
     readability: "verified",
@@ -694,6 +873,7 @@ function SidebarMenuButton({
     props: mergeProps<"button">(
       {
         ...paint,
+        children: plain ? <SidebarMenuButtonText value={plain.value} span={plain.span} lane={lane} /> : children,
         className: cn(sidebarMenuButtonVariants({ variant, size }), className),
       },
       props,
@@ -900,9 +1080,10 @@ function SidebarMenuAction({
   });
 }
 
-function SidebarMenuBadge({ className, ref, style, ...props }: React.ComponentProps<"div">) {
+function SidebarMenuBadge({ className, ref, style, children, ...props }: React.ComponentProps<"div">) {
   const { node, ref: hostRef } = useMotionHostRef<HTMLDivElement>(ref);
   const cm = useCadenceMotion(node);
+  const lane = React.useContext(SidebarLabelLane);
   // `surface.colour` owns this non-item badge paint; its row is the actual region.
   const paint = useStateColor(hostRef, cm, ["color"], {
     readability: "verified",
@@ -926,7 +1107,15 @@ function SidebarMenuBadge({ className, ref, style, ...props }: React.ComponentPr
         className,
       )}
       {...props}
-    />
+    >
+      {typeof children === "number" || typeof children === "bigint" ? (
+        <SidebarMenuBadgeCount value={children} lane={lane} />
+      ) : typeof children === "string" ? (
+        <SidebarMenuBadgeText value={children} lane={lane} />
+      ) : (
+        children
+      )}
+    </div>
   );
 }
 
