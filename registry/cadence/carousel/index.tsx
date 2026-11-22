@@ -5,9 +5,18 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
-
 import { carouselClock, transitionFor } from "../lib/motion";
+import {
+  createPresentationScope,
+  documentPresentation,
+  MotionPresentation,
+  usePresentationScope,
+} from "../lib/motion-presence";
+import { useMotionHostRef } from "../lib/motion-ref";
 import { useCadenceMotion, useCadenceMotionScope, useEngineEnvironment, withCadenceScope } from "../lib/provider";
+import { createSurfacePresence } from "../lib/surface-presence";
+import { useNumberPresentation } from "../lib/use-number-presentation";
+import { useTextPresentation } from "../lib/use-text-presentation";
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -31,6 +40,7 @@ type CarouselContextProps = {
 } & CarouselProps;
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
+const subscribe = () => () => {};
 
 function useCarousel() {
   const context = React.useContext(CarouselContext);
@@ -51,7 +61,46 @@ function Carousel({
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
-  const { cm, ref: scopeRef, element } = useCadenceMotionScope(props.ref);
+  const { cm, ref: scopeRef, element, node } = useCadenceMotionScope(props.ref);
+  // Opacity envelope on the outer root only; the track transform stays Embla's.
+  const parent = usePresentationScope();
+  const [scope] = React.useState(() => createPresentationScope(node));
+  const hydrated = React.useSyncExternalStore(
+    subscribe,
+    () => false,
+    () => true,
+  );
+  const initialHydration = React.useRef(hydrated);
+  const entranceConsumed = React.useRef(false);
+  const presence = React.useRef<ReturnType<typeof createSurfacePresence> | null>(null);
+  React.useEffect(() => {
+    if (!parent && node.current) documentPresentation(node.current.ownerDocument).presented = true;
+  }, [parent, node]);
+  React.useLayoutEffect(() => {
+    const host = node.current;
+    const parentScope = parent ?? (host ? documentPresentation(host.ownerDocument) : null);
+    // A same-cause parent insertion consumes the entrance; navigation never replays it.
+    const enter = Boolean(
+      !entranceConsumed.current &&
+        !initialHydration.current &&
+        host &&
+        parentScope?.presented &&
+        parentScope.available(),
+    );
+    if (host && !presence.current) presence.current = createSurfacePresence(host);
+    if (host) entranceConsumed.current = true;
+    presence.current?.commit({ present: true, enter, cm });
+    // Nested content inserted with the surface shares that cause instead of
+    // adding a second entrance; later insertion still animates through its owner.
+    scope.presented = true;
+  });
+  React.useLayoutEffect(
+    () => () => {
+      presence.current?.dispose();
+      presence.current = null;
+    },
+    [],
+  );
   // Resolve the full base even while restricted; never reconstruct it from reduced output.
   const authored = cm.reduced
     ? transitionFor("data.transition", "full", { timeScale: cm.timeScale }, cm.scope)
@@ -318,32 +367,34 @@ function Carousel({
 
   return withCadenceScope(
     cm,
-    <CarouselContext.Provider
-      value={{
-        carouselRef,
-        api: api,
-        opts,
-        orientation: orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
-        scrollPrev,
-        scrollNext,
-        canScrollPrev,
-        canScrollNext,
-      }}
-    >
-      {/* biome-ignore lint/a11y/useSemanticElements: Upstream requires a div with native div props/ref. */}
-      <div
-        data-motion={cm.mode}
-        onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
-        role="region"
-        aria-roledescription="carousel"
-        data-slot="carousel"
-        {...props}
-        ref={scopeRef}
+    <MotionPresentation scope={scope}>
+      <CarouselContext.Provider
+        value={{
+          carouselRef,
+          api: api,
+          opts,
+          orientation: orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
+          scrollPrev,
+          scrollNext,
+          canScrollPrev,
+          canScrollNext,
+        }}
       >
-        {children}
-      </div>
-    </CarouselContext.Provider>,
+        {/* biome-ignore lint/a11y/useSemanticElements: Upstream requires a div with native div props/ref. */}
+        <div
+          data-motion={cm.mode}
+          onKeyDownCapture={handleKeyDown}
+          className={cn("relative", className)}
+          role="region"
+          aria-roledescription="carousel"
+          data-slot="carousel"
+          {...props}
+          ref={scopeRef}
+        >
+          {children}
+        </div>
+      </CarouselContext.Provider>
+    </MotionPresentation>,
   );
 }
 
@@ -362,8 +413,10 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
-  const { orientation } = useCarousel();
+function CarouselItem({ className, children, ref, ...props }: React.ComponentProps<"div">) {
+  const { orientation, api } = useCarousel();
+  const cm = useCadenceMotion();
+  const { node, ref: itemRef } = useMotionHostRef<HTMLDivElement>(ref);
 
   return (
     // biome-ignore lint/a11y/useSemanticElements: Upstream slide is a div, not a fieldset.
@@ -371,9 +424,84 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
       role="group"
       aria-roledescription="slide"
       data-slot="carousel-item"
+      data-motion={cm.mode}
       className={cn("min-w-0 shrink-0 grow-0 basis-full", orientation === "horizontal" ? "pl-4" : "pt-4", className)}
       {...props}
-    />
+      ref={itemRef}
+    >
+      {typeof children === "number" ? (
+        <CarouselItemNumber api={api} item={node} value={children} />
+      ) : typeof children === "string" ? (
+        <CarouselItemText api={api} item={node} value={children} />
+      ) : (
+        children
+      )}
+    </div>
+  );
+}
+
+/**
+ * Engine-owned visibility: the real handler asks Embla's cached `slidesInView`
+ * records at commit time. No extra observer, no layout read during render, and
+ * an engine without that query keeps the caller's visible baseline.
+ */
+function slideVisible(item: React.RefObject<HTMLElement | null>, api: CarouselApi) {
+  if (!api || !item.current) return undefined;
+  if (typeof api.slideNodes !== "function" || typeof api.slidesInView !== "function") return undefined;
+  const index = api.slideNodes().indexOf(item.current);
+  if (index < 0) return undefined;
+  // The public query reports any intersecting slide from Embla's own records.
+  return api.slidesInView().includes(index);
+}
+
+function CarouselItemText({
+  api,
+  item,
+  value,
+}: {
+  api: CarouselApi;
+  item: React.RefObject<HTMLElement | null>;
+  value: string;
+}) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const entity = React.useRef<object>({}).current;
+  const text = useTextPresentation(node, value, cm, entity, {
+    characterStagger: false,
+    get visible() {
+      return slideVisible(item, api);
+    },
+  });
+  return (
+    <span ref={ref} data-slot="carousel-item-text" data-motion={cm.mode}>
+      {text}
+    </span>
+  );
+}
+
+function CarouselItemNumber({
+  api,
+  item,
+  value,
+}: {
+  api: CarouselApi;
+  item: React.RefObject<HTMLElement | null>;
+  value: number;
+}) {
+  const { node, ref } = useMotionHostRef<HTMLSpanElement>();
+  const cm = useCadenceMotion(node);
+  const entity = React.useRef<object>({}).current;
+  const text = useNumberPresentation(node, value, cm, entity, {
+    compact: true,
+    cause: "independent",
+    get visible() {
+      return slideVisible(item, api);
+    },
+  });
+  return (
+    <span ref={ref} data-slot="carousel-item-number" data-motion={cm.mode}>
+      {text}
+    </span>
   );
 }
 

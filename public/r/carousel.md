@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/carousel`
 - Type: registry:ui
 - Since: 0.4.0
-- Motion recipes: data.transition
+- Motion recipes: data.transition, enter.pop, text.change, number.roll
 
 ## Installation
 
@@ -34,9 +34,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority e
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -72,6 +73,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority e
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | carousel | `@components/cadence/carousel/index.tsx` | [JSON files[].content](https://cadence.dev/r/carousel.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -89,6 +91,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority e
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json)
 
 [Source files: carousel](https://cadence.dev/r/carousel.json)
 
@@ -245,8 +249,9 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten target files, including every file from the motion and provider
-helpers, into the same `cadence/` tree so their relative imports resolve.
+Copy every resolved target file, including every file from the motion, text,
+number, presence and provider helpers, into the same `cadence/` tree so their
+relative imports resolve.
 Preserve the sources' `"use client"` directives and the exact
 `embla-carousel-react@8.6.0` pin: the motion policy integrates with that
 engine's internals. Complete the base theme setup linked above and ensure
@@ -258,7 +263,7 @@ Standalone components follow the system motion preference. Use
 Usage, Multiple visible slides, Vertical collection, Looping, Right-to-left,
 Drag behavior, Alignment and initial position, and Without motion use
 serializable props and children and can be composed in a Server Component.
-Changing slides needs a client caller for state and handlers. API and plugins
+Changing slides and Content updates need a client caller for state and handlers. API and plugins
 needs a client caller for hooks, `setApi`, plugin lifecycle functions and
 external navigation; Custom controls needs one for `useCarousel` and its
 handlers. Refs, function-valued options and Button render/state callbacks
@@ -600,6 +605,60 @@ export function ChangingExample() {
 }
 ```
 
+## Content updates
+
+A plain string or number passed directly to `CarouselItem` is the one case Cadence animates inside a slide: text changes in place and finite numbers roll. Any other slide content stays yours to compose. Here both slides change at once; only the visible one plays, and the offscreen one simply reaches its latest value.
+
+<ComponentExample name="content" />
+
+```tsx
+"use client";
+
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+import { Button } from "@/components/cadence/button";
+import { useState } from "react";
+
+export function ContentExample() {
+  const [step, setStep] = useState(0);
+  const label = ["Kickoff", "Review", "Release"][step];
+  const count = [3, 7, 12][step];
+  return (
+    <div className="grid w-full max-w-lg gap-4">
+      <div className="flex justify-center">
+        <Button size="sm" variant="outline" onClick={() => setStep((step + 1) % 3)}>
+          Update slide content
+        </Button>
+      </div>
+      <div className="px-12 py-12">
+        <Carousel
+          aria-label="Content updates"
+          tabIndex={0}
+          opts={{ align: "start" }}
+          className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <CarouselContent className="touch-pan-y">
+            <CarouselItem
+              aria-label="Stage 1 of 2"
+              className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold"
+            >
+              {label}
+            </CarouselItem>
+            <CarouselItem
+              aria-label="Stage 2 of 2"
+              className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold"
+            >
+              {count}
+            </CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+    </div>
+  );
+}
+```
+
 ## API and plugins
 
 Use the real Embla API for external navigation and subscribe with cleanup. A stable lifecycle-only plugin reports readiness without adding animation. This example also keeps a native narrow-screen duration override; reduced/none clamp its interpolation. Install Button for the external action.
@@ -894,7 +953,7 @@ export function WithoutMotionExample() {
 | --- | --- |
 | Root | Native div props/ref; `orientation="horizontal"` (or `vertical`); `opts` and `plugins` use Embla types; `setApi(api)` receives the public instance. |
 | Track | Native div props/ref/style/classes target the **inner track**. Its fixed overflow-hidden outer viewport owns the `carousel-content` slot and Embla ref. |
-| Slide | Native div props/ref; group/slide semantics. Default full basis; caller classes size each slide. |
+| Slide | Native div props/ref; group/slide semantics. Default full basis; caller classes size each slide. A direct plain string or number child is the only display content Cadence owns; wrap rich content in elements. |
 | Previous / Next | All Button props, including render, ref, state callback classes/styles and events. Defaults: outline, icon-sm. Caller disabled/onClick override the navigation defaults as upstream does. |
 | Context hook | Context with API, viewport ref, original options, orientation, navigation functions and canScroll states. Throws outside Carousel. |
 | API type | Exported Embla instance type (possibly undefined before initialization). |
@@ -907,15 +966,17 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 
 ## Motion contract
 
-Authored intensity is **medium**: The existing Embla owner slides the collection while native drag and final slide position remain authoritative.
+Authored intensity is **medium**: Embla owns collection travel and the final snap, while one root opacity envelope and direct slide display changes stay local to their parts.
 
 | Phase | Recipe | Behaviour |
 | --- | --- | --- |
-| Enter / exit | — | No authored entrance or removal animation. |
+| Enter | `enter.pop/one-shot` | One short opacity envelope on the outer root when the carousel is inserted independently. Navigation, re-initialisation and retained surfaces never replay it, and nested slide content inserted with the surface shares that cause instead of adding a second entrance. |
 | Interaction | `data.transition/one-shot` | `data.transition/one-shot`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
 | Interruption | — | Next/previous/drag retarget Embla's existing location and velocity. Release uses the effective base clock, including breakpoint options, instead of a hard-coded release duration. |
-| Reduced | — | Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
-| None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
+| Reduced | — | The opacity envelope stays as short local feedback. Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
+| None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests, and no entrance opacity, delay or transition. |
+| Slide text | `text.change/changed-runs` | A direct plain string CarouselItem child changes in place without re-laying out the slide; rich slide trees and unchanged text remain composed and do not replay. A change observed while the slide is outside the viewport reaches its latest value immediately. |
+| Slide number | `number.roll/reels` | A direct finite number CarouselItem child rolls compactly between values; formatted, formatted-string or rich numeric content stays caller-composed. |
 | Buttons | — | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
 
 A mode downgrade settles autonomous navigation without resetting selection. A held drag keeps its
@@ -947,9 +1008,12 @@ Size slides with basis utilities and pair inner negative margins with slide padd
 tracks require an explicit height. Set touch-pan-y on horizontal tracks and touch-pan-x on
 vertical tracks to preserve cross-axis page scrolling. Leave room for controls outside the viewport.
 Embla observes viewport/slide geometry and slide mutations, reinitializing snaps as needed;
-options/plugins reinitialize through the native React adapter. No layout reads happen in render.
-SSR renders static first-slide markup, then Embla initializes after hydration. No autoplay,
-virtualization or per-slide Motion instances are bundled. Only track transforms animate.
+options/plugins reinitialize through the native React adapter. No layout reads happen in render: a
+direct display change asks Embla's own cached slide-view records at commit instead of adding an
+observer or per-frame measurement. SSR renders static first-slide markup, then Embla initializes
+after hydration. No autoplay, virtualization or per-slide Motion instances are bundled. Embla alone
+writes the track transform; Cadence adds only the outer-root opacity envelope and the direct
+text/number paint of a plain slide child.
 
 ## Notes for AI
 
