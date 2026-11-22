@@ -1,6 +1,6 @@
 # Sidebar motion contract
 
-Status: target design; desktop offcanvas/icon size-linked projection and a safe completion-gated plain-label envelope are implemented. The two paint regions (`sidebar.item.colour`, `sidebar.surface.colour`) and the plain `showOnHover` action channel (`sidebar.action.enter`, `sidebar.action.exit`) are implemented on their real parts with the actual-region gate and three-mode tests (`tests/components/sidebar.test.tsx`, `.cache/sidebar-s2/`). The desktop container/gap geometry is proven on both sides, on the icon rail, on every variant, on an in-flight reversal, on a live downgrade and across a breakpoint change (`tests/e2e/sidebar-s1-geometry.spec.ts`). The remaining capabilities/acceptance are pending; migration remains legacy.
+Status: target design; desktop offcanvas/icon size-linked projection, a safe completion-gated plain-label envelope, the two paint regions (`sidebar.item.colour`, `sidebar.surface.colour`), the plain `showOnHover` action channel (`sidebar.action.enter`, `sidebar.action.exit`), changed plain labels/string badges (`sidebar.label.replace`), plain numeric badge reels (`sidebar.badge.change`) and the mobile Sheet composition are implemented. Each is exercised on its real parts with the actual-region gate and three-mode tests (`tests/components/sidebar.test.tsx`). The desktop container/gap geometry is proven on both sides, on the icon rail, on every variant, on an in-flight reversal, on a live downgrade and across a breakpoint change (`tests/e2e/sidebar-s1-geometry.spec.ts`); the changed label, changed count and mobile Sheet matrix is recorded in `.cache/sidebar-s3/`. Migration remains legacy: `meta.motionMigration` is not set because the desktop geometry, label-envelope and mobile bindings still have no executed v2 action receipts, only the shipped legacy contract.
 
 Sidebar preserves spatial orientation while changing how much navigation is exposed. Offcanvas mode moves the existing desktop container; icon mode changes the occupied width and reveals labels only when space is usable. Mobile delegates to its existing Sheet composition. Route changes do not replay the sidebar.
 
@@ -83,6 +83,12 @@ SidebarTrigger and SidebarInput keep native Button/Input contracts.
 Header/Footer/Content/GroupContent are structural child hosts, not a recursively rewritten text model.
 The labels binding covers the GroupLabel and MenuButton label regions only; MenuAction collapse/hover paint stays with its action owner rather than joining that envelope. Collapse visibility stays
 CSS-authored (`group-data-[collapsible=icon]:hidden`) so the sidebar never owns a second opacity.
+The lane itself is published once as a provider fact — desktop expanded, or the mobile Sheet open —
+so a label settles its current value instead of re-reading geometry or starting work it cannot finish.
+A MenuButton label that is a direct primitive or a final plain span keeps the caller's element and
+ref; a caller-authored tree (links, refs, selection, extra siblings) is composed and keeps native
+text. A plain numeric badge rolls changed places; a formatted badge string stays text and a
+formatted/rich numeric badge needs an explicit composed owner.
 MenuAction's hover visibility and collapse visibility have one opacity owner: focus/open state settles
 its usable presentation immediately, and collapse/teardown invalidates a pending hover completion.
 
@@ -127,8 +133,10 @@ span and overflow viewport. These real regions lay out at the destination width.
 or interactive label shapes use immediate native expansion; known composed submenus keep their
 required content on immediate native geometry. Current collapse semantics remove the
 safe label lane immediately, so label paint settles rather than prolonging a fade. Item/surface
-colour and the plain `showOnHover` action channel are implemented; changed-run text, reels, composed
-badge numbers and the mobile composition are not.
+colour, the plain `showOnHover` action channel, changed plain labels and string badges, place-value
+rolling for plain numeric badges and the mobile Sheet composition are implemented. A composed or
+formatted badge number keeps its caller's numeric owner; it is never parsed out of a formatted
+string.
 
 The continuous page-inset reflow below remains subordinate to the shared focused-editor rule.
 Before a known collapse transaction, check the actual owned Sidebar/Inset focus region: if the
@@ -151,7 +159,10 @@ Navigation labels lay out at their destination inline-size before the separate s
   while labels change. The shell never waits for opacity; unusable label paint settles, the latest
   hidden text does not animate, and a retired reveal cannot expose collapsed content. Repeat with
   full-mode zero clock, live reduction and a focus action during expansion, preserving accessible
-  names and the same coupled container/gap owner.
+  names and the same coupled container/gap owner. The changed-label half is now exercised: a label
+  update while the lane is hidden establishes content with no run and a later expansion reveals it
+  (`tests/components/sidebar.test.tsx`, `.cache/sidebar-s3/`). Still open: slowing that fade against
+  the size preset and the focus action during expansion.
 
 - Pending: collapse from an external control while a SidebarInput or known Inset editor remains
   focused, and toggle during a captured resize/control interaction. The dependent scalar settles
@@ -169,12 +180,12 @@ Navigation labels lay out at their destination inline-size before the separate s
   new extent, a live downgrade to reduced/none mid-collapse, and a
   breakpoint change that retires the desktop projection before the Sheet mounts. Screenshots for the
   matrix (both sides × light/dark × narrow/wide × three modes) are written to `.cache/sidebar-s1/`.
-- Pending: resize across the mobile breakpoint during motion, reopen Sheet and navigate a route; no double entrance or stale transform remains. The desktop half is proven above: the panel unmounts and no running animation survives into the Sheet.
-- Pending: change a plain badge/label, use sidebar-input and keyboard navigation while collapsed, and verify accessibility/hit regions.
-- Pending: verify all modes, zero clock, live downgrade, SSR initial state and unmount during desktop/mobile exit. Live downgrade of the coupled geometry itself is proven above; the SSR and mobile-exit halves remain open.
+- Pending: resize across the mobile breakpoint during motion, reopen Sheet and navigate a route; no double entrance or stale transform remains. The desktop half is proven above: the panel unmounts and no running animation survives into the Sheet. The mobile half is now recorded: opening and closing the Sheet from the trigger inherits its own edge entry/exit with no desktop animation alongside it, and a breakpoint change retires the desktop projection before the panel mounts (`.cache/sidebar-s3/mobile-*`). Still open: navigating a route while the Sheet is mid-exit.
+- Proven: change a plain badge/label, use sidebar-input and keyboard navigation while collapsed, and verify accessibility/hit regions. `tests/components/sidebar.test.tsx` updates a plain GroupLabel, a MenuButton label, a string badge and a plain numeric badge in place and confirms the input keeps its native editing surface in full, reduced and none; `.cache/sidebar-s3/` holds the label and badge matrix across both OS preferences and light/dark.
+- Pending: verify all modes, zero clock, live downgrade, SSR initial state and unmount during desktop/mobile exit. Live downgrade of the coupled geometry itself is proven above, and the changed label/count halves settle immediately under reduced and none. The SSR and mobile-exit halves remain open.
 - Partly proven: change side, width tokens or available space during a toggle, including floating/inset variants. Both sides and the three variants resolve from the actual variables, and a `--sidebar-width` change issued mid-collapse retires the running projection, lands on the new extent without a stale transform, and is the extent a later toggle resolves (above). Still open: changing the available page space under a constrained shell, and proving no temporary page overlap survives it.
 
-- Pending: update string and numeric badges, showOnHover actions and inherited menu skeletons while collapsing or changing theme/mode; no duplicate colour/pulse, invisible focused action or stale hover completion survives. The colour half is exercised for the real menu button, action, rail, group label and badge in all three modes by `tests/components/sidebar.test.tsx`, including a collapse that retires a pending pointer reveal; changed text, reels and a live theme switch during a badge update remain open.
+- Pending: update string and numeric badges, showOnHover actions and inherited menu skeletons while collapsing or changing theme/mode; no duplicate colour/pulse, invisible focused action or stale hover completion survives. The colour half is exercised for the real menu button, action, rail, group label and badge in all three modes by `tests/components/sidebar.test.tsx`, including a collapse that retires a pending pointer reveal; the changed label/count half is exercised there too, including a hidden lane that establishes content without work. Still open: a live theme switch during a badge update.
 - Pending: switch to reduced during collapse plus label/action/text feedback, and edit a positive clock mid-toggle. Coupled geometry stays coherent, permitted short paint remains eligible, collapsed content stays hidden and no owner restarts from an old target. None/zero settles one-shot work without breaking native Sheet completion or substituting the recipe clock for Skeleton's theme clock.
 - Partly proven: focus a menu action or SidebarInput during shell/item theme feedback, then invalidate an
   actual owner. Its whole paint and the paint of actual focused-containing regions settle; an independent
