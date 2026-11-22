@@ -2,10 +2,11 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { fr } from "date-fns/locale";
 import { TZDate } from "react-day-picker";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { DatePickerDemo } from "@/registry/cadence/date-picker";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 const date = new Date(2026, 10, 12);
 describe("Date Picker composition", () => {
@@ -102,4 +103,98 @@ describe("Date Picker composition", () => {
     expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: "trigger-press" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
+});
+
+const november = new Date(2026, 10, 12);
+const december = new Date(2026, 11, 1);
+const january = new Date(2027, 0, 1);
+const longest = new Date(2029, 8, 30);
+const triggerPaint = [
+  { color: "#111827", backgroundColor: "#ffffff" },
+  { color: "#f8fafc", backgroundColor: "#1e293b" },
+];
+const panelPaint = [{ backgroundColor: "#ffffff" }, { backgroundColor: "#eef2ff" }];
+
+type Frame = { open: boolean; value: Date; month: Date; months: number; trigger: number; panel: number };
+type OpenChange = NonNullable<React.ComponentProps<typeof DatePickerDemo>["onOpenChange"]>;
+
+describe("Date Picker v2 owners", () => {
+  // A cold catalogue-wide source/contract audit; a hang guard, not a performance budget.
+  beforeAll(() => prepareV2MotionPlan(), 300_000);
+
+  it.each(["full", "reduced", "none"] as const)(
+    "executes every inherited owner on the real composition in %s",
+    async (mode) => {
+      const owned = (binding: string, exercise: () => void | Promise<void>) =>
+        expectV2MotionAction("date-picker", binding, mode, exercise).catch((error) => {
+          throw new Error(`${binding} in ${mode}: ${(error as Error).message}`);
+        });
+      let frame: Frame = { open: true, value: longest, month: november, months: 1, trigger: 0, panel: 0 };
+      let view: ReturnType<typeof render>;
+      const scene = () => (
+        <CadenceProvider mode={mode} timeScale={0}>
+          <DatePickerDemo
+            mode="single"
+            value={frame.value}
+            open={frame.open}
+            onOpenChange={onOpenChange}
+            onValueChange={() => {}}
+            calendarProps={{ today: november, month: frame.month, numberOfMonths: frame.months }}
+            triggerProps={{ style: triggerPaint[frame.trigger] }}
+            contentProps={{ style: panelPaint[frame.panel] }}
+          />
+        </CadenceProvider>
+      );
+      // Keep the closing surface so Popover's own presence decides when the portal node
+      // leaves the DOM; the block's entrance is measured on that retained node.
+      const onOpenChange: OpenChange = (next, details) => {
+        if (!next) details.preventUnmountOnClose();
+        frame = { ...frame, open: next };
+        view.rerender(scene());
+      };
+      const update = (next: Partial<Frame>) => {
+        frame = { ...frame, ...next };
+        view.rerender(scene());
+      };
+
+      view = render(scene());
+      const user = userEvent.setup();
+      const trigger = screen.getByRole("button", { name: /Choose date:/ });
+      const grid = await screen.findByRole("grid");
+
+      // A formatted label change resizes the retained trigger box Button measures.
+      await owned("date-picker.trigger.resize", () => update({ value: november }));
+      expect(trigger).toHaveTextContent("November 12th, 2026");
+
+      // Caller paint on that same trigger host stays Button's own colour clock.
+      await owned("date-picker.trigger.colour", () => update({ trigger: 1 }));
+
+      // One committed month change paints the retained table, then commits one shell height.
+      await owned("date-picker.grid.change", () => update({ month: december }));
+      expect(screen.getByRole("grid")).toBe(grid);
+      await owned("date-picker.month.resize", () => update({ month: january }));
+      expect(screen.getByRole("grid")).toBe(grid);
+
+      // The retained navigation button owns one scoped paint family on its own host.
+      const previous = document.querySelector<HTMLElement>('[data-slot="calendar-nav-previous"]');
+      await owned("date-picker.navigation.colour", () => {
+        if (previous) previous.style.backgroundColor = "#eef2ff";
+      });
+
+      // The panel surface stays Popover's own colour owner under caller paint.
+      await owned("date-picker.popup.colour", () => update({ panel: 1 }));
+
+      // Real content growth resizes the mounted panel through Popover's measured shell.
+      await owned("date-picker.popup.resize", () => update({ months: 2 }));
+
+      // Close, then reopen on the retained surface: that is the panel's only entrance.
+      await user.keyboard("{Escape}");
+      await owned("date-picker.popup.enter", () => update({ open: true }));
+      await screen.findByRole("dialog");
+
+      await expectV2NativeBoundaries("date-picker", { container: view.container });
+      expectMotionContract(mode, { root: view.container, policy: ["color"] });
+      view.unmount();
+    },
+  );
 });
