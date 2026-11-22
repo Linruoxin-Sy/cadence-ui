@@ -612,6 +612,9 @@
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
         "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
         "@cadence/button"
       ],
       "files": [
@@ -626,11 +629,28 @@
         "tier": "T5",
         "batch": "B9",
         "motion": [
+          "data.transition",
+          "exit.fade",
           {
             "recipe": "data.transition",
             "form": "continuous"
           },
-          "feedback.press"
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
         ],
         "intensity": "subtle",
         "complexity": "M",
@@ -644,23 +664,88 @@
           "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Progress feedback stays within the attachment; it introduces no upload state or surface choreography."
+          "reason": "Attachment coordinates one tile's presence, supplied media/state envelope, busy title, changed display text, direct quantities and its own measured box; the group keeps native scroll and snap placement."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment integrates its tile entrance, the later media/action regions and the current supplied media visual and state envelope; composed controls and rich child content retain their native owners."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "AttachmentAction mounts Button on the same host, so Button keeps its own label and root transition instead of a second attachment writer."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment integrates the tile exit and the media/action region exit on the same retained hosts; no outgoing interactive copy is created."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "AttachmentAction keeps Button's own retained exit; Attachment never wraps the action host in a second opacity writer."
+              }
+            ],
             "data.transition/continuous": [
               {
                 "relationship": "default",
                 "owner": "attachment",
-                "reason": "Attachment integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "Attachment runs the busy title pulse through the shared continuous policy on the title's single opacity owner."
               }
             ],
-            "feedback.press/one-shot": [
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment owns its own content/orientation-driven box after commitment; the group writes no tile geometry and an explicit caller axis stays native."
+              },
               {
                 "relationship": "inherited",
                 "owner": "button",
-                "reason": "Attachment mounts button for press feedback; that installed component remains the integration owner."
+                "reason": "AttachmentAction keeps Button's committed label box; Attachment measures only its own tile and never the shared action host."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment replaces changed runs in the plain filename and description displays; composed rich metadata keeps its own owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "AttachmentAction's label text stays Button's own changed-run owner; Attachment replaces only its filename and description displays."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment reels direct display quantities in the description; names, extensions, ids and composed progress remain textual or composed."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "AttachmentAction's numeric label content stays Button's own reel owner; Attachment reels only its direct description quantity."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment owns the tile and media surface-foreground paint plus explicit title and description foreground; AttachmentAction delegates to Button."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "AttachmentAction keeps Button's scoped colour clock on the same host; Attachment never writes the action surface or foreground."
               }
             ]
           }
