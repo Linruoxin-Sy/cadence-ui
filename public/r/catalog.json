@@ -1674,13 +1674,25 @@
       "@cadence/button",
       "@cadence/cadence-motion",
       "@cadence/cadence-utils",
-      "@cadence/cadence-provider"
+      "@cadence/cadence-provider",
+      "@cadence/cadence-text",
+      "@cadence/cadence-number",
+      "@cadence/cadence-surface-presence"
     ],
     "since": "0.4.0",
     "tier": "T4",
     "batch": "B6",
     "motion": [
-      "data.transition"
+      "data.transition",
+      "enter.pop",
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
+      }
     ],
     "intensity": "medium",
     "complexity": "M",
@@ -1693,7 +1705,7 @@
       "scope": "collection",
       "travel": "extended",
       "coordination": "independent",
-      "reason": "The existing Embla owner slides the collection while native drag and final slide position remain authoritative."
+      "reason": "Embla owns collection travel and the final snap, while one root opacity envelope and direct slide display changes stay local to their parts."
     },
     "motionCoverage": {
       "schema": 1,
@@ -1702,12 +1714,43 @@
           {
             "relationship": "default",
             "owner": "carousel",
-            "reason": "Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+            "reason": "Carousel's clock adapter releases the existing content/data/status phase through the reached installed executor at its own track."
           },
           {
             "relationship": "inherited",
             "owner": "button",
             "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
+          }
+        ],
+        "enter.pop/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "carousel",
+            "reason": "Carousel integrates the surface executor as one opacity envelope on its outer root; the Embla track transform keeps its single writer."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "carousel",
+            "reason": "CarouselItem integrates the executor for a direct plain string child only; arbitrary slide trees remain composed and unchanged text does not replay."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The composed previous/next controls reach button's installed text.change/changed-runs owner through their own label; this is inherited execution, not a second local writer."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "carousel",
+            "reason": "CarouselItem integrates the compact reel executor for a direct finite number child only; formatted or rich numeric content stays caller-composed."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The composed previous/next controls reach button's installed number.roll/reels owner through their own label; this is inherited execution, not a second local writer."
           }
         ]
       }

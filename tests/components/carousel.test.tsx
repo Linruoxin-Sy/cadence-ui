@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
   useCarousel,
 } from "@/registry/cadence/carousel";
+import { createPresentationScope, MotionPresentation } from "@/registry/cadence/lib/motion-presence";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
@@ -250,5 +251,147 @@ describe("Carousel", () => {
     expect(second[1][0]).toBe(first[1][0]);
     expect(engine.internals.animation.render).toHaveBeenCalledWith(1);
     first[1][0].destroy();
+  });
+  for (const mode of ["full", "reduced", "none"] as const)
+    it(`replaces a direct slide text and rolls a direct number in ${mode}`, () => {
+      const draw = (label: string, count: number) => (
+        <CadenceProvider mode={mode} timeScale={0}>
+          <Carousel aria-label="Projects">
+            <CarouselContent>
+              <CarouselItem>{label}</CarouselItem>
+              <CarouselItem>{count}</CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </CadenceProvider>
+      );
+      const view = render(draw("Draft", 3));
+      const text = view.container.querySelector('[data-slot="carousel-item-text"]');
+      const number = view.container.querySelector('[data-slot="carousel-item-number"]');
+      expect(text).toBeTruthy();
+      expect(number).toBeTruthy();
+      const painted = text?.firstChild;
+      view.rerender(draw("Ready", 8));
+      // The host keeps one paint identity: the same text node, never a re-mount.
+      expect(text?.firstChild).toBe(painted);
+      expect(text).toHaveTextContent("Ready");
+      expect(number).toHaveTextContent("8");
+      expectMotionContract(mode, {
+        behavior: () => {
+          expect(text).toHaveTextContent("Ready");
+          expect(number).toHaveTextContent("8");
+        },
+      });
+      view.unmount();
+    });
+  for (const mode of ["full", "reduced", "none"] as const)
+    it(`enters with one opacity envelope in ${mode} and never replays on navigation`, () => {
+      const animate = vi.fn((_frames: Keyframe[], _timing: KeyframeAnimationOptions) => ({
+        effect: { setKeyframes: () => {}, getKeyframes: () => [] },
+        cancel: vi.fn(),
+        play: () => {},
+        pause: () => {},
+        finish: () => {},
+        playState: "finished",
+        currentTime: 0,
+        startTime: 0,
+        finished: Promise.resolve(),
+        ready: Promise.resolve(),
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      }));
+      const previous = Element.prototype.animate;
+      Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+      const scope = createPresentationScope();
+      const draw = (inserted: boolean) => (
+        <CadenceProvider mode={mode} timeScale={2}>
+          <MotionPresentation scope={scope}>
+            {inserted ? (
+              <Carousel aria-label="Projects">
+                <CarouselContent>
+                  <CarouselItem>One</CarouselItem>
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            ) : (
+              <span>Earlier content</span>
+            )}
+          </MotionPresentation>
+        </CadenceProvider>
+      );
+      try {
+        const view = render(draw(false));
+        view.rerender(draw(true));
+        const root = view.container.querySelector('[data-slot="carousel"]') as HTMLElement;
+        if (mode === "none") {
+          expect(animate).not.toHaveBeenCalled();
+          expect(root).not.toHaveStyle({ opacity: "0" });
+        } else {
+          expect(animate).toHaveBeenCalledOnce();
+          const [keys, timing] = animate.mock.lastCall as [Keyframe[], KeyframeAnimationOptions];
+          expect(keys.map((frame) => Object.keys(frame ?? {}))).toEqual([["opacity"], ["opacity"]]);
+          expect(timing).toMatchObject({ fill: "both" });
+          expect(timing.duration).toBeGreaterThan(0);
+        }
+        // A directly manipulated surface settles the entrance instead of stacking.
+        if (mode !== "none") animate.mock.results.at(-1)?.value.cancel.mockClear();
+        fireEvent.pointerDown(root);
+        if (mode !== "none") expect(animate.mock.results.at(-1)?.value.cancel).toHaveBeenCalled();
+        // Navigation never replays the insertion envelope.
+        fireEvent.click(screen.getByRole("button", { name: "Next slide" }));
+        if (mode !== "none") expect(animate).toHaveBeenCalledOnce();
+        expectMotionContract(mode, {
+          behavior: () => expect(engine.api.scrollNext).toHaveBeenCalled(),
+        });
+        view.unmount();
+      } finally {
+        Element.prototype.animate = previous;
+      }
+    });
+  it("resolves slide display changes against the engine's own view records", () => {
+    const draw = (label: string, count: number) => (
+      <CadenceProvider mode="full" timeScale={1}>
+        <Carousel aria-label="Projects">
+          <CarouselContent>
+            <CarouselItem>{label}</CarouselItem>
+            <CarouselItem>{count}</CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </CadenceProvider>
+    );
+    const view = render(draw("Draft", 3));
+    const items = Array.from(view.container.querySelectorAll('[data-slot="carousel-item"]'));
+    const inView = vi.fn(() => [0]);
+    Object.assign(engine.api, { slideNodes: () => items, slidesInView: inView });
+    const offscreen = view.container.querySelector('[data-slot="carousel-item-number"]');
+    view.rerender(draw("Draft", 8));
+    expect(inView).toHaveBeenCalled();
+    expect(offscreen).toHaveTextContent("8");
+    expect(view.container.querySelector('[data-slot="carousel-item-text"]')).toHaveTextContent("Draft");
+    delete (engine.api as { slideNodes?: unknown }).slideNodes;
+    delete (engine.api as { slidesInView?: unknown }).slidesInView;
+    view.unmount();
+  });
+  it("keeps rich slide trees outside the direct display owners", () => {
+    const view = render(
+      <Carousel aria-label="Projects">
+        <CarouselContent>
+          <CarouselItem>
+            <strong>Rich</strong> content
+          </CarouselItem>
+          <CarouselItem>
+            <span>4.5</span>
+          </CarouselItem>
+        </CarouselContent>
+      </Carousel>,
+    );
+    expect(view.container.querySelector('[data-slot="carousel-item-text"]')).toBeNull();
+    expect(view.container.querySelector('[data-slot="carousel-item-number"]')).toBeNull();
+    expect(view.container.querySelector("strong")).toBeTruthy();
+    view.unmount();
   });
 });
