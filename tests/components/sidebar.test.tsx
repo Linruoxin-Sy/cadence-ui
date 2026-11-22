@@ -538,3 +538,199 @@ describe("Sidebar action visibility", () => {
     expect(action).not.toHaveAttribute("data-action-exiting");
   });
 });
+
+type ChangeMode = "full" | "reduced" | "none";
+
+function ChangeExample({
+  mode = "full",
+  open = true,
+  label = "My projects",
+  menu = "Projects",
+  status = "New",
+  count = 3,
+  caller,
+}: {
+  mode?: ChangeMode;
+  open?: boolean;
+  label?: string;
+  menu?: string;
+  status?: string;
+  count?: number;
+  caller?: React.Ref<HTMLSpanElement>;
+}) {
+  return (
+    <CadenceProvider mode={mode}>
+      <SidebarProvider open={open}>
+        <Sidebar collapsible="icon">
+          <SidebarGroup>
+            <SidebarGroupLabel>{label}</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton>
+                  <svg aria-hidden="true" />
+                  <span ref={caller} className="caller-label">
+                    {menu}
+                  </span>
+                </SidebarMenuButton>
+                <SidebarMenuBadge aria-label={`${count} unread`}>{count}</SidebarMenuBadge>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton>Preferences</SidebarMenuButton>
+                <SidebarMenuBadge>{status}</SidebarMenuBadge>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        </Sidebar>
+        <SidebarTrigger />
+      </SidebarProvider>
+    </CadenceProvider>
+  );
+}
+
+/** The latest committed sample of one presentation host. */
+function latest(node: Element) {
+  return [...presentationSamples.values()].filter((sample) => sample.node === node).at(-1);
+}
+
+describe("Sidebar changed labels and counts", () => {
+  it.each(["full", "reduced", "none"] as const)("replaces plain labels and string badges in place in %s", (mode) => {
+    const caller = vi.fn();
+    const { container, rerender } = render(<ChangeExample mode={mode} caller={caller} />);
+    const groupLabel = slot(container, "sidebar-group-label");
+    const groupSpan = slot(container, "sidebar-group-label-text");
+    const menuSpan = container.querySelector(".caller-label") as HTMLElement;
+    const statusSpan = slot(container, "sidebar-menu-badge-text");
+    expect(groupSpan).toHaveTextContent("My projects");
+    expect(menuSpan).toHaveTextContent("Projects");
+    expect(statusSpan).toHaveTextContent("New");
+    expect(caller).toHaveBeenCalledWith(menuSpan);
+    rerender(<ChangeExample mode={mode} caller={caller} label="All projects" menu="Archive" status="Done" />);
+    // The caller's own element and props survive; only its text moved.
+    expect(container.querySelector(".caller-label")).toBe(menuSpan);
+    expect(menuSpan).toHaveClass("caller-label");
+    expect(groupLabel).toHaveAttribute("data-motion", mode);
+    expect(groupSpan).toHaveTextContent("All projects");
+    expect(menuSpan).toHaveTextContent("Archive");
+    expect(statusSpan).toHaveTextContent("Done");
+    for (const node of [groupSpan, menuSpan, statusSpan]) {
+      expect(node).toHaveAttribute("data-motion-lane", "usable");
+      expect(latest(node)).toMatchObject({ form: "text.change/changed-runs", mode });
+    }
+    expect(latest(groupSpan)?.target).toBe("All projects");
+    expect(latest(statusSpan)?.target).toBe("Done");
+    expectMotionContract(mode, {
+      forms: ["text.change/changed-runs"],
+      ownerLocal: [groupSpan, menuSpan, statusSpan],
+      behavior: () => {
+        expect(groupSpan.textContent).toBe("All projects");
+        expect(menuSpan.textContent).toBe("Archive");
+      },
+    });
+  });
+
+  it.each(["full", "reduced", "none"] as const)("rolls a plain numeric badge in place in %s", (mode) => {
+    const { container, rerender } = render(<ChangeExample mode={mode} count={3} />);
+    const countSpan = slot(container, "sidebar-menu-badge-count");
+    const badge = slot(container, "sidebar-menu-badge");
+    expect(countSpan).toHaveTextContent("3");
+    expect(badge).toHaveAttribute("aria-label", "3 unread");
+    rerender(<ChangeExample mode={mode} count={5} />);
+    expect(countSpan).toHaveTextContent("5");
+    expect(latest(countSpan)).toMatchObject({ form: "number.roll/reels", mode, target: "5" });
+    // A newer count retargets the same places instead of queueing the older value.
+    rerender(<ChangeExample mode={mode} count={9} />);
+    rerender(<ChangeExample mode={mode} count={4} />);
+    expect(countSpan).toHaveTextContent("4");
+    expect(latest(countSpan)?.target).toBe("4");
+    const reel = parameterCalls.filter((call) => call.form === "number.roll/reels").at(-1);
+    expect(reel).toMatchObject({ mode });
+    const clock =
+      (reel?.result as { transition?: { duration: number } } | undefined)?.transition?.duration ?? Number.NaN;
+    // Reduced and none settle the count immediately; no reel survives that mode.
+    expect(clock === 0).toBe(mode !== "full");
+    expectMotionContract(mode, {
+      forms: ["number.roll/reels"],
+      ownerLocal: [countSpan],
+      behavior: () => expect(countSpan.textContent).toBe("4"),
+    });
+  });
+
+  it.each(["full", "reduced", "none"] as const)("settles a hidden lane and reveals the latest value in %s", (mode) => {
+    const { container, rerender } = render(<ChangeExample mode={mode} open={false} />);
+    const groupSpan = slot(container, "sidebar-group-label-text");
+    const countSpan = slot(container, "sidebar-menu-badge-count");
+    // A collapsed icon rail hides the lane before any paint can be defended.
+    expect(groupSpan).toHaveAttribute("data-motion-lane", "hidden");
+    expect(countSpan).toHaveAttribute("data-motion-lane", "hidden");
+    rerender(<ChangeExample mode={mode} open={false} label="All projects" count={8} />);
+    // The hidden lane still establishes the current value, without visual work.
+    expect(groupSpan).toHaveTextContent("All projects");
+    expect(countSpan).toHaveTextContent("8");
+    expect(latest(groupSpan)?.target).toBe("All projects");
+    expect(latest(countSpan)?.target).toBe("8");
+    rerender(<ChangeExample mode={mode} open label="All projects" count={8} />);
+    expect(groupSpan).toHaveAttribute("data-motion-lane", "usable");
+    // Expansion reveals the established value; the consumed update never replays.
+    expect(groupSpan).toHaveTextContent("All projects");
+    expect(countSpan).toHaveTextContent("8");
+  });
+
+  it("keeps rich labels, rich badges and link labels native", () => {
+    const click = vi.fn();
+    const { container, rerender } = render(
+      <CadenceProvider mode="full">
+        <SidebarProvider>
+          <Sidebar collapsible="icon">
+            <SidebarGroup>
+              <SidebarGroupLabel>
+                <span>Two</span>
+                <span>words</span>
+              </SidebarGroupLabel>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton render={<a href="#rich" />}>
+                    <span>Linked</span>
+                    <span>label</span>
+                  </SidebarMenuButton>
+                  <SidebarMenuBadge>
+                    <span>12</span>
+                  </SidebarMenuBadge>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton onClick={click}>Plain</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </Sidebar>
+        </SidebarProvider>
+      </CadenceProvider>,
+    );
+    expect(slot(container, "sidebar-group-label-text")).toBeNull();
+    expect(slot(container, "sidebar-menu-badge-text")).toBeNull();
+    expect(slot(container, "sidebar-menu-badge-count")).toBeNull();
+    const link = screen.getByRole("link", { name: "Linked label" });
+    expect(link).toHaveAttribute("href", "#rich");
+    // A rich caller tree keeps native text; a direct primitive still owns its label.
+    expect(link.querySelector('[data-slot="sidebar-menu-button-label"]')).toBeNull();
+    expect(link.querySelector(".caller-label")).toBeNull();
+    expect(screen.getByRole("button", { name: "Plain" })).toHaveAttribute("data-slot", "sidebar-menu-button");
+    expect(
+      screen.getByRole("button", { name: "Plain" }).querySelector('[data-slot="sidebar-menu-button-label"]'),
+    ).not.toBeNull();
+    rerender(
+      <CadenceProvider mode="full">
+        <SidebarProvider>
+          <Sidebar collapsible="icon">
+            <SidebarGroup>
+              <SidebarGroupLabel>
+                <span>Other</span>
+                <span>words</span>
+              </SidebarGroupLabel>
+            </SidebarGroup>
+          </Sidebar>
+        </SidebarProvider>
+      </CadenceProvider>,
+    );
+    expect(screen.getByText("Other")).toBeInTheDocument();
+  });
+});

@@ -24,7 +24,7 @@
     "changing-content",
     "quantities"
   ],
-  "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
+  "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data", "later-insertion"],
   "toc": ["nested", "controlled", "scroll-tracking"],
   "input": ["invalid", "file", "controlled", "disabled-readonly"],
   "textarea": ["auto-growing", "resizable", "rows-revision", "invalid", "disabled-readonly", "controlled"],
@@ -267,6 +267,7 @@
     "sub-navigation",
     "loading-navigation",
     "caller-updates",
+    "changing-labels",
     "custom-parts",
     "without-motion"
   ],

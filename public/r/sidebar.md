@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/sidebar`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: layout.move, geometry.resize, data.transition, state.color, exit.fade
+- Motion recipes: layout.move, geometry.resize, data.transition, state.color, exit.fade, text.change, number.roll
 
 ## Installation
 
@@ -1837,6 +1837,106 @@ export function Example() {
 }
 ```
 
+## Changing labels and counts
+
+A changed plain label replaces its changed graphemes in place, so an untouched word keeps its identity
+while the rest of the row stays still. A plain numeric badge rolls only the digit places that
+changed, and a string badge is text, never a parsed count. A label update while the lane is hidden
+—a collapsed panel, or a closed mobile Sheet—establishes the current value without starting visual
+work, so nothing fades behind clip. Reduced keeps the short changed-run opacity and settles the count
+immediately; none does both at once. A formatted or rich badge needs an explicit composed numeric
+owner, and a MenuButton whose children are a link, ref or extra sibling keeps native text.
+
+Both bindings run only where the shared text engine proves the actual font: this example scopes a
+monospaced, feature-free face, because proportional kerning or OpenType feature settings keep exact
+native text. Tabular figures are measured rather than overridden, so a `tabular-nums` count still
+rolls; small caps, proportional and old-style figures do not.
+
+<ComponentExample name="changing-labels" />
+
+```tsx
+"use client";
+
+import { Home, Inbox } from "lucide-react";
+import { type CSSProperties, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+}) {
+  return (
+    <SidebarProvider
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className="relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)]"
+    >
+      {children}
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        {content ?? <p className="text-sm font-medium">Project overview</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function ChangingLabels() {
+  const [scope, setScope] = useState<"mine" | "all">("mine");
+  const [inbox, setInbox] = useState(3);
+  return (
+    <Frame
+      label="Changing labels"
+      content={
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={() => setScope((value) => (value === "mine" ? "all" : "mine"))}>
+            Switch scope
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setInbox((value) => (value + 1) % 4)}>
+            Receive item
+          </Button>
+        </div>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full font-mono [font-feature-settings:normal]">
+        <SidebarContent>
+          <nav aria-label="Changing labels">
+            <SidebarGroup>
+              <SidebarGroupLabel>{scope === "mine" ? "My projects" : "All projects"}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive>
+                      <Inbox aria-hidden="true" />
+                      <span>Inbox</span>
+                    </SidebarMenuButton>
+                    <SidebarMenuBadge aria-label={`${inbox} unread`}>{inbox}</SidebarMenuBadge>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>
+                      <Home aria-hidden="true" />
+                      <span>{scope === "mine" ? "Website" : "Website archive"}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <ChangingLabels />;
+}
+```
+
 ## Custom parts
 
 Base UI render accepts a native element; the anchor ref, native event and hash destination stay usable. The external focus action is desktop-only, where the link stays mounted. dir="rtl" follows the panel through its mobile portal. A tooltip props object configures the collapsed tooltip. This example deliberately supplies style.transform="none": caller ownership suppresses desktop offcanvas travel, so collapsing makes content inert without moving that caller-positioned surface. Manage its position yourself or omit transform for standard offcanvas behavior.
@@ -2119,7 +2219,7 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 
 ## Motion contract
 
-Authored intensity is **medium**: The reserved gap and panel position share a size-linked owner while destination-width labels stay readable.
+Authored intensity is **medium**: The reserved gap and panel position share a size-linked owner while destination-width labels stay readable, and plain labels and numeric badges change in place without travel.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -2128,6 +2228,8 @@ Authored intensity is **medium**: The reserved gap and panel position share a si
 | Safe icon label reveal | opacity after actual size completion | `data.transition/one-shot` | Yes, cancelled on reversal, input or invalidation. |
 | Item and surface paint | explicit background, text, border and shadow properties | `state.color/css-transition` | Yes, actual focus or invalid state settles that region; disjoint regions stay eligible. |
 | Pointer reveal and hide of a menu action | opacity on the action host | `data.transition/one-shot`, `exit.fade/one-shot` | Yes, one channel; focus/open settle it and collapse retires a pending reveal. |
+| Changed plain label or string badge | changed-run opacity on that label host | `text.change/changed-runs` | Yes, a newer value retargets the run and a hidden lane settles it. |
+| Changed plain numeric badge | place-value translation of changed digits | `number.roll/reels` | Yes, a newer count retargets the same places. |
 
 Full drives the actual gap and panel position from one clamped size spring. Initial state is native;
 there is no mounting reveal. Reduced, none and zero clock reach the current destinations immediately.
@@ -2165,6 +2267,16 @@ of their installed Button, Input, Separator and Skeleton owners; the sidebar add
 to those parts. SidebarSeparator delegates definite-length geometry and its other independent rule
 effects to Separator. Passive stretch remains native; these inherited effects do not migrate the
 remaining Sidebar contract.
+
+A plain group label, a MenuButton label that is a direct string or its final plain span, and a string
+badge own one changed-run channel each: only changed graphemes are replaced, an unchanged word keeps
+its identity, and rapid updates retarget instead of queueing. A caller-authored span keeps its
+element, props and ref. A direct numeric badge rolls only the digit places that changed, with carry
+and sign handled by the shared number semantics; a formatted or rich badge keeps its caller's numeric
+owner, and a badge string stays text. Reduced keeps the short changed-run opacity and settles counts
+immediately; none reaches both at once. While the label lane is hidden — the desktop panel collapsed,
+or the mobile Sheet closed — a changed label or count establishes the current value without starting
+its own visual work, and a later expansion reveals the established value.
 
 Mobile delegates `popup.anchored` / `exit.fade` to Sheet. Button press, tooltip popup and Skeleton pulse
 are owned by those dependencies, not extra Sidebar recipes. Their effective mode follows the provider.
@@ -2208,7 +2320,7 @@ values survive desktop state and motion-mode updates. Render only the navigation
 ## Notes for AI
 
 Keep the provider, navigation landmark and main content together. Use `render`, never `asChild`.
-Do not assume the cookie is read or desktop `open` controls the mobile sheet. Use an icon plus a plain final span for MenuButton labels to enable the safe expansion envelope. Rich labels retain immediate native expansion. Other v2 capabilities remain pending.
+Do not assume the cookie is read or desktop `open` controls the mobile sheet. Use an icon plus a plain final span for MenuButton labels to enable the safe expansion envelope and changed runs; a changed label settles while that lane is hidden. Rich labels and rich badges retain immediate native expansion and a caller-owned numeric owner. Other v2 capabilities remain pending, so the component is not marked as fully migrated.
 
 ---
 

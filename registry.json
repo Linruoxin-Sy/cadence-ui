@@ -2221,19 +2221,38 @@
       "description": "Responsive data charts with themed tooltips and legends.",
       "categories": ["collection"],
       "dependencies": ["recharts@3.10.1", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/chart/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/chart/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/chart-recharts.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/chart-recharts.ts"
         }
       ],
       "meta": {
         "since": "0.4.0",
         "tier": "T4",
         "batch": "B7",
-        "motion": ["data.transition"],
+        "motion": [
+          {
+            "recipe": "enter.pop",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -2250,6 +2269,13 @@
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "chart",
+                "reason": "A later inserted ChartContainer owns one local opacity entrance on its own root; initial and hydrated surfaces stay at their first-paint state."
+              }
+            ],
             "data.transition/one-shot": [
               {
                 "relationship": "default",
@@ -2998,6 +3024,10 @@
         "@cadence/input",
         "@cadence/table",
         "@cadence/cadence-utils",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-number",
+        "@cadence/cadence-text",
         "@cadence/cadence-provider"
       ],
       "files": [
@@ -3005,6 +3035,21 @@
           "path": "registry/cadence/data-table/index.tsx",
           "type": "registry:component",
           "target": "@components/cadence/data-table/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/button-group-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/button-group-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/label-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/label-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
@@ -3021,6 +3066,20 @@
           {
             "recipe": "exit.fade",
             "form": "one-shot"
+          },
+          "data.transition",
+          "layout.move",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -3033,10 +3092,10 @@
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         },
         "motionProfile": {
-          "scope": "surface",
+          "scope": "collection",
           "travel": "compact",
-          "coordination": "independent",
-          "reason": "Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates."
+          "coordination": "group",
+          "reason": "Committed sorting, filtering, visibility and data revisions move retained payments by one local box, newly inserted rows take a short opacity entrance, the bounded frame animates its committed shrink, and owned cell strings and quantities replace or roll in place."
         },
         "motionCoverage": {
           "schema": 1,
@@ -3082,6 +3141,86 @@
                 "relationship": "inherited",
                 "owner": "table",
                 "reason": "Data Table mounts Table, whose surface-presence runtime implements the same retained exit form; Table remains that independent integration owner."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "data-table",
+                "reason": "A genuinely inserted payment row takes one opacity entrance on its own retained tr host; rows already visible at first paint and rows revisited by pagination take no entrance."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "Data Table mounts input, whose migrated owner reaches this installed form inside the composition; input remains that independent integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "checkbox",
+                "reason": "Data Table mounts checkbox, whose migrated owner reaches this installed form inside the composition; checkbox remains that independent integration owner."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "data-table",
+                "reason": "Retained visible payments move to their committed native boxes on the same tr hosts after a sort, filter, visibility or data revision; no cell, region or page replacement supplies a second transform owner."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "data-table",
+                "reason": "The bounded frame around the native table owns one measured block-size transition for a committed shrink; growth, a focused or pointer-held row and reduced/none resolve to native layout immediately."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Data Table mounts dropdown-menu, whose migrated owner reaches this installed form inside the composition; dropdown-menu remains that independent integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "Data Table mounts input, whose migrated owner reaches this installed form inside the composition; input remains that independent integration owner."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "data-table",
+                "reason": "Owned status and email cell strings replace only their changed graphemes on the retained cell host; Table delegates cell text to this caller, so no second text layer exists."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Data Table mounts dropdown-menu, whose migrated owner reaches this installed form inside the composition; dropdown-menu remains that independent integration owner."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "data-table",
+                "reason": "Known payment amounts roll with the existing currency formatter and the selected count rolls on a known selection revision; the filter-derived result total and every query-derived count resolve directly."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Data Table mounts button, whose migrated owner reaches this installed form inside the composition; button remains that independent integration owner."
               }
             ]
           }
@@ -6041,6 +6180,14 @@
           {
             "recipe": "exit.fade",
             "form": "one-shot"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -6054,7 +6201,7 @@
           "scope": "surface",
           "travel": "extended",
           "coordination": "group",
-          "reason": "The reserved gap and panel position share a size-linked owner while destination-width labels stay readable."
+          "reason": "The reserved gap and panel position share a size-linked owner while destination-width labels stay readable, and plain labels and numeric badges change in place without travel."
         },
         "motionCoverage": {
           "schema": 1,
@@ -6182,6 +6329,50 @@
                 "relationship": "inherited",
                 "owner": "sheet",
                 "reason": "The mobile composition delegates its edge exit to the installed Sheet; the sidebar keeps its separate desktop presentation."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "Plain GroupLabel and MenuButton labels and string badges keep their own changed-run lane; a semantically hidden lane establishes the current value without visual work, and rich trees stay native."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "SidebarTrigger renders the installed Button, whose own changed label run stays its owner; the sidebar adds no second text writer to that control."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "sheet",
+                "reason": "The mobile Sheet carries its own title and description strings, so those changed runs belong to Sheet; the sidebar adds no second writer to the popup."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "tooltip",
+                "reason": "SidebarMenuButton's optional hint renders the installed Tooltip, whose own label run stays its owner; the sidebar adds no writer to that popup."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "A plain numeric MenuBadge rolls only its changed digit places; reduced and none settle the count immediately and a hidden lane never starts a reel."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "SidebarTrigger reaches Button's installed numeric reel for a supported count child; the sidebar adds no second digit writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "sheet",
+                "reason": "The mobile Sheet owns its own numeric content reels; the sidebar keeps its badge reel separate."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "tooltip",
+                "reason": "The installed Tooltip owns any numeric hint content it renders; the sidebar adds no second digit writer to that popup."
               }
             ]
           }

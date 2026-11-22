@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/chart`
 - Type: registry:ui
 - Since: 0.4.0
-- Motion recipes: data.transition
+- Motion recipes: enter.pop, data.transition
 
 ## Installation
 
@@ -32,6 +32,7 @@ npm install clsx tailwind-merge motion recharts@3.10.1
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -54,13 +55,17 @@ npm install clsx tailwind-merge motion recharts@3.10.1
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | chart | `@components/cadence/chart/index.tsx` | [JSON files[].content](https://cadence.dev/r/chart.json) |
+| chart | `@components/cadence/lib/chart-recharts.ts` | [JSON files[].content](https://cadence.dev/r/chart.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json)
 
 [Source files: chart](https://cadence.dev/r/chart.json)
 
@@ -217,7 +222,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, including every shared helper, into the same
+Copy every target file listed for Chart, including every shared helper, into the same
 `cadence/` tree. Preserve relative imports and the shipped `"use client"`
 directives. Complete the base theme setup linked above and ensure Tailwind
 scans these files. No additional Chart-specific CSS is required. Configured
@@ -790,7 +795,13 @@ export function Tooltips() {
 
 ## Live data and motion ownership
 
-Each Update action replaces only its own chart data. Recharts owns interpolation and the data model; Cadence owns the `data.transition` clock. The deliberately explicit series timing below cannot override the inherited clock. `isAnimationActive={false}` opts a series out. Reduced and none settle geometry immediately, including a running transition when the header mode changes. Custom shapes, nested controllers and independent CSS/WAAPI must honour the same modes. Tooltip position changes stay immediate.
+Each Update action replaces only its own chart data. Recharts owns interpolation and the data model
+through its own animation controller; Cadence supplies the `data.transition` clock, the mode ceiling and
+unknown-work settlement. The deliberately explicit series timing below cannot override the inherited clock.
+`isAnimationActive={false}` opts a series out. Reduced and none settle geometry immediately, including a
+running transition when the header mode changes. Custom shapes, nested controllers and independent
+CSS/WAAPI must honour the same modes. Tooltip position changes stay immediate; only the tooltip/legend
+surface may take one short opacity entrance.
 
 <ComponentExample name="live-data" />
 
@@ -926,6 +937,50 @@ export function LiveData() {
 }
 ```
 
+## Later insertion
+
+A chart added after the page has painted owns one short opacity entrance on its own surface. The first render, server output and hydration stay at their final paint, and switching the motion mode while the entrance runs settles it immediately.
+
+<ComponentExample name="later-insertion" />
+
+```tsx
+import { useState } from "react";
+import { Bar, BarChart, XAxis } from "recharts";
+import { Button } from "@/components/cadence/button";
+import { ChartContainer } from "@/components/cadence/chart";
+
+const config = {
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+};
+const baseline = [
+  { month: "Jan", desktop: 186 },
+  { month: "Feb", desktop: 305 },
+  { month: "Mar", desktop: 237 },
+  { month: "Apr", desktop: 73 },
+];
+
+export function LaterInsertion() {
+  const [shown, setShown] = useState(false);
+  return (
+    <div className="grid w-full min-w-0 gap-3">
+      <Button variant="outline" className="justify-self-start" onClick={() => setShown(true)}>
+        Add chart
+      </Button>
+      {shown ? (
+        <ChartContainer role="group" config={config} className="h-64 w-full min-w-0" aria-label="Monthly desktop visits">
+          <BarChart accessibilityLayer data={baseline}>
+            <XAxis dataKey="month" />
+            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} isAnimationActive />
+          </BarChart>
+        </ChartContainer>
+      ) : (
+        <p className="text-sm text-muted-foreground">No chart yet.</p>
+      )}
+    </div>
+  );
+}
+```
+
 ## When to use
 
 - Comparing categories with a bar chart.
@@ -981,17 +1036,19 @@ plus either color or a complete light/dark theme map. Helpers require ChartConta
 
 Authored intensity is **medium**: Recharts interpolates the plotted geometry; Cadence does not add a second data-geometry writer.
 
-| Phase | Properties | Token | Interruptible |
+| Phase | Properties | Recipe / form | Interruptible |
 | --- | --- | --- | --- |
-| Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition/one-shot` | Recharts retargets from its series state |
-| Tooltip / legend | Immediate placement; no wrapper reveal | — | Immediate |
-| Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition/one-shot` | Running controller completes |
-| None | Zero animation duration; final data | `data.transition/one-shot` | Running controller completes |
+| Later chart surface insertion | Opacity on the chart root only | `enter.pop/one-shot` | A caller interaction settles it early |
+| Tooltip / legend appearing after the baseline | Opacity on the owned annotation root | `data.transition/one-shot` | Replacement settles and re-commits |
+| Series data update | SVG data geometry written by Recharts | Recharts animation controller | Recharts retargets from its series state |
+| Reduced | Geometry jumps to final data; annotation opacity stays short | `data.transition/one-shot` reduced | Running controller completes |
+| None | Zero duration; final data and visible annotation | zero duration | Running controller completes |
 
-The initial chart presents final geometry without an entrance. The full update clock is
-duration.base / ease.out, scaled by provider timeScale. Reduced adds no fade
-because comparison must remain legible. Static SVG coordinate transforms are retained in all
-modes. This is not a DOM layout animation. Mode changes do not remount the chart.
+The initial chart and its first tooltip/legend paint present final content without an entrance. Full
+geometry uses duration.base / ease.out, scaled by provider timeScale. Annotation opacity uses the same
+local tokens. Reduced keeps the short annotation opacity but adds no geometry fade; none is immediate.
+Static SVG coordinate transforms are retained in all modes. This is not a DOM layout animation. Mode
+changes do not remount the chart.
 
 Local tokens supply the clock and easing. Positive clock edits preserve each series' data action,
 including when ordinary callbacks or custom paint props are created inline. Restoring full motion

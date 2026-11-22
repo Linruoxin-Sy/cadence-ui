@@ -1386,7 +1386,11 @@ rolls changed columns in the direction of the whole value; 99 → 100 retains un
 hundreds. Unchanged digits stay still. Separators/affixes only enter, exit or reposition as needed.
 An existing tabular-nums style helps equal-digit widths, not total digit-count changes; the helper
 must not add it automatically and change the component's font metrics. One geometry owner sizes the
-surrounding shell; reel movement and shell movement must not fight.
+surrounding shell; reel movement and shell movement must not fight. Tabular figures are measured as
+native paint rather than overridden: with `font-variant-numeric: tabular-nums` Chromium cannot
+serialize the `font` shorthand, so the raster proof composes the same face from font longhands and
+the whole-string/unit equality still gates the reel. Any other numeric/ligature/caps variant stays
+exact native text.
 
 Default direction is trend. Explicit up/down/shortest are alternatives; shortest never silently
 reverses trend for a large delta. Bound turns and total visual time. Unchanged formatted output does

@@ -466,6 +466,55 @@ function CallerUpdates() {
   );
 }
 
+function ChangingLabels() {
+  const [scope, setScope] = useState<"mine" | "all">("mine");
+  const [inbox, setInbox] = useState(3);
+  return (
+    <Frame
+      label="Changing labels"
+      content={
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={() => setScope((value) => (value === "mine" ? "all" : "mine"))}>
+            Switch scope
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setInbox((value) => (value + 1) % 4)}>
+            Receive item
+          </Button>
+        </div>
+      }
+    >
+      {/* A changed run is only proven where the glyph raster corresponds per unit, so this
+          example scopes a monospaced, feature-free face. Proportional kerning keeps native text. */}
+      <Sidebar className="md:absolute md:h-full font-mono [font-feature-settings:normal]">
+        <SidebarContent>
+          <nav aria-label="Changing labels">
+            <SidebarGroup>
+              <SidebarGroupLabel>{scope === "mine" ? "My projects" : "All projects"}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton isActive>
+                      <Inbox aria-hidden="true" />
+                      <span>Inbox</span>
+                    </SidebarMenuButton>
+                    <SidebarMenuBadge aria-label={`${inbox} unread`}>{inbox}</SidebarMenuBadge>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>
+                      <Home aria-hidden="true" />
+                      <span>{scope === "mine" ? "Website" : "Website archive"}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
 function CustomParts() {
   const link = useRef<HTMLAnchorElement>(null);
   const id = useId();
@@ -555,6 +604,9 @@ export function SidebarPreview({ example }: { example?: string }) {
       break;
     case "caller-updates":
       content = <CallerUpdates />;
+      break;
+    case "changing-labels":
+      content = <ChangingLabels />;
       break;
     case "custom-parts":
       content = <CustomParts />;

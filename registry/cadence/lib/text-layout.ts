@@ -73,6 +73,16 @@ export function proveTextLayout(
   const view = host.ownerDocument.defaultView;
   const css = view?.getComputedStyle(host);
   const viewport = view?.visualViewport;
+  // Chromium refuses to serialize the `font` shorthand while
+  // `font-variant-numeric` is applied, so a tabular-figure count composes the
+  // same face from longhands instead. Tabular numerals share one advance width,
+  // which is exactly the column geometry a place-value roll measures; every
+  // other variant (small caps, proportional or old-style figures) stays native.
+  const font =
+    css?.font ||
+    (css?.fontVariant === "tabular-nums" && css.fontStretch === "100%"
+      ? `${css.fontStyle} ${css.fontWeight} ${css.fontSize}/${css.lineHeight} ${css.fontFamily}`
+      : "");
   if (
     // Native/canvas glyph coverage is proven at unit device scale only.
     // Other scales keep exact native text until that correspondence is proven.
@@ -97,10 +107,10 @@ export function proveTextLayout(
     !["normal", "0px"].includes(css.wordSpacing) ||
     css.fontFeatureSettings !== "normal" ||
     css.fontVariationSettings !== "normal" ||
-    css.fontVariant !== "normal" ||
-    !css.font ||
+    !["normal", "tabular-nums"].includes(css.fontVariant) ||
+    !font ||
     /[^\x20-\x7e]/.test(snapshot.value) ||
-    !host.ownerDocument.fonts?.check(css.font, snapshot.value || " ")
+    !host.ownerDocument.fonts?.check(font, snapshot.value || " ")
   )
     return null;
   for (let node: HTMLElement | null = host; node; node = node.parentElement) {
@@ -141,7 +151,7 @@ export function proveTextLayout(
   const canvas = host.ownerDocument.createElement("canvas");
   const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) return null;
-  context.font = css.font;
+  context.font = font;
   context.fontKerning = css.fontKerning as CanvasFontKerning;
   const letterSpacing = css.letterSpacing === "normal" ? "0px" : css.letterSpacing;
   if (letterSpacing !== "0px") {
@@ -171,7 +181,7 @@ export function proveTextLayout(
     return null;
   canvas.width = width;
   canvas.height = height;
-  context.font = css.font;
+  context.font = font;
   context.fontKerning = css.fontKerning as CanvasFontKerning;
   if (typeof context.letterSpacing === "string") context.letterSpacing = letterSpacing;
   context.fillText(snapshot.value, padding, padding + ascent);
@@ -234,7 +244,7 @@ export function proveTextLayout(
   }
   return {
     boxes,
-    font: css.font,
+    font,
     color: css.color,
     ascent,
     descent,
@@ -433,7 +443,7 @@ export function textPaintSignature(chain: readonly HTMLElement[], view: Window |
     return css
       ? {
           paint: [
-            css.font,
+            css.font || `${css.fontStyle} ${css.fontWeight} ${css.fontSize}/${css.lineHeight} ${css.fontFamily}`,
             css.color,
             css.whiteSpace,
             css.letterSpacing,
