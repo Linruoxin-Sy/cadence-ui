@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/attachment`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: data.transition, feedback.press
+- Motion recipes: data.transition, exit.fade, data.transition, geometry.resize, text.change, number.roll, state.color
 
 ## Installation
 
@@ -38,10 +38,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -307,13 +307,17 @@ native/disabled semantics when customizing actions. Keep parents shrinkable:
 filenames truncate, and AttachmentGroup scrolls horizontally with native
 snap points. The group does not own card orientation or list virtualization.
 
-Uploading and processing titles use the theme's `animate-pulse` opacity loop
-in full and reduced modes; none applies `animate-none` and leaves text opaque.
-The provider's `timeScale` controls recipes, not this continuous CSS clock;
-retune `--animate-pulse` in the theme when needed. Default actions use Button's
-`feedback.press` scale in full, with no scale in reduced/none. State, file,
-size, orientation, media and removal updates are immediate in every mode;
-Attachment adds no entry, exit or measured resize animation.
+Uploading and processing titles fade the theme's `animate-pulse` opacity loop
+in full only; reduced and none keep the filename static and fully opaque, and
+a live mode change stops or resumes it on the same span. The provider's
+`timeScale` controls recipes, not this continuous theme clock; retune
+`--animate-pulse` in the theme when needed. Default actions keep Button's own
+colour and press feedback. A tile, a later media or action region and a
+supplied preview revision each fade on its retained host; a supplied state
+change moves scoped surface and foreground colour, and a changed filename,
+description or direct quantity settles on its retained span. The tile's own
+box follows a committed content or orientation change, while the group keeps
+native scroll and snap placement instead of easing tile positions.
 
 ## Usage
 
@@ -367,7 +371,7 @@ export function ReadyFile() {
 
 ## Upload state
 
-Pass all five caller-owned states directly: idle, uploading, processing, error and done. Uploading and processing pulse the filename; readable status remains when motion is disabled. These fixed cards do not upload anything. A busy region uses aria-busy; announce meaningful milestones in a separate polite status, rather than each percentage.
+Pass all five caller-owned states directly: idle, uploading, processing, error and done. Uploading and processing pulse the filename only in full mode; readable status and the supplied `data-state` value remain when motion is reduced or off. These fixed cards do not upload anything. A busy region uses aria-busy; announce meaningful milestones in a separate polite status, rather than each percentage.
 
 <ComponentExample name="upload-state" />
 
@@ -795,7 +799,7 @@ export function CustomParts() {
 
 ## Without motion
 
-This named example explicitly uses CadenceProvider mode="none". Its uploading title is fully opaque and has no loop from its first insertion. The other specimens inherit the site header mode and speed; reduced keeps the opacity loop, while none cancels it. State, file selection and geometry remain immediate in every mode.
+This named example explicitly uses CadenceProvider mode="none". Its uploading title is fully opaque and has no loop from its first insertion. The other specimens inherit the site header mode and speed; full plays the opacity loop, while reduced and none keep the filename static. Entrance, state colour and the owned tile box reach their semantic target immediately in none.
 
 <ComponentExample name="without-motion" />
 
@@ -850,7 +854,7 @@ implement an uploader, drop zone, file parser or streaming message runtime.
 | `Attachment` | Native div props; state `done`, size `default`, orientation `horizontal` |
 | `AttachmentMedia` | Native div props; variant `icon` or `image`, default `icon` |
 | `AttachmentContent` | Native div props; wraps metadata |
-| `AttachmentTitle` | Native span props; filename, busy opacity loop |
+| `AttachmentTitle` | Native span props; filename, supplied `data-state`, busy pulse in full mode |
 | `AttachmentDescription` | Native span props; metadata/status text |
 | `AttachmentActions` | Native div props; independent action layer |
 | `AttachmentAction` | All Button props; size `icon-xs`, variant falls back to `ghost` |
@@ -858,25 +862,40 @@ implement an uploader, drop zone, file parser or streaming message runtime.
 | `AttachmentGroup` | Native div props; horizontal scroll and snap |
 
 Every part preserves its upstream `attachment-*` data-slot (root: `attachment`).
-Native refs, styles and events pass through; classes merge last. Root also exposes
-`data-state`, `data-size`, `data-orientation`; media exposes `data-variant`.
-No File or request state is stored internally. There is no default upload action.
+Native refs, styles and events pass through; classes merge last. Root and title
+expose `data-state`, root also `data-size` and `data-orientation`; media exposes
+`data-variant`. No File or request state is stored internally. There is no default
+upload action.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Progress feedback stays within the attachment; it introduces no upload state or surface choreography.
+Authored intensity is **subtle**: Attachment coordinates one tile's presence, supplied media/state envelope, busy title, changed display text, direct quantities and its own measured box; the group keeps native scroll and snap placement.
 
-| Cause | Recipe | Full | Reduced | None |
+| Cause / owner | Recipe / form | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
-| Uploading/processing title | `data.transition/continuous` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
-| Default action pressed | `feedback.press/one-shot` | Button token spring/press scale | No scale | Instant, no scale |
+| Tile insert / retained removal, Attachment | `data.transition/one-shot`, `exit.fade/one-shot` | One tile opacity entrance or fade | Short opacity | Immediate |
+| Later media/action region insert, removal or preview replacement | `data.transition/one-shot`, `exit.fade/one-shot` | That region or preview envelope only | Short opacity | Immediate |
+| Supplied state change, Attachment and AttachmentMedia | `data.transition/one-shot`, `state.color/css-transition` | Scoped surface/foreground colour and preview envelope | Short colour and opacity | Immediate |
+| Explicit title/description foreground | `state.color/css-transition` | Scoped foreground colour | Short colour | Immediate |
+| Uploading/processing title, AttachmentTitle | `data.transition/continuous` | Theme `--animate-pulse` opacity loop | Static, no loop | Static, no loop |
+| Plain filename/description strings and structural revision, Attachment | `text.change/changed-runs`, `geometry.resize/measured` | Changed-only opacity, then the owned tile box | Short text opacity; box immediate | Immediate |
+| Direct numeric description quantity | `number.roll/reels` | Compact place-value reels | Immediate | Immediate |
 
-Continuous timing comes from the project's `--animate-pulse` theme token. This
-replaces upstream's travelling shimmer with opacity to stay in the motion budget.
-Root/title and default actions expose `data-motion`; live none cancels the loop
-without replacing nodes. State, removal, size, orientation and media updates are
-immediate. No entry, exit, layout or geometry recipe is implied. Custom render
-controls can own their own feedback as with Button.
+Appearance, owned box, surface/foreground, changed strings and direct quantities
+are default capabilities; Button keeps its own colour and press ownership on
+`AttachmentAction`. One retained host carries each envelope: the tile, a later
+region and the supplied preview never start a second writer for the same
+property, and the group writes no tile geometry — native scroll and snap keep
+placement. The overlay trigger adds no press scale because its hit geometry is
+the whole tile and a caller-renderable overlay has no safe internal layer, so
+the documented fallback applies.
+
+Mount a tile inside `AnimatePresence` to retain its exit; without a surviving
+owner, removal and region exit are immediate. An exiting tile or region is inert
+and aria-hidden, keeps no tab stop and duplicates no id or caller ref. A live
+mode change stops the busy loop on the same span; error and done cancel it
+immediately rather than waiting for a cycle, and reduced/none reach the semantic
+target with zero duration, including colour.
 
 ## Keyboard interactions
 
@@ -905,16 +924,22 @@ The Caller-owned file selection example reports a local filename and simulates m
 
 Cards cap at their parent's width; long names truncate. Groups scroll horizontally
 with no document overflow when their parent can shrink. Large lists should be
-paginated or virtualized by the application. The busy opacity loop uses CSS with
-no per-frame JavaScript or layout reads; none stops it on the next style update.
-No @shadcn/react dependency or streaming runtime is needed for this pinned API.
+paginated or virtualized by the application. The busy opacity loop is a CSS theme
+animation with no per-frame JavaScript; reduced and none stop it on the same span.
+One committed revision measures the changed tile's own box, with no per-frame layout
+read and no second writer over native scroll or snap placement. Numerical
+performance governance and real-device frame measurement remain deferred under
+ADR-023. No @shadcn/react dependency or streaming runtime is needed for this pinned API.
 
 ## AI usage notes
 
 Compose these nine parts; keep upload state and file lifecycle in your application.
 Do not infer a network operation from the visual `state` value. Prefer stable file
-IDs as keys so a progress update preserves focus and the native input. There is no
-message streaming dependency and no reason to remount a composer when a file changes.
+IDs as keys so a progress update preserves focus and the native input. A streaming
+message update owns its own text and never rebuilds the attachment list: the tile
+keeps its supplied state and media while the surrounding conversation changes.
+There is no message streaming dependency and no reason to remount a composer when a
+file changes.
 
 ## Related components
 
