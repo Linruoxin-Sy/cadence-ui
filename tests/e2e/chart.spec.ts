@@ -14,6 +14,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     test.use({ reducedMotion });
     for (const mode of MODES) {
       test(`data, engine clock, keyboard and downgrade ${mode}`, async ({ page }) => {
+        // Four series each sample three 50-frame windows; the 30 s default is a
+        // hang guard tuned for single-chart specs, not this matrix. Assertions
+        // stay unchanged; only the wall-clock ceiling widens on slow runners.
+        test.slow();
         const errors: string[] = [];
         page.on("pageerror", (error) => errors.push(error.message));
         await page.goto(`/components/chart?motion=${mode}`);
