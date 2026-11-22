@@ -1,6 +1,6 @@
 # Sidebar motion contract
 
-Status: target design; desktop offcanvas/icon size-linked projection and a safe completion-gated plain-label envelope are implemented. The desktop container/gap geometry is proven on both sides, on the icon rail, on every variant, on an in-flight reversal, on a live downgrade and across a breakpoint change (`tests/e2e/sidebar-s1-geometry.spec.ts`). The remaining capabilities/acceptance are pending; migration remains legacy.
+Status: target design; desktop offcanvas/icon size-linked projection and a safe completion-gated plain-label envelope are implemented. The two paint regions (`sidebar.item.colour`, `sidebar.surface.colour`) and the plain `showOnHover` action channel (`sidebar.action.enter`, `sidebar.action.exit`) are implemented on their real parts with the actual-region gate and three-mode tests (`tests/components/sidebar.test.tsx`, `.cache/sidebar-s2/`). The desktop container/gap geometry is proven on both sides, on the icon rail, on every variant, on an in-flight reversal, on a live downgrade and across a breakpoint change (`tests/e2e/sidebar-s1-geometry.spec.ts`). The remaining capabilities/acceptance are pending; migration remains legacy.
 
 Sidebar preserves spatial orientation while changing how much navigation is exposed. Offcanvas mode moves the existing desktop container; icon mode changes the occupied width and reveals labels only when space is usable. Mobile delegates to its existing Sheet composition. Route changes do not replay the sidebar.
 
@@ -74,16 +74,27 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | Existing showOnHover action visibility / MenuAction paint   | Short opacity for pointer reveal/hide; focus/open state exposes action immediately. Collapse semantics remain authoritative.                               | Short pointer opacity; focus immediate.                                                | Final visibility immediately.   | `sidebar.action.enter` → `presence.inline` → `data.transition/opacity`; `sidebar.action.exit` → `presence.exit` → `exit.fade/opacity`                                                                            |
 
 `surface.colour` owns the sidebar shell/inset/submenu border and non-item group-label/badge paint;
-`item.colour` owns menu/action/rail interaction regions, including the Rail's existing pseudo-element.
-Their property regions do not overlap. A badge string is a display string, never parsed as a count;
-a direct supported numeric badge uses `badge.change`. SidebarMenuSkeleton inherits Skeleton's loop,
-mode and visibility policy; SidebarTrigger and SidebarInput keep native Button/Input contracts.
+`item.colour` owns menu/action/rail interaction regions, including the Rail's existing line. Their
+property regions do not overlap. The Rail draws that line as its own `data-sidebar="rail-line"`
+element so the colour clock has one real owner instead of an unreachable pseudo-element. A badge
+string is a display string, never parsed as a count; a direct supported numeric badge uses
+`badge.change`. SidebarMenuSkeleton inherits Skeleton's loop, mode and visibility policy;
+SidebarTrigger and SidebarInput keep native Button/Input contracts.
 Header/Footer/Content/GroupContent are structural child hosts, not a recursively rewritten text model.
-The labels binding covers the GroupLabel and MenuButton label regions only; MenuAction collapse/hover paint stays with its action owner rather than joining that envelope.
+The labels binding covers the GroupLabel and MenuButton label regions only; MenuAction collapse/hover paint stays with its action owner rather than joining that envelope. Collapse visibility stays
+CSS-authored (`group-data-[collapsible=icon]:hidden`) so the sidebar never owns a second opacity.
 MenuAction's hover visibility and collapse visibility have one opacity owner: focus/open state settles
 its usable presentation immediately, and collapse/teardown invalidates a pending hover completion.
 
-Each actual shell/inset/submenu, item/action/rail and label/badge paint region follows the [shared owner precedence](../presets.md#31-effective-modes-and-clock-ownership). DOM focus/focus-within or a region's own invalid state cancels its colour clock and settles all its declared paint, including the actual containing shell regions of a focused control. Disjoint regions remain eligible for verified colour feedback; a route's active state alone is not DOM focus. Inherited Input/Button owners apply the same priority without an extra sidebar writer.
+Each actual shell/inset/submenu, item/action/rail and label/badge paint region follows the
+[shared owner precedence](../presets.md#31-effective-modes-and-clock-ownership). DOM focus/focus-within
+or a region's own invalid state cancels its colour clock and settles all its declared paint, including
+the actual containing shell regions of a focused control. The regions are the part itself for the shell,
+inset, submenu, item, action and rail, the group for a group label, and the row for a badge or an action,
+so a focused row settles its own label/badge/action paint while an unrelated region stays eligible for
+verified colour feedback; a route's active state alone is not DOM focus. The per-cause gate value is
+also read at commit time, because the CSS owner's insertion fast path runs before its connection.
+Inherited Input/Button owners apply the same priority without an extra sidebar writer.
 
 ## Interruption and lifecycle
 
@@ -115,8 +126,9 @@ display span within its temporary text-only clip; a MenuButton uses an icon, its
 span and overflow viewport. These real regions lay out at the destination width. Unsupported rich
 or interactive label shapes use immediate native expansion; known composed submenus keep their
 required content on immediate native geometry. Current collapse semantics remove the
-safe label lane immediately, so label paint settles rather than prolonging a fade. This limited
-adoption does not implement changed-run text, reels, action hover or colour.
+safe label lane immediately, so label paint settles rather than prolonging a fade. Item/surface
+colour and the plain `showOnHover` action channel are implemented; changed-run text, reels, composed
+badge numbers and the mobile composition are not.
 
 The continuous page-inset reflow below remains subordinate to the shared focused-editor rule.
 Before a known collapse transaction, check the actual owned Sidebar/Inset focus region: if the
@@ -162,6 +174,10 @@ Navigation labels lay out at their destination inline-size before the separate s
 - Pending: verify all modes, zero clock, live downgrade, SSR initial state and unmount during desktop/mobile exit. Live downgrade of the coupled geometry itself is proven above; the SSR and mobile-exit halves remain open.
 - Partly proven: change side, width tokens or available space during a toggle, including floating/inset variants. Both sides and the three variants resolve from the actual variables, and a `--sidebar-width` change issued mid-collapse retires the running projection, lands on the new extent without a stale transform, and is the extent a later toggle resolves (above). Still open: changing the available page space under a constrained shell, and proving no temporary page overlap survives it.
 
-- Pending: update string and numeric badges, showOnHover actions and inherited menu skeletons while collapsing or changing theme/mode; no duplicate colour/pulse, invisible focused action or stale hover completion survives.
+- Pending: update string and numeric badges, showOnHover actions and inherited menu skeletons while collapsing or changing theme/mode; no duplicate colour/pulse, invisible focused action or stale hover completion survives. The colour half is exercised for the real menu button, action, rail, group label and badge in all three modes by `tests/components/sidebar.test.tsx`, including a collapse that retires a pending pointer reveal; changed text, reels and a live theme switch during a badge update remain open.
 - Pending: switch to reduced during collapse plus label/action/text feedback, and edit a positive clock mid-toggle. Coupled geometry stays coherent, permitted short paint remains eligible, collapsed content stays hidden and no owner restarts from an old target. None/zero settles one-shot work without breaking native Sheet completion or substituting the recipe clock for Skeleton's theme clock.
-- Pending: focus a menu action or SidebarInput during shell/item theme feedback, then invalidate an actual owner. Its whole paint and the paint of actual focused-containing regions settle; an independent rail/badge may continue eligible colour, without treating route-active state as focus.
+- Partly proven: focus a menu action or SidebarInput during shell/item theme feedback, then invalidate an
+  actual owner. Its whole paint and the paint of actual focused-containing regions settle; an independent
+  rail/badge may continue eligible colour, without treating route-active state as focus. The gate is
+  exercised on the real parts for focus, focus-within and an invalid SidebarInput in three modes; a live
+  theme switch during that feedback and the browser matrix are recorded in `.cache/sidebar-s2/`.

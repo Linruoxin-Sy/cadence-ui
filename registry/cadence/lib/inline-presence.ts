@@ -10,6 +10,11 @@ export type InlinePresenceCommit = {
   enter: boolean;
   /** A committed replacement shares the existing opacity channel. */
   revision?: unknown;
+  /**
+   * This presentation is exposed by DOM focus or an open state, so it settles
+   * immediately instead of fading in. A caller-declared cause, not a clock.
+   */
+  immediate?: boolean;
   cm: CadenceMotion;
   complete?: () => void;
 };
@@ -176,7 +181,7 @@ export function createInlinePresence(node: HTMLElement, transaction = createMoti
       if (change) {
         const from = animation ? node.ownerDocument.defaultView?.getComputedStyle(node).opacity : undefined;
         cancel();
-        play(from);
+        play(from, input.immediate);
       } else if (input.cm.disabled || input.cm.timeScale === 0) {
         if (input.present) settle();
         else if (animation?.effect?.getTiming().duration !== 0) {
