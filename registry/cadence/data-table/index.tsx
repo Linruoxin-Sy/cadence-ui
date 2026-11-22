@@ -392,6 +392,10 @@ export function DataTableDemo({
   };
   const previous = React.useRef<TableSnapshot | null>(null);
   const change = tableChange(previous.current, snapshot);
+  // The last accepted commit, kept across the follow-up renders its own effect work
+  // causes: a render cannot reclassify the change it is already presenting.
+  const committedChange = React.useRef<TableChange>("initial");
+  if (change !== "none") committedChange.current = change;
 
   // Stable per-record identity keeps a retained readout the same entity across
   // data revisions, so a changed value rolls instead of restarting its string.
@@ -414,7 +418,11 @@ export function DataTableDemo({
   const geometryRelease = React.useRef<(() => void) | null>(null);
 
   committed(() => {
+    // Only an accepted semantic revision does work; the follow-up renders of a
+    // client commit (menus, focus, the theme clock) must stay cheap.
+    if (change === "none") return;
     previous.current = snapshot;
+    const kind = committedChange.current;
     const section = body.node.current;
     const rows = table.getRowModel().rows;
     if (!section) return;
@@ -455,10 +463,10 @@ export function DataTableDemo({
 
     // Commit-time retained-row movement. A page replacement, a selection change
     // or an unsafe ancestor mapping settles instead of guessing a source box.
-    const reorder = change === "sort" || change === "filter" || change === "visibility" || change === "data";
+    const reorder = kind === "sort" || kind === "filter" || kind === "visibility" || kind === "data";
     positions.commit({
       host: body.node,
-      revision: transaction.revision("layout", `${change}:${visible.map((entry) => entry.id).join(",")}`, section),
+      revision: transaction.revision("layout", `${kind}:${visible.map((entry) => entry.id).join(",")}`, section),
       cm,
       boxes,
       from: reorder ? lastBoxes.current : new Map(),
@@ -521,7 +529,7 @@ export function DataTableDemo({
 
   const selectedRows = table.getFilteredSelectedRowModel().rows.length;
   const filteredRows = table.getFilteredRowModel().rows.length;
-  const filterDerived = change === "filter" || change === "page" || change === "visibility" || change === "data";
+  const filterDerived = ["filter", "page", "visibility", "data"].includes(committedChange.current);
 
   return (
     <div
