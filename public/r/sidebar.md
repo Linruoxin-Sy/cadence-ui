@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/sidebar`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: layout.move, geometry.resize, data.transition
+- Motion recipes: layout.move, geometry.resize, data.transition, state.color, exit.fade
 
 ## Installation
 
@@ -2126,6 +2126,8 @@ Authored intensity is **medium**: The reserved gap and panel position share a si
 | Desktop offcanvas position | transform projected from actual occupied width | `layout.move/size-linked` | Yes, one shared size scalar. |
 | Desktop offcanvas gap and icon gap/container | measured, clamped widths | `geometry.resize/measured` | Yes, one scalar maps both icon endpoints. |
 | Safe icon label reveal | opacity after actual size completion | `data.transition/one-shot` | Yes, cancelled on reversal, input or invalidation. |
+| Item and surface paint | explicit background, text, border and shadow properties | `state.color/css-transition` | Yes, actual focus or invalid state settles that region; disjoint regions stay eligible. |
+| Pointer reveal and hide of a menu action | opacity on the action host | `data.transition/one-shot`, `exit.fade/one-shot` | Yes, one channel; focus/open settle it and collapse retires a pending reveal. |
 
 Full drives the actual gap and panel position from one clamped size spring. Initial state is native;
 there is no mounting reveal. Reduced, none and zero clock reach the current destinations immediately.
@@ -2141,8 +2143,28 @@ uses immediate native layout. Focused editing in the Sidebar/Inset, native point
 width/viewport changes and live mode downgrades settle both dependent properties. The same desktop
 panel and input nodes survive toggles.
 
-SidebarSeparator delegates definite-length geometry and its other independent rule effects to
-Separator. Passive stretch remains native; these inherited effects do not migrate the remaining Sidebar contract.
+Two disjoint paint regions each own one short colour clock, and their properties never overlap.
+The item region covers the menu button, menu action, submenu button, group action and the rail,
+including the rail's visible line, so its background, text and outline shadow move together. The
+surface region covers the shell, the inset, the submenu rule and the non-item group label and badge
+paint. Hovering, an active route and a selected row are ordinary state paint; DOM focus
+(including focus-within) or the region's own invalid state cancels that region's clock and lands
+its declared paint at once, including the shell that contains the focused control. A focus in one
+region leaves an unrelated region eligible, and an active route is not treated as focus. Reduced
+keeps this short colour feedback; none reaches every declared value and every delay immediately.
+
+A menu action with `showOnHover` has one opacity owner: a pointer reveal fades in and a pointer hide
+fades out on that same host, while focus or an open popup exposes it immediately. Collapse stays
+authoritative, so collapsing to the icon rail retires a pending reveal instead of completing or
+replaying it. Reduced keeps the short pointer opacity and none settles both directions at once.
+Caller `style.opacity` and caller `transition` declarations revoke the channel instead of competing
+with it.
+
+SidebarTrigger, SidebarInput, SidebarSeparator and SidebarMenuSkeleton keep the paint and presence
+of their installed Button, Input, Separator and Skeleton owners; the sidebar adds no second writer
+to those parts. SidebarSeparator delegates definite-length geometry and its other independent rule
+effects to Separator. Passive stretch remains native; these inherited effects do not migrate the
+remaining Sidebar contract.
 
 Mobile delegates `popup.anchored` / `exit.fade` to Sheet. Button press, tooltip popup and Skeleton pulse
 are owned by those dependencies, not extra Sidebar recipes. Their effective mode follows the provider.
