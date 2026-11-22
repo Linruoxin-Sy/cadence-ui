@@ -5564,6 +5564,14 @@
       {
         "recipe": "exit.fade",
         "form": "one-shot"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
       }
     ],
     "intensity": "medium",
@@ -5577,7 +5585,7 @@
       "scope": "surface",
       "travel": "extended",
       "coordination": "group",
-      "reason": "The reserved gap and panel position share a size-linked owner while destination-width labels stay readable."
+      "reason": "The reserved gap and panel position share a size-linked owner while destination-width labels stay readable, and plain labels and numeric badges change in place without travel."
     },
     "motionCoverage": {
       "schema": 1,
@@ -5705,6 +5713,50 @@
             "relationship": "inherited",
             "owner": "sheet",
             "reason": "The mobile composition delegates its edge exit to the installed Sheet; the sidebar keeps its separate desktop presentation."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "sidebar",
+            "reason": "Plain GroupLabel and MenuButton labels and string badges keep their own changed-run lane; a semantically hidden lane establishes the current value without visual work, and rich trees stay native."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "SidebarTrigger renders the installed Button, whose own changed label run stays its owner; the sidebar adds no second text writer to that control."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "sheet",
+            "reason": "The mobile Sheet carries its own title and description strings, so those changed runs belong to Sheet; the sidebar adds no second writer to the popup."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "tooltip",
+            "reason": "SidebarMenuButton's optional hint renders the installed Tooltip, whose own label run stays its owner; the sidebar adds no writer to that popup."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "sidebar",
+            "reason": "A plain numeric MenuBadge rolls only its changed digit places; reduced and none settle the count immediately and a hidden lane never starts a reel."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "SidebarTrigger reaches Button's installed numeric reel for a supported count child; the sidebar adds no second digit writer."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "sheet",
+            "reason": "The mobile Sheet owns its own numeric content reels; the sidebar keeps its badge reel separate."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "tooltip",
+            "reason": "The installed Tooltip owns any numeric hint content it renders; the sidebar adds no second digit writer to that popup."
           }
         ]
       }
