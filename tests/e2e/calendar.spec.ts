@@ -5,6 +5,11 @@ import { effectiveMode, MODES, openComponent } from "./helpers";
 import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).calendar;
+// This file builds and drives the whole page: the entrance settle, the axe pass over
+// every named example and the 3 × 2 × scheme × width capture are slower than the
+// default 30 s ceiling on a loaded runner, so the file states its own ceiling and the
+// capture case sets a larger one below.
+test.describe.configure({ timeout: 120_000 });
 const card = (page: Page, name: string) => page.locator(`[data-component-example="calendar/${name}"]`);
 const day = (scope: Locator, name: string) => scope.getByRole("button", { name: new RegExp(name, "i") });
 async function open(page: Page, mode = "none") {
@@ -14,11 +19,13 @@ async function open(page: Page, mode = "none") {
   // page's entrance has made it visible. Exercise the actual visible calendar;
   // its environment owner correctly cancels work while that clip still hides it.
   await expect
-    .poll(() =>
-      page
-        .locator("[data-document-entrance]")
-        .first()
-        .evaluate((node) => getComputedStyle(node).clipPath),
+    .poll(
+      () =>
+        page
+          .locator("[data-document-entrance]")
+          .first()
+          .evaluate((node) => getComputedStyle(node).clipPath),
+      { timeout: 60_000 },
     )
     .toBe("none");
   // `networkidle` can settle before this page's client chunk parses, and the SSR
@@ -731,6 +738,9 @@ for (const prefersReduced of PREFERENCES) {
     }
 
     test("captures the committed calendar in every mode and scheme", async ({ page }) => {
+      // Twelve page opens, each settling its own entrance: a run artifact case, not a
+      // single interaction, so it states its own ceiling instead of inheriting 120 s.
+      test.setTimeout(300_000);
       for (const scheme of SCHEMES) {
         await page.emulateMedia({ colorScheme: scheme });
         for (const viewport of WIDTHS) {
