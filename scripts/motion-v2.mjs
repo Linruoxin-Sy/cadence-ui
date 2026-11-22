@@ -297,6 +297,10 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
               candidates.push({ ...host, file: selection.file, source: bytes, selected });
         }
       let hosts = candidates;
+      // Reachability may add anchors to an imported export, but it cannot lend that export
+      // another export's physical region: a host authored by a different selected export
+      // would report the anchored export's name on somebody else's element.
+      if (binding.relationship === "inherited") hosts = hosts.filter((host) => host.selected === exported);
       const region = contract.regions?.[contract.bindings.get(binding.binding).part];
       if (binding.relationship === "inherited" && region) {
         const overrides = new Set();

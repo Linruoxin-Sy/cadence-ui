@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   // The compiler owns render memoization for the site. Do not add `useMemo`,
   // `useCallback`, or `React.memo` to site or registry source to compensate.
   reactCompiler: true,
+  // The catalogue's static pages each take longer than Next's 60s default to render on a
+  // small runner, and a single slow page fails the whole build (browser job, PR #128's own
+  // run). The limit only bounds waiting, it does not change what is rendered.
+  staticPageGenerationTimeout: 180,
   async rewrites() {
     return {
       beforeFiles: [{ source: "/r/:path*", destination: "/registry-files/:path*" }],

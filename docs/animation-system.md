@@ -2107,6 +2107,26 @@ numerical performance acceptance is deferred under §7 / ADR-023.
 Keep API/parity/keyboard checks and actual engine/native WAAPI assertions. Performance evidence is
 measured separately under §7, including complete routes and real-device frame presentation.
 
+### 9.6 Instance-path and reachability evidence
+
+Compositions make dependency ownership ambiguous in two places; both are resolved from evidence,
+never from assumption.
+
+- **Static anchors follow the import.** A composition usually imports a dependency's root (`Calendar`)
+  while the owning part is a sub-export (`CalendarMonth`). For an export reached through an installed
+  import edge, the plan adds the sibling exports that export references by value, one hop per edge and
+  each judged on its own slice. Reachability widens which export may own the part, not which module,
+  region or physical host does: the anchor still resolves to that export's own file and to a host
+  authored by that same export, so a sibling export it references can never lend its element.
+- **Runtime instance path survives a render edge.** React element-prop parent edges do not survive a
+  render-prop (`render` on Base UI) or `components` (DayPicker) boundary, and a popup panel is portalled
+  outside the block's own element. An inherited action therefore proves the same instance either by an
+  execution ancestor chain or by physical containment in a host owned by an execution whose own chain
+  reaches the block. A separately mounted dependency satisfies neither.
+- **Non-serialisable revisions.** A measured owner may key its semantic revision on caller JSX content.
+  Its action compares the executed commit instead of a fabricated serialisation; properties, clock and
+  mode policy still have to match exactly.
+
 ---
 
 ## 10. Anti-pattern list (sent straight back in review)
@@ -2164,20 +2184,23 @@ the Data Table composition. Each composition must retain the installed controls'
 
 ### Date Picker composition (B8)
 
-Delivered baseline; value/panel capabilities are scheduled in the v2 plan, not claimed here.
+Delivered v2 contract: every capability is inherited from an installed owner, and the block adds no
+animation of its own.
 
-The T2 `registry:block` composes Button `feedback.press`, Popover
-`popup.anchored` / `exit.fade` and Calendar `data.transition`. The date label and
-selection update immediately. Single/range selection never keys the popup or
-calendar by the selected value. Month movement follows §3.1.3 unchanged.
-Popover resolves duration.fast locally through the portal with timeScale and
-reducedDurationScale; caller callback classes/styles are evaluated and merged
-last. Full uses opacity and scale, reduced transitions opacity only, none uses
-transition-none/duration-0 and removes decorative hidden starting opacity. A closed
-host retained by native policy keeps its correct closed ending paint; `none` does
-not make it visible. Removing the scale transition on downgrade cancels an active
-scale immediately. Nested
-full under outer none restores the local clock, subject to OS reduce. Other popups require their own applicable lifecycle proof.
+The `registry:block` composes Button's measured trigger box and paint clock, Popover's anchored panel
+presence, measured shell and surface paint, and Calendar's month-grid paint, month-shell height and
+navigation paint. Single/range selection never keys the popup or calendar by the selected value, and
+the formatted label swaps its whole string natively. Button creates its independent press layer only
+for a known plain label, so this trigger's rich content has no `button-feedback` host and a declared
+press action would have no executable owner; activation stays native. The trigger is one composed
+element: Popover's trigger slot wins on it, while Button remains the export that registers its size
+and paint, so the declared region is the composed slot. A zero clock keeps the three-mode matrix about
+ownership; the shipped clocks are proven by each dependency's own suite and in a real engine. The browser
+matrix in `tests/e2e/date-picker.spec.ts` also records where an inherited owner settles in this composition:
+Calendar's `autoFocus` puts a real day inside the panel and the grid, and both the anchored presence and the
+month-grid paint refuse to animate a surface that contains focus, so a keyboard-driven month change stays
+native while a mouse-driven one travels and fades. Caller paint classes keep their own immediate cascade
+through the installed readability gates; neither branch adds a second writer.
 
 Site DocumentEntrance follows §3.3's readable SSR/no-JS/hydration baseline. Only a later eligible
 client insertion may enter; returning to full after an initial none or restoring an offscreen document

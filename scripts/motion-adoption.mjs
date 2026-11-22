@@ -70,7 +70,24 @@ function targetImplementation(source, targetForm, installedForm) {
   });
 }
 
+/** Sibling exports a module's selected export installs by value. A Calendar root
+ * renders its month/grid/navigation parts through `components={{…}}`, so an
+ * integration path that imports Calendar reaches those parts; a dependency
+ * declaration alone still cannot supply the edge. One hop only: a sibling's own
+ * later references are that sibling's business, not this path's evidence. Each
+ * export keeps its own slice so a form stays attributed to its actual export. */
+function installedReach(source, selected, exports) {
+  const reach = [...selected];
+  // The slice keeps the module's export clause, which names every export and
+  // would make all of them look installed by value; only real references count.
+  const slice = motionSource(source, reach).source.replace(/\bexport\s+(?:type\s+)?\{[^}]*\}/g, "");
+  for (const name of exports)
+    if (!reach.includes(name) && new RegExp(`(?<![\\w$])${name}(?![\\w$])`).test(slice)) reach.push(name);
+  return reach;
+}
+
 /** Each selected root is scanned separately; a sibling export cannot certify it.
+ * Only exports a live installed import already installs join a path's anchors.
  * Paths retain actual import names, including aliases, and installation closure.
  * No persisted report/JSON declaration can supply a positive source reference.
  */
@@ -106,12 +123,29 @@ async function partScanner(root, registry) {
       if (!exportSets.has(file)) exportSets.set(file, valueExports(source));
       if (selected.some((name) => !exportSets.get(file).has(name))) return;
       const owner = file.match(/^registry\/cadence\/([^/]+)\/index\.tsx$/)?.[1];
-      const route = owner ? [...anchors, ...selected.map((name) => `${owner}#${name}`)] : anchors;
-      const scanned = motionSource(source, selected);
-      const pathSelections = [...selections, { file, selected }];
-      if (targetImplementation(scanned.source, targetForm, installedForm)) {
+      const reach = owner && via.length ? installedReach(source, selected, exportSets.get(file)) : selected;
+      const route = owner ? [...anchors, ...reach.map((name) => `${owner}#${name}`)] : anchors;
+      const scanned = motionSource(source, reach);
+      // A reference records the selection it was actually read from, so a
+      // consumer rebuilding physical hosts uses the same export as the anchor.
+      const implemented = owner
+        ? reach.map((name) => ({
+            anchors: [...anchors, `${owner}#${name}`],
+            source: motionSource(source, [name]).source,
+            selections: [...selections, { file, selected: [name] }],
+          }))
+        : [{ anchors: route, source: scanned.source, selections: [...selections, { file, selected }] }];
+      for (const candidate of implemented) {
+        if (!targetImplementation(candidate.source, targetForm, installedForm)) continue;
         const [recipe, form] = installedForm.split("/");
-        references.push({ recipe, form, file, via, anchors: route, selections: pathSelections });
+        references.push({
+          recipe,
+          form,
+          file,
+          via,
+          anchors: candidate.anchors,
+          selections: candidate.selections,
+        });
       }
       for (const dependency of scanned.imports) {
         if (!dependency.path.startsWith(".")) continue;
@@ -124,7 +158,7 @@ async function partScanner(root, registry) {
             [...via, `${file}#${dependency.local}`],
             route,
             new Set([...visiting, key]),
-            pathSelections,
+            [...selections, { file, selected }],
           );
       }
     };

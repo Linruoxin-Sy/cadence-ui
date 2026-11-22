@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/date-picker`
 - Type: registry:block
 - Since: 0.5.0
-- Motion recipes: feedback.press, popup.anchored, exit.fade, data.transition
+- Motion recipes: geometry.resize, state.color, popup.anchored, data.transition
 
 ## Installation
 
@@ -810,22 +810,37 @@ components. A custom render must retain a focusable button and the supplied prop
 
 ## Motion contract
 
-Authored intensity is **medium**: Installed Popover owns the surface and Calendar owns month changes; the formatted trigger label still updates immediately.
+Authored intensity is **medium**: Installed Button, Popover and Calendar own the trigger size and paint, the panel presence and size, and the month-grid and day paint; this block composes them and swaps the formatted label natively.
 
 T2 describes existing control motion. No date label animation, layout tween,
-selection-keyed remount, new recipe or runtime is added.
+selection-keyed remount, new recipe or runtime is added. Every declared form
+below belongs to the dependency that renders the physical host; the block
+declares inherited ownership rather than a second writer. The trigger declares no
+press action: Button creates its independent press layer only for a known plain
+label, so this icon-and-label trigger renders its children directly with no
+`button-feedback` host and activation stays native.
 
-| Recipe / cause | full | reduced | none |
-| --- | --- | --- | --- |
-| `feedback.press/one-shot` / trigger press | token spring scale | no scale | immediate |
-| `popup.anchored/one-shot` / open | opacity with the short anchor-side approach | opacity only | visible first frame |
-| `exit.fade/one-shot` / close | opacity only | opacity only | immediate |
-| `data.transition/one-shot` / calendar month | token horizontal translation and opacity | opacity only | immediate |
+| Recipe / form | Cause | full | reduced | none |
+| --- | --- | --- | --- | --- |
+| `geometry.resize/measured` / trigger label, panel content, month shell | Button inline size, Popover shell, Calendar month shell | clamped measured transition | destination size | destination size |
+| `state.color/css-transition` / trigger, panel, calendar paint | Button state paint, Popover surface, Calendar navigation | eligible colour under each actual-owner gate | eligible short colour | final colours |
+| `popup.anchored/one-shot` / open | the mounted Popover panel | settled entry: the composed Calendar focuses a day inside the panel, and a focused surface is never faded or delayed | settled for the same reason | visible first frame |
+| `data.transition/month-grid` / displayed month | the retained Calendar table | token direction travel and opacity once focus has left the grid | opacity only after focus leaves the grid | immediate |
+
+One inherited boundary applies to both appearance rows. Calendar's `autoFocus` puts
+a real day inside the panel and inside the month table, and the anchored presence
+and the month-grid paint both refuse to animate a surface that already contains
+focus, because a focused surface must be readable at the semantic target. A
+keyboard-driven month change therefore paints natively, while a mouse-driven
+change — which moves focus to the navigation button — travels and fades. Measured
+in `tests/e2e/date-picker.spec.ts` across all three modes.
 
 Popover resolves its own `duration.fast` clock with timeScale and reducedDurationScale
 inside the portal. Nested full can recover under outer none; OS reduce still wins.
 Live reduced drops the approach and live none cancels its writers immediately. Calendar
 cancels its WAAPI effect on mode changes without replacing the grid or focused day.
+The popup's close exit stays Popover's own installed form: this block mounts no
+Button that is removed, so it declares no exit of its own.
 
 ## Keyboard and accessibility
 

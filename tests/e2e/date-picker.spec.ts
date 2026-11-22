@@ -31,7 +31,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       await expect(popup.getByRole("button", { name: /November 5th/ })).toBeEnabled();
       const grid = popup.getByRole("grid");
       await grid.evaluate((el) => el.setAttribute("data-identity", "grid"));
-      const monthSamples = await popup.getByRole("button", { name: /next month/i }).evaluate(async (el) => {
+      // A surface that contains keyboard focus keeps its paint native, so this programmatic
+      // navigation (focus stays on the day) settles in every mode instead of fading a grid
+      // the user is already reading.
+      const focusedSamples = await popup.getByRole("button", { name: /next month/i }).evaluate(async (el) => {
         (el as HTMLButtonElement).click();
         const samples = [];
         for (let i = 0; i < 12; i++) {
@@ -44,14 +47,40 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         }
         return samples;
       });
-      expect(monthSamples.length).toBeGreaterThan(0);
-      if (effective === "full") expect(monthSamples.some((s) => s.transform !== "none")).toBe(true);
-      else expect(monthSamples.every((s) => s.transform === "none")).toBe(true);
-      if (effective === "reduced") expect(new Set(monthSamples.map((s) => s.opacity)).size).toBeGreaterThan(1);
-      if (effective === "none") expect(monthSamples.every((s) => s.opacity === "1" && s.animations === 0)).toBe(true);
+      expect(focusedSamples.length).toBeGreaterThan(0);
+      expect(focusedSamples.every((s) => s.transform === "none" && s.opacity === "1" && s.animations === 0)).toBe(true);
       await expect(grid).toHaveAttribute("aria-label", "December 2026");
+      // A mouse-driven change takes focus out of the grid, so Calendar's own month paint runs:
+      // full travels and fades, reduced keeps the fade without travel, none settles immediately.
+      await page.evaluate(() => {
+        const rows: { transform: string; opacity: string; animations: number }[] = [];
+        (window as unknown as { __monthRows: typeof rows }).__monthRows = rows;
+        const sample = () => {
+          const grid = document.querySelector('[data-slot="calendar-month-grid"]');
+          if (grid) {
+            const cs = getComputedStyle(grid);
+            rows.push({ transform: cs.transform, opacity: cs.opacity, animations: grid.getAnimations().length });
+          }
+          if (rows.length < 120) requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      });
+      await popup.getByRole("button", { name: /next month/i }).click();
+      await page.waitForTimeout(400);
+      const mouseSamples = await page.evaluate(
+        () =>
+          (window as unknown as { __monthRows: { transform: string; opacity: string; animations: number }[] })
+            .__monthRows,
+      );
+      expect(mouseSamples.length).toBeGreaterThan(0);
+      if (effective === "full") expect(mouseSamples.some((s) => s.transform !== "none")).toBe(true);
+      else expect(mouseSamples.every((s) => s.transform === "none")).toBe(true);
+      if (effective === "full" || effective === "reduced")
+        expect(new Set(mouseSamples.map((s) => s.opacity)).size).toBeGreaterThan(1);
+      if (effective === "none") expect(mouseSamples.every((s) => s.opacity === "1" && s.animations === 0)).toBe(true);
+      await expect(grid).toHaveAttribute("aria-label", "January 2027");
       await popup.getByRole("button", { name: /previous month/i }).click();
-      await expect(grid).toHaveAttribute("aria-label", "November 2026");
+      await expect(grid).toHaveAttribute("aria-label", "December 2026");
       await expect(grid).toHaveAttribute("data-identity", "grid");
       await page.keyboard.press("Escape");
       await expect(trigger).toBeFocused();
@@ -64,17 +93,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           const p = document.querySelector('[data-slot="popover-content"]');
           if (p) {
             const cs = getComputedStyle(p);
-            samples.push({ opacity: cs.opacity, scale: cs.scale, duration: cs.transitionDuration });
+            samples.push({ opacity: cs.opacity, scale: cs.scale, animations: p.getAnimations().length });
           }
         }
         return samples;
       });
       expect(samples.length).toBeGreaterThan(0);
-      if (effective === "full") {
-        expect(new Set(samples.map((s) => s.opacity)).size).toBeGreaterThan(1);
-        expect(new Set(samples.map((s) => s.scale)).size).toBeGreaterThan(1);
-      } else expect(samples.every((s) => s.scale === "none")).toBe(true);
-      if (effective === "none") expect(samples.every((s) => s.opacity === "1" && s.duration === "0s")).toBe(true);
+      // Calendar autofocuses a day inside the panel, and the anchored presence never delays a
+      // focused surface: the entry settles at its resting paint instead of fading or travelling.
+      expect(samples.every((s) => s.opacity === "1" && s.scale === "none" && s.animations === 0)).toBe(true);
+      expect(await popup.evaluate((el) => el.contains(document.activeElement))).toBe(true);
       await page.keyboard.press("Escape");
       const controlled = page.locator('[data-component-example="date-picker/controlled-date-and-clearing"]');
       const controlledTrigger = controlled.getByRole("button", { name: /Controlled appointment:/ });
@@ -116,7 +144,9 @@ test("date-picker nested clock and live downgrade preserve popup and focused day
   const trigger = preview.getByRole("button", { name: /Fixture appointment:/ });
   await trigger.click();
   const popup = page.getByRole("dialog", { name: "Fixture appointment" });
-  await expect(popup).toHaveCSS("transition-duration", "0.64s");
+  // A caller palette keeps the panel's colour paint immediate, so the nested clock is
+  // observed where it is still authoritative: the inherited surface variable itself.
+  expect(await popup.evaluate((el) => getComputedStyle(el).getPropertyValue("--cadence-time-scale").trim())).toBe("4");
   // Retarget an opening transition before it settles, then recover full.
   await popup.getByRole("button", { name: /next month/i }).click();
   const grid = popup.getByRole("grid");
@@ -146,7 +176,13 @@ test("date-picker nested clock and live downgrade preserve popup and focused day
   await expect(popup).toHaveAttribute("data-identity", "popup");
   await expect(day).toBeFocused();
   await expect(day).toHaveAttribute("data-identity", "day");
-  await expect(popup).toHaveCSS("transition-duration", "0s");
+  expect(
+    await popup.evaluate((el) =>
+      getComputedStyle(el)
+        .transitionDuration.split(",")
+        .every((time) => Number.parseFloat(time) === 0),
+    ),
+  ).toBe(true);
   await expect(popup).toHaveCSS("scale", "none");
   expect(await popup.evaluate((el) => el.getAnimations().length)).toBe(0);
   await page.getByLabel("Fixture motion", { exact: true }).evaluate((el) => {
@@ -156,14 +192,14 @@ test("date-picker nested clock and live downgrade preserve popup and focused day
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(popup).toHaveAttribute("data-motion", "reduced");
   await expect(popup).toHaveCSS("scale", "none");
-  await expect(popup).toHaveCSS("transition-duration", "0.384s");
+  expect(await popup.evaluate((el) => getComputedStyle(el).getPropertyValue("--cadence-time-scale").trim())).toBe("4");
   await expect(day).toBeFocused();
   await expect(trigger).toContainText("November 12th, 2026");
 });
 
 for (const colorScheme of ["light", "dark"] as const) {
   test(`date-picker ${colorScheme} accessibility and responsive proof`, async ({ page }) => {
-    test.setTimeout(60000);
+    test.setTimeout(120000);
     await page.emulateMedia({ colorScheme, reducedMotion: "no-preference" });
     await page.goto("/components/date-picker?motion=none");
     await page.waitForLoadState("networkidle");

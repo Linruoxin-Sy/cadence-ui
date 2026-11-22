@@ -218,6 +218,7 @@ describe("current registry inventory and real part references", () => {
         "resizable",
         "table",
         "calendar",
+        "date-picker",
         "toc",
         "chart",
       ].sort(),
