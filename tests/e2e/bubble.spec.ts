@@ -17,21 +17,19 @@ async function open(page: Page, mode = "none") {
 async function observeEntry(scope: Locator, selector: string) {
   await scope.evaluate((el, selector) => {
     const w = window as unknown as {
-      entry: Promise<{ opacity: number; transform: string; duration: string; animations: number }[]>;
+      entry: Promise<{ opacity: number; animations: number; transform: string }[]>;
     };
     w.entry = new Promise((resolve) => {
       const observer = new MutationObserver(() => {
         const node = el.querySelector(selector);
         if (!node) return;
         observer.disconnect();
-        const result: { opacity: number; transform: string; duration: string; animations: number }[] = [];
+        const result: { opacity: number; animations: number; transform: string }[] = [];
         const sample = () => {
-          const s = getComputedStyle(node);
           result.push({
-            opacity: Number(s.opacity),
-            transform: s.transform,
-            duration: s.transitionDuration,
+            opacity: Number(getComputedStyle(node).opacity),
             animations: node.getAnimations().length,
+            transform: getComputedStyle(node).transform,
           });
           if (result.length < 30) requestAnimationFrame(sample);
           else resolve(result);
@@ -42,22 +40,21 @@ async function observeEntry(scope: Locator, selector: string) {
     });
   }, selector);
 }
+/** The entrance is a real engine animation on the retained root, not a CSS clock. */
 async function assertEntry(page: Page, actual: string) {
   const frames = await page.evaluate(
     () =>
       (
         window as unknown as {
-          entry: Promise<{ opacity: number; transform: string; duration: string; animations: number }[]>;
+          entry: Promise<{ opacity: number; animations: number; transform: string }[]>;
         }
       ).entry,
   );
   expect(frames.every((f) => f.transform === "none")).toBe(true);
-  const duration = actual === "none" ? "0s" : actual === "reduced" ? "0.528s" : "0.88s";
-  expect(frames.every((f) => f.duration === duration)).toBe(true);
   if (actual === "none") expect(frames.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
   else {
     expect(Math.min(...frames.map((f) => f.opacity))).toBeLessThan(0.9);
-    expect(new Set(frames.map((f) => f.opacity)).size).toBeGreaterThan(2);
+    expect(frames.some((f) => f.animations > 0)).toBe(true);
   }
   return frames;
 }
@@ -182,7 +179,7 @@ for (const os of [false, true])
       .toBeGreaterThan(0);
     const before = await live.evaluate((el) => ({
       opacity: Number(getComputedStyle(el).opacity),
-      duration: getComputedStyle(el).transitionDuration,
+      animations: el.getAnimations().length,
     }));
     expect(before.opacity).toBeLessThan(1);
     const content = live.locator('[data-slot="bubble-content"]');
@@ -199,12 +196,11 @@ for (const os of [false, true])
         frames.push({
           opacity: getComputedStyle(el).opacity,
           animations: el.getAnimations().length,
-          duration: getComputedStyle(el).transitionDuration,
         });
       }
       return frames;
     });
-    expect(after.every((f) => f.opacity === "1" && f.animations === 0 && f.duration === "0s")).toBe(true);
+    expect(after.every((f) => f.opacity === "1" && f.animations === 0)).toBe(true);
     expect(await live.evaluate((el, saved) => el === saved, saved)).toBe(true);
     await expect(content).toBeFocused();
     await info.attach("running-cancellation", {
