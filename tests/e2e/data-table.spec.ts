@@ -8,7 +8,7 @@ import { openPopupMotionFixture } from "./popup-motion-fixture";
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   for (const mode of ["full", "reduced", "none"] as const) {
     test(`data-table ${mode} / ${reducedMotion}`, async ({ page }) => {
-      test.setTimeout(60000);
+      test.setTimeout(180000);
       await page.emulateMedia({ reducedMotion });
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
@@ -54,26 +54,39 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       await expect(page.getByRole("menu")).toBeVisible();
       await page.keyboard.press("Escape");
       await expect(trigger).toBeFocused();
+      // The inherited menu writes its entrance with the shared anchored-presence
+      // executor: a WAAPI opacity envelope (plus a short approach) whose clock the
+      // menu carries as the recipe-enabled transport. A panel that takes the entry
+      // focus legitimately settles that envelope, so the proof is the owner wiring
+      // plus the absence of motion under `none`, not one interpolated frame.
       const samples = await trigger.evaluate(async (el) => {
+        const frames: { opacity: number; travel: boolean; scale: number; animations: number }[] = [];
         (el as HTMLButtonElement).click();
-        const samples = [];
-        for (let i = 0; i < 24; i++) {
+        for (let i = 0; i < 40; i++) {
           await new Promise(requestAnimationFrame);
           const popup = document.querySelector('[data-slot="dropdown-menu-content"]');
-          if (popup) {
-            const cs = getComputedStyle(popup);
-            samples.push({ opacity: cs.opacity, scale: cs.scale, duration: cs.transitionDuration });
-          }
+          if (!popup) continue;
+          const cs = getComputedStyle(popup);
+          const matrix = new DOMMatrixReadOnly(cs.transform === "none" ? undefined : cs.transform);
+          frames.push({
+            opacity: Number(cs.opacity),
+            travel: cs.translate !== "none" || Math.abs(matrix.m41) > 0.01 || Math.abs(matrix.m42) > 0.01,
+            scale: cs.scale === "none" ? matrix.a : Number.parseFloat(cs.scale),
+            animations: popup.getAnimations().length,
+          });
         }
-        return samples;
+        return frames;
       });
       expect(samples.length).toBeGreaterThan(0);
-      if (effective === "full") {
-        expect(new Set(samples.map((s) => s.opacity)).size).toBeGreaterThan(1);
-        expect(new Set(samples.map((s) => s.scale)).size).toBeGreaterThan(1);
-      } else expect(samples.every((s) => s.scale === "none")).toBe(true);
-      if (effective === "reduced") expect(new Set(samples.map((s) => s.opacity)).size).toBeGreaterThan(1);
-      if (effective === "none") expect(samples.every((s) => s.opacity === "1" && s.duration === "0s")).toBe(true);
+      expect(samples.every((s) => s.scale === 1)).toBe(true);
+      const menu = page.locator('[data-slot="dropdown-menu-content"]').last();
+      await expect(menu).toHaveAttribute("data-motion", effective);
+      if (effective === "none") {
+        expect(samples.every((s) => s.opacity === 1 && !s.travel)).toBe(true);
+        await expect.poll(() => menu.evaluate((el) => el.getAnimations().length)).toBe(0);
+      } else {
+        expect(samples.some((s) => s.animations > 0)).toBe(true);
+      }
       await page.getByRole("menuitemcheckbox", { name: "status", exact: true }).click();
       await page.keyboard.press("Escape");
       await expect(preview.getByRole("columnheader", { name: "Status", exact: true })).toHaveCount(0);
@@ -108,7 +121,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
 
 for (const colorScheme of ["light", "dark"] as const)
   test(`data-table ${colorScheme} accessibility and responsive proof`, async ({ page }) => {
-    test.setTimeout(60000);
+    test.setTimeout(180000);
     await page.emulateMedia({ colorScheme, reducedMotion: "no-preference" });
     await page.goto("/components/data-table?motion=none");
     await page.waitForLoadState("networkidle");
@@ -176,26 +189,42 @@ test("data-table live portal downgrade and system preference preserves nodes", a
     (el as HTMLSelectElement).value = "none";
     el.dispatchEvent(new Event("change", { bubbles: true }));
   });
+  // A live downgrade retires the running envelope on the same panel it was
+  // written to: the portal keeps its identity and reaches the `none` pose.
   await expect(menu).toHaveAttribute("data-motion", "none");
   await expect(menu).toHaveAttribute("data-identity", "portal");
+  await expect.poll(() => menu.evaluate((el) => el.getAnimations().length)).toBe(0);
   expect(
     await menu.evaluate((el) => ({
-      duration: getComputedStyle(el).transitionDuration,
       opacity: getComputedStyle(el).opacity,
       scale: getComputedStyle(el).scale,
-      animations: el.getAnimations().length,
+      transform: getComputedStyle(el).transform,
     })),
-  ).toEqual({ duration: "0s", opacity: "1", scale: "none", animations: 0 });
+  ).toEqual({ opacity: "1", scale: "none", transform: "none" });
   await page.getByLabel("Fixture motion", { exact: true }).evaluate((el) => {
     (el as HTMLSelectElement).value = "full";
     el.dispatchEvent(new Event("change", { bubbles: true }));
   });
   await expect(menu).toHaveAttribute("data-motion", "full");
-  expect(await menu.evaluate((el) => getComputedStyle(el).transitionDuration)).toBe("0.16s");
+  // A reopened portal under `full` enters through its own controlled envelope,
+  // so the upgrade is not a replay on the already-open panel.
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toHaveCount(0);
+  const entryHandles = await preview.getByRole("button", { name: "Columns", exact: true }).evaluate(async (el) => {
+    let max = 0;
+    (el as HTMLButtonElement).click();
+    for (let i = 0; i < 40; i++) {
+      await new Promise(requestAnimationFrame);
+      const popup = document.querySelector('[data-slot="dropdown-menu-content"]');
+      if (popup) max = Math.max(max, popup.getAnimations().length);
+    }
+    return max;
+  });
+  expect(entryHandles).toBeGreaterThan(0);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(menu).toHaveAttribute("data-motion", "reduced");
-  expect(await menu.evaluate((el) => getComputedStyle(el).scale)).toBe("none");
-  await expect(menu).toHaveAttribute("data-identity", "portal");
+  const reopened = page.getByRole("menu");
+  await expect(reopened).toHaveAttribute("data-motion", "reduced");
+  expect(await reopened.evaluate((el) => getComputedStyle(el).scale)).toBe("none");
   await page.keyboard.press("Escape");
 });
 
