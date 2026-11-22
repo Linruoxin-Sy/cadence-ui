@@ -119,6 +119,81 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     }
   });
 }
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  for (const mode of MODES) {
+    test.describe(`chart late insertion ${mode}/${reducedMotion}`, () => {
+      test.use({ reducedMotion });
+      test("one surface entrance and no first-paint motion", async ({ page }) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
+        await page.goto(`/components/chart?motion=${mode}`);
+        await page.waitForLoadState("networkidle");
+        const scene = page.locator('[data-component-example="chart/later-insertion"]');
+        await scene.scrollIntoViewIfNeeded();
+        await expect(scene.locator('[data-slot="chart"]')).toHaveCount(0);
+        await expect(scene).toContainText("No chart yet.");
+        await scene.getByRole("button", { name: "Add chart" }).click();
+        const root = scene.locator('[data-slot="chart"]');
+        await expect(root).toBeVisible();
+        const effective = reducedMotion === "reduce" && mode === "full" ? "reduced" : mode;
+        await expect(root).toHaveAttribute("data-motion", effective);
+        const frames = await root.evaluate(async (el) => {
+          const values: { opacity: number; running: number }[] = [];
+          for (let index = 0; index < 12; index++) {
+            await new Promise(requestAnimationFrame);
+            values.push({
+              opacity: Number(getComputedStyle(el).opacity),
+              running: el.getAnimations().filter((animation) => animation.playState === "running").length,
+            });
+          }
+          return values;
+        });
+        // Only none is immediate; full and reduced keep their short opacity entrance.
+        if (effective === "none") expect(frames.every((frame) => frame.running === 0)).toBe(true);
+        else expect(frames.some((frame) => frame.running > 0)).toBe(true);
+        expect(frames.at(-1)?.opacity).toBe(1);
+        await expect(root.locator("svg")).toBeVisible();
+        await expect(root.locator(".recharts-bar")).toHaveCount(1);
+        expect(errors).toEqual([]);
+      });
+    });
+  }
+}
+
+test("same-target downgrade cancels a running chart surface entrance", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/components/chart?motion=full");
+  await page.waitForLoadState("networkidle");
+  const scene = page.locator('[data-component-example="chart/later-insertion"]');
+  await scene.scrollIntoViewIfNeeded();
+  const outcome = await scene.evaluate(async (el) => {
+    const add = [...el.querySelectorAll("button")].find((button) => button.textContent?.trim() === "Add chart");
+    add?.click();
+    await new Promise(requestAnimationFrame);
+    const root = el.querySelector('[data-slot="chart"]');
+    if (!root) throw new Error("missing later chart");
+    const begin = root.getAnimations().filter((animation) => animation.playState === "running").length;
+    const group = [...document.querySelectorAll('[role="group"]')].find(
+      (node) => node.getAttribute("aria-label") === "Motion mode",
+    );
+    const none = [...(group?.querySelectorAll("button") ?? [])].find((button) => button.textContent?.trim() === "none");
+    none?.click();
+    const samples: { opacity: number; running: number }[] = [];
+    for (let index = 0; index < 10; index++) {
+      await new Promise(requestAnimationFrame);
+      samples.push({
+        opacity: Number(getComputedStyle(root).opacity),
+        running: root.getAnimations().filter((animation) => animation.playState === "running").length,
+      });
+    }
+    return { begin, motion: root.getAttribute("data-motion"), samples };
+  });
+  expect(outcome.begin).toBeGreaterThan(0);
+  expect(outcome.motion).toBe("none");
+  expect(outcome.samples.every((sample) => sample.running === 0)).toBe(true);
+  expect(outcome.samples.at(-1)?.opacity).toBe(1);
+});
+
 for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`chart ${colorScheme}`, () => {
     test.use({ colorScheme });
