@@ -10,6 +10,11 @@ async function open(page: Page, mode = "none") {
   await page.waitForLoadState("networkidle");
 }
 const runtimeErrors = new WeakMap<Page, string[]>();
+const zeroDurations = (value: string) =>
+  value
+    .split(",")
+    .map((entry) => entry.trim())
+    .every((entry) => entry === "0s");
 test.beforeEach(({ page }) => {
   const errors: string[] = [];
   runtimeErrors.set(page, errors);
@@ -127,9 +132,17 @@ for (const os of [false, true])
       await expect(updates.getByText("$42.00")).toBeVisible();
       await expect(top.getByRole("textbox")).toHaveValue("");
       await top.getByRole("button", { name: "Email", exact: true }).scrollIntoViewIfNeeded();
+      // The sort header carries a rich label (text plus an icon), so Button authors
+      // no press pose there; the control itself stays at rest.
       const heldScale = await pressScale(page, '[data-preview="data-table"] th [data-slot="button"]');
-      if (effectiveMode("full", os) === "full") expect(heldScale).toBeLessThan(1);
-      else expect(heldScale).toBe(1);
+      expect(heldScale).toBe(1);
+      // A plain-label control inherits Button's press through its own feedback part.
+      const feedback =
+        '[data-component-example$="/controlled-sorting-and-pagination"] button:has-text("Reset sorting and page") >> [data-slot="button-feedback"]';
+      await page.locator(feedback).first().scrollIntoViewIfNeeded();
+      const plainScale = await pressScale(page, feedback);
+      if (effectiveMode("full", os) === "full") expect(plainScale).toBeLessThan(1);
+      else expect(plainScale).toBe(1);
       const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((n) => n.id));
       expect(new Set(ids).size).toBe(ids.length);
     });
@@ -204,7 +217,14 @@ for (const mode of MODES)
     await trigger.click();
     const menu = page.getByRole("menu");
     await expect(menu).toBeVisible();
-    if (mode !== "none") await expect.poll(() => menu.evaluate((el) => el.getAnimations().length)).toBeGreaterThan(0);
+    // A default top-level open focuses the menu, and a focused surface is never
+    // faded or delayed: the anchored entry settles at its resting paint on the
+    // first frame (dropdown-menu.md, "actual-focus gate").
+    if (mode !== "none") {
+      await expect(menu).toHaveCSS("opacity", "1");
+      await expect(menu).toHaveCSS("scale", "none");
+      await expect.poll(() => menu.evaluate((el) => el.getAnimations().length)).toBe(0);
+    }
     const saved = await menu.elementHandle();
     if (mode !== "none") {
       await page.getByLabel("Fixture motion", { exact: true }).evaluate((el) => {
@@ -233,7 +253,9 @@ for (const mode of MODES)
     expect(samples.length).toBeGreaterThan(0);
     if (mode === "none")
       expect(
-        samples.every((f) => f.opacity === "1" && f.scale === "none" && f.duration === "0s" && f.animations === 0),
+        samples.every(
+          (f) => f.opacity === "1" && f.scale === "none" && zeroDurations(f.duration) && f.animations === 0,
+        ),
       ).toBe(true);
     await page.keyboard.press("Escape");
     await expect(trigger).toBeFocused();
@@ -345,7 +367,7 @@ test("Data Table fixed none production menu is visible on its first inserted fra
   });
   expect(frames.length).toBeGreaterThanOrEqual(12);
   expect(
-    frames.every((f) => f.opacity === "1" && f.scale === "none" && f.duration === "0s" && f.animations === 0),
+    frames.every((f) => f.opacity === "1" && f.scale === "none" && zeroDurations(f.duration) && f.animations === 0),
   ).toBe(true);
   await page.keyboard.press("Escape");
   await expect(trigger).toBeFocused();
