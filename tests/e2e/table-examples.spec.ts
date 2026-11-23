@@ -32,6 +32,7 @@ for (const os of ["no-preference", "reduce"] as const)
           nodes.map((node) => {
             const s = getComputedStyle(node);
             return {
+              slot: node.getAttribute("data-slot"),
               mode: node.getAttribute("data-motion"),
               transform: s.transform,
               scale: s.scale,
@@ -43,7 +44,13 @@ for (const os of ["no-preference", "reduce"] as const)
           }),
         );
         for (const s of styles) {
-          expect(s.mode).toBeNull();
+          // The container, footer and each row are the table's own animated parts
+          // and carry the resolved mode. Head, Cell and Caption keep their authored
+          // static paint and no mode attribute; the table readout never animates
+          // geometry, opacity or an animation name.
+          if (["table-container", "table-footer", "table-row"].includes(s.slot ?? ""))
+            expect(s.mode, s.slot ?? "").toBe(effectiveMode(mode, os === "reduce"));
+          else expect(s.mode, s.slot ?? "").toBeNull();
           expect(s.transform).toBe("none");
           expect(s.scale).toBe("none");
           expect(s.opacity).toBe("1");
