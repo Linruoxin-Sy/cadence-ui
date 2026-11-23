@@ -23,7 +23,7 @@ Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tok
 1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
 
 ```package-manager
-npm install clsx tailwind-merge motion
+npm install motion clsx tailwind-merge
 ```
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
@@ -32,6 +32,8 @@ npm install clsx tailwind-merge motion
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
 - [@cadence/cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -55,6 +57,11 @@ npm install clsx tailwind-merge motion
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-surface-presence | `@components/cadence/lib/surface-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-surface-presence.json) |
 | table | `@components/cadence/table/index.tsx` | [JSON files[].content](https://cadence.dev/r/table.json) |
 
@@ -63,6 +70,10 @@ npm install clsx tailwind-merge motion
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
 
 [Source files: cadence-surface-presence](https://cadence.dev/r/cadence-surface-presence.json)
 
@@ -222,13 +233,16 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 ```
 
 Copy the recursive dependency files from the Manual panel, keeping
-`table/index.tsx` beside `lib/cn.ts`, the motion runtime modules and the shared
-surface-presence module in the same `cadence/` tree so the
+`table/index.tsx` beside `lib/cn.ts`, the motion runtime modules, the shared
+surface-presence module and `lib/text-layout.ts` with its text-diff and
+motion-transaction inputs in the same `cadence/` tree so the
 relative imports resolve. Preserve the source's `"use client"` directive. Complete
 the base theme setup linked above and ensure Tailwind scans the copied files. Table
 installs the Cadence motion runtime and provider: one surface envelope and one scoped
-row/footer colour owner. Cell content, rich children, editors and caller paint keep
-their own owners, and all three motion modes keep the native table hierarchy.
+row/footer colour owner. The text module is reached only by `nativeTextContext`, which
+keeps the entrance native inside an editable or form context; Table declares no text
+recipe and animates no cell text. Cell content, rich children, editors and caller paint
+keep their own owners, and all three motion modes keep the native table hierarchy.
 
 Usage, Footer totals, Density and alignment, Horizontal overflow, and Empty
 results pass serializable props and children and can be composed in a Server
@@ -704,9 +718,10 @@ width. The caller owns column sizing, wrapping and any sticky behavior. Rows are
 datasets need application pagination or virtualization.
 
 The surface envelope and the row/footer colour owners reuse the shared Cadence
-runtime, so this item installs the provider and the surface-presence module. Table
-adds no measured size writer, no per-cell observer and no per-cell text controller;
-each cell is the caller's own content. Interactive children and application
+runtime, so this item installs the provider, the surface-presence module and the
+shared text module that decides whether an editable ancestor keeps the entrance
+native. Table adds no measured size writer, no per-cell observer and no per-cell text
+controller; each cell is the caller's own content. Interactive children and application
 handlers still need their own client code, and server-rendered markup does not
 imply that every interaction works without
 JavaScript. The historical T0 source reference for this item is advisory under

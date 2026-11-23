@@ -109,6 +109,9 @@ jobs:
           name: registry-payloads
           path: public
       - run: pnpm registry:check
+      # Distribution: every payload agrees with `registry.json`, and every install plan resolves only
+      # the relative, namespaced and package dependencies that plan declares.
+      - run: pnpm install:check
 
   runtime:
     needs: prepare

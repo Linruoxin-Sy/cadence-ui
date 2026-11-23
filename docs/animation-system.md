@@ -2205,8 +2205,10 @@ through the installed readability gates; neither branch adds a second writer.
 Site DocumentEntrance follows §3.3's readable SSR/no-JS/hydration baseline. Only a later eligible
 client insertion may enter; returning to full after an initial none or restoring an offscreen document
 must not re-hide or replay that consumed host. Print retains current semantic visibility. An SSR-hidden
-strategy with a noscript repair is not this target contract. Site adoption and browser evidence remain
-tracked by the rollout plan; they are separate from §3.8's explicit standalone Reveal API.
+strategy with a noscript repair is not this target contract. The site entrance now implements this
+baseline — see the distribution guide §2.4 for the delivery contract and `tests/site/document-entrance.test.tsx`
+plus `tests/e2e/document-entrance.spec.ts` for the render and browser evidence. It remains separate from
+§3.8's explicit standalone Reveal API and installs no Reveal.
 
 ## 12. Technical references
 

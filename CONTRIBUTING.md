@@ -225,7 +225,8 @@ pnpm registry:build && pnpm check
 ```
 
 which runs typecheck, Biome (lint, formatting, and import order), the registry checks (targets, payload
-freshness, docs, export names, advisory tier budgets, P11), and the unit tests. `registry:check` verifies recipe
+freshness, docs, export names, advisory tier budgets, P11), the install matrix (every plan resolves only
+declared relative/namespaced/package dependencies), and the unit tests. `registry:check` verifies recipe
 declarations and requires animated test files; the test reporter
 requires three-mode helper adoption. Neither replaces the animation review or browser evidence for
 running cancellation, first paint, nested providers and measured geometry.

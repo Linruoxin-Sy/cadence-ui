@@ -1511,7 +1511,9 @@
     "categories": [
       "foundation"
     ],
-    "dependencies": [],
+    "dependencies": [
+      "motion"
+    ],
     "registryDependencies": [],
     "docs": "/r/cadence-motion.md",
     "item": "/r/cadence-motion.json"
@@ -6304,6 +6306,7 @@
     "registryDependencies": [
       "@cadence/cadence-motion",
       "@cadence/cadence-utils",
+      "@cadence/cadence-text",
       "@cadence/cadence-provider",
       "@cadence/cadence-surface-presence"
     ],
