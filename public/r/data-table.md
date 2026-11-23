@@ -29,7 +29,7 @@ Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tok
 1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
 
 ```package-manager
-npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react @tanstack/react-table@9.3.1
+npm install motion clsx tailwind-merge @base-ui/react class-variance-authority lucide-react @tanstack/react-table@9.3.1
 ```
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
