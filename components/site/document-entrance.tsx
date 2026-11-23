@@ -14,7 +14,17 @@ export interface DocumentEntranceProps {
   as?: "article" | "div" | "section";
 }
 
-/** First-screen HTML is natural paint. Only a later client insertion may enter. */
+/**
+ * Visible-first site entrance (distribution guide §2.4, animation system §3.3).
+ *
+ * The server paints final content: this component writes no hidden style, so SSR, no-JS, print,
+ * hydration and the first client commit are readable without a repair rule. Only a later eligible
+ * client insertion — a route change or remount — may enter, and an entrance that is consumed is never
+ * re-hidden or replayed. There is no intersection observer here: the document is already visible, so
+ * the entrance has no viewport cause (unlike `Reveal`, which owns one).
+ *
+ * The outer node is the article's layout slot (the grid item on a component page's `xl` layout).
+ */
 export function DocumentEntrance({ children, className, as: Tag = "div" }: DocumentEntranceProps) {
   const ref = useRef<HTMLElement>(null);
   const cm = useCadenceMotion(ref);

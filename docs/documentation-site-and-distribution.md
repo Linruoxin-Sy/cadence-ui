@@ -349,8 +349,10 @@ keeps that height explicit — written in the frame the content changed, from a 
 rather than on the wrapper — so the card around a preview is always the size of its example and never lags
 behind it.
 
-A hash targeting content inside `DocumentEntrance` also triggers its entrance. A cold deep link
-must not leave a long document behind its initial clip while waiting for an intersection delivery.
+A hash targeting content inside `DocumentEntrance` needs no entrance trigger of its own: the server
+paints the document visible, so a cold deep link lands on readable content and the browser performs the
+fragment scroll against the natural layout. There is no clip to wait behind and no intersection delivery
+to race (§2.4).
 
 It does not tween, and that is a correction rather than a simplification. The first version animated the
 measurement with `geometry.resize`, and the trace showed why that could not work: the content it watches is
@@ -439,24 +441,41 @@ Each page makes its content `<article class="max-w-3xl py-12">` the entrance via
 `DocumentEntrance as="article"`, a site-only client component (`components/site/document-entrance.tsx`). The
 `.typeset` container inside it is untouched; the entrance belongs to the outer article, not to the markdown
 elements. On a guide page the article is the title, description, and body; on a component page it is the
-breadcrumb, header, preview, and body. The article rises 24px, fades from 0, clears a 4px blur, and opens a
-`clip-path` from zero height at the same time. The wipe runs on `duration.slow` with `ease.inOut` — quicker
-than the body's `duration.page` — so the edge leads and the content's rise, fade, and blur are still in
-progress as it uncovers them. The clip keeps the element's full box, so the entrance does not reflow the page.
-An unanimated outer box owns the intersection observer and occupies the article's layout slot. The
-article keeps its classes and semantic element. Observing this box lets a cold load, restored scroll or
-fast deep scroll trigger the entrance even when the article's initial zero-height clip is above the
-viewport; the animated clip must never gate its own visibility trigger.
+breadcrumb, header, preview, and body.
 
-The server paints the hidden state. The root layout's `<noscript>` rule and the `@media print` rule in
-`app/globals.css` restore the body when the entrance cannot run. The component stays outside
-`registry/cadence/**`: a whole-body blur and a clip wipe exceed the shipped motion contract. Its timings still
-come from `lib/motion.ts`, and the `reduced` branch keeps opacity only while `none` resolves every duration to
-zero.
+The entrance follows the shared **visible-first** reveal policy of
+[animation system §3.3](animation-system.md#33-presence-and-composition), not a hidden-SSR strategy:
 
-The entrance uses the committed control adapter so mode/clock changes stop an existing
-writer before paint even when its target is unchanged. Explicit none renders RESTING
-in server HTML; other modes retain the hidden SSR state and no-script/print restoration.
+| State                                             | What the reader sees                                                      |
+| ------------------------------------------------- | ------------------------------------------------------------------------- |
+| SSR HTML, no JS, print, hydration, first commit   | final content; no inline `opacity` / `clip-path` / `filter` / `transform` |
+| A later eligible client insertion (route change)  | one entrance: fade from 0 with `distance.lg` travel on the `reveal` clock |
+| Focus, text selection or a competing mutation     | settled immediately — the entrance never conceals the interaction         |
+| `reduced` / `none` / zero clock / hidden document | `reduced` keeps opacity only; the others render the resting state at once |
+
+**The server paints final content.** Nothing outside the component hides the body, so there is no
+`<noscript>` repair rule and no `@media print` override — both were removed with the hidden state they
+existed to undo. A cold load, a restored scroll position and a deep link are readable before any script
+runs, which is also why a fragment scroll needs no entrance trigger (§2.2).
+
+Only a _later_ insertion may enter: the component plays once, on the committed frame that follows a client
+insertion, and never on hydration or the first client commit. The entrance is one opacity channel plus
+`distance.lg` travel on the `reveal` recipe (`duration.base`, `ease.out`); there is no clip wipe and no blur.
+A host that contains focus or a text selection, an effective `reduced` mode (opacity only), `none` or a zero
+clock, a hidden document, or a class/style/attribute mutation all settle it before or instead of painting it.
+An entrance is consumed once: returning to `full` after an initial `none`, or restoring an already-presented
+document, must not re-hide or replay it.
+
+The unanimated outer `div` is the article's layout slot — the grid item of a component page's `xl` layout —
+not an observer box. There is no intersection observer and no viewport cause: the document is already
+visible, so the entrance has nothing to gate. The article keeps its classes and semantic element, and the
+Toc stays outside it (§2.5) so the entrance transform cannot affect its sticky position.
+
+The component stays outside `registry/cadence/**`: the site owns the readable-first document policy, the
+entrance is not a shipped recipe surface, and a page-wide entrance is not part of any component's motion
+contract. Its timings still come from `lib/motion.ts`, and the committed control adapter stops an existing
+writer before paint when the mode or clock changes even if the target is unchanged. Every mode renders
+resting content in server HTML.
 
 ### 2.5 Site width and alignment
 
@@ -480,7 +499,7 @@ scrolls independently when longer than the available viewport. Below `xl`, a nat
 aligned to the right below the title exposes the same links, including without JavaScript.
 Its list is an absolutely positioned panel, so expanding it does not move the document or
 invalidate the browser's restored fragment position when the disclosure closes on reload.
-The Toc sits outside DocumentEntrance on desktop so the article's transform and clip do not
+The Toc sits outside DocumentEntrance on desktop so the article's entrance transform does not
 affect its sticky position. Heading text, nesting depth and collision-safe ids come from the
 same MDX compilation that renders the body; there is no second Markdown heading parser.
 The site imports the registry's T3 `toc` directly. Scroll tracking enhances native anchors and
@@ -552,7 +571,11 @@ item.meta.sourceSha = await componentSha(root, item); // 8 hex over this item's 
 `public/r/<id>.json` and `public/r/<id>.md` are reviewed files. `meta.sourceSha` is the item's own
 content hash — its files (path + content), its expanded `docs` and its metadata without the hash —
 so a payload changes only when that component changes, and a rebuild of unchanged input is
-byte-identical. `public/r/registry.json` and `public/r/catalog.json` deliberately omit the hash: they
+byte-identical. It is stamped on every item that carries a `meta` block, which is every documented
+component and block; the 17 support items (`registry:lib`, `registry:base`, `registry:theme`,
+`registry:hook`) publish no `meta`, so their payloads carry no hash and `scripts/install-matrix.mjs`
+checks their file set, content, declarations and install plan instead.
+`public/r/registry.json` and `public/r/catalog.json` deliberately omit the hash: they
 are the shared index, and a per-item hash there would rewrite the whole file for any component edit.
 `public/llms.txt` and `public/llms-full.txt` are not committed at all; `pnpm registry:build` writes
 them, CI uploads the build output as an artifact, and `pnpm build` regenerates them for deployment.
@@ -564,6 +587,12 @@ Consequences a contributor has to honour:
 - run `pnpm registry:build` before `pnpm check` (and before `pnpm test`, whose registry and llms
   fixtures read the build output), because `registry:check` compares payloads against source and
   fails on stale or missing artifacts;
+- `pnpm install:check` (`scripts/install-matrix.mjs`) resolves every item's install plan and fails when
+  a planned file imports something that plan does not install: a relative path outside the plan or the
+  `@components/cadence/` tree, an `@/` alias, a validation library, a Node builtin, or a package no
+  planned item declares. `react`, `react-dom` and `next` are the consumer's framework and are not
+  Cadence dependencies. A missing declaration is fixed in `registry.json`/the MDX frontmatter, never by
+  relaxing the check;
 - resolve a payload conflict by rebuilding on top of the merge result, never by picking a side;
 - resolve a `registry.json` conflict the same way — take both entries and rebuild (§3.4);
 - a full-local rebuild is expected only when the build itself changes. Ordinary component work
