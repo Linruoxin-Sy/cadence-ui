@@ -171,7 +171,7 @@ function RadioGroupItem({ className, style, ...props }: RadioGroupItemProps) {
  * it. The dot uses `currentColor` so the item's single colour transaction reaches it.
  */
 const itemChrome =
-  "group/radio-group-item peer relative aspect-square size-4 shrink-0 rounded-full border border-input text-primary shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-disabled:cursor-not-allowed data-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 dark:bg-input/30";
+  "group/radio-group-item peer relative aspect-square size-4 shrink-0 rounded-full border border-input text-primary shadow-xs focus-visible:[outline:2px_solid_transparent] focus-visible:[outline-offset:2px] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-disabled:cursor-not-allowed data-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 dark:bg-input/30";
 
 const shippedChrome = new Set([
   "border",

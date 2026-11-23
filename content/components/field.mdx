@@ -258,7 +258,12 @@ export function BillingFields() {
 
 ## A choice card
 
-A wrapping FieldLabel supplies the card border and a real label association. The checkbox owns checked state; FieldTitle and FieldDescription provide its name and description. Click the card or use Space on the checkbox. The composed Checkbox keeps its own motion contract and inherits the page setting.
+A wrapping FieldLabel supplies the card border; FieldTitle names the checkbox
+through `aria-labelledby` and FieldDescription describes it through
+`aria-describedby`, so the control keeps a name that does not depend on the
+browser accepting a `<label>` around an ARIA toggle. The checkbox owns checked
+state. Click the card or use Space on the checkbox. The composed Checkbox keeps
+its own motion contract and inherits the page setting.
 
 <ComponentExample name="choice-card" />
 
@@ -276,10 +281,17 @@ export function ChoiceCard() {
       <FieldLabel htmlFor={id}>
         <Field orientation="horizontal">
           <FieldContent>
-            <FieldTitle>Team plan</FieldTitle>
+            <FieldTitle id={`${id}-title`}>Team plan</FieldTitle>
             <FieldDescription id={`${id}-help`}>Unlimited projects for your team.</FieldDescription>
           </FieldContent>
-          <Checkbox id={id} name="team-plan" value="team" aria-describedby={`${id}-help`} defaultChecked />
+          <Checkbox
+            id={id}
+            name="team-plan"
+            value="team"
+            aria-labelledby={`${id}-title`}
+            aria-describedby={`${id}-help`}
+            defaultChecked
+          />
         </Field>
       </FieldLabel>
     </FieldGroup>

@@ -14,17 +14,20 @@ test("combobox real filtering, groups, controls, chips, caller values and native
     if (await popup.count()) await page.keyboard.press("Escape");
     await expect(popup).toHaveCount(0);
   };
-  const input = page.locator('[data-preview="combobox"]').getByRole("combobox");
+  const input = page.locator('[data-preview="combobox"]').getByRole("combobox", {
+    name: "Framework",
+    exact: true,
+  });
   await input.fill("Rem");
   await expect(popup.getByRole("option")).toHaveCount(1);
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(input).toHaveValue("Remix");
-  await card("groups").getByRole("combobox").click();
+  await card("groups").getByRole("combobox", { name: "Stack", exact: true }).click();
   await expect(popup.getByRole("group", { name: "Frontend" })).toBeVisible();
   await expect(popup.getByRole("group", { name: "Backend" })).toBeVisible();
   await expect(popup.locator('[data-slot="combobox-separator"]')).toHaveCount(1);
-  await card("groups").getByRole("combobox").fill("Ru");
+  await card("groups").getByRole("combobox", { name: "Stack", exact: true }).fill("Ru");
   await expect(popup.getByRole("option")).toHaveCount(1);
   await expect(popup.getByRole("option")).toHaveText("Rust");
   await expect(popup.getByText("Frontend", { exact: true })).toHaveCount(0);
@@ -85,7 +88,10 @@ test("combobox real filtering, groups, controls, chips, caller values and native
   await expect(invalid).toHaveValue("Nuxt");
   await expect(popup.getByRole("option", { name: "Nuxt.js" })).toHaveAttribute("aria-disabled", "true");
   await close();
-  const controlled = card("controlled").getByRole("combobox");
+  const controlled = card("controlled").getByRole("combobox", {
+    name: "Controlled framework",
+    exact: true,
+  });
   const node = await controlled.elementHandle();
   await card("controlled").getByRole("button", { name: "Set Astro externally" }).click();
   await expect(controlled).toHaveValue("Astro");
@@ -102,11 +108,11 @@ test("combobox real filtering, groups, controls, chips, caller values and native
     await expect(controlled).toHaveValue("SvelteKit");
     await expect(input).toHaveValue("Remix");
   }
-  await card("objects").getByRole("combobox").fill("Grace");
+  await card("objects").getByRole("combobox", { name: "Assignee", exact: true }).fill("Grace");
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(card("objects").getByRole("status")).toHaveText("Assignee id: grace");
-  const city = card("results").getByRole("combobox");
+  const city = card("results").getByRole("combobox", { name: "City", exact: true });
   await city.fill("To");
   await expect(popup.getByRole("option")).toHaveText("Tokyo");
   await city.fill("zz");
@@ -149,12 +155,20 @@ test("combobox real filtering, groups, controls, chips, caller values and native
 for (const os of [false, true])
   for (const mode of MODES)
     test(`combobox all body portals inherit modes and retain references ${mode}/${os}`, async ({ page }) => {
+      // Every example's popup is opened and closed once in this cell; on the
+      // catalogue's largest route the cycle needs more than the 30 s default.
+      test.slow();
       await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
       await page.goto(`/components/combobox?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       for (const name of examples) {
         const card = page.locator(`[data-component-example="combobox/${name}"]`);
-        for (const input of await card.getByRole("combobox", { includeHidden: true }).all()) {
+        // The trigger's role settles only after hydration: the server renders the
+        // composed `Show options` button as `role="combobox"` and Base UI turns it
+        // into a plain listbox button once the input registers. Iterating the
+        // transient role set therefore drops the second node mid-test; the input is
+        // the addressable control and the popup it opens is the same portal.
+        for (const input of await card.locator('input[role="combobox"]').all()) {
           if (await input.isDisabled()) continue;
           await input.press("ArrowDown");
           const popup = page.locator('[data-slot="combobox-content"]');
@@ -186,6 +200,10 @@ for (const theme of ["light", "dark"])
   for (const width of [1280, 390])
     for (const name of examples)
       test(`combobox body screenshots and accessibility ${name}/${theme}/${width}`, async ({ page }) => {
+        // The route is the largest page in the catalogue (~114k nodes), and a card
+        // may hold four comboboxes: one page-wide axe scan on an open popup takes ~25 s
+        // on this host, so a four-input card cannot fit the default budget.
+        test.setTimeout(240_000);
         await page.setViewportSize({ width, height: 1000 });
         await page.addInitScript((theme) => localStorage.setItem("cadence-theme", theme), theme);
         await page.goto("/components/combobox?motion=none");
@@ -195,7 +213,7 @@ for (const theme of ["light", "dark"])
         const card = page.locator(`[data-component-example="combobox/${name}"]`);
         await card.scrollIntoViewIfNeeded();
         await card.screenshot({ path: `.cache/b5-proof/combobox-${name}-${theme}-${width}.png` });
-        for (const input of await card.getByRole("combobox", { includeHidden: true }).all()) {
+        for (const input of await card.locator('input[role="combobox"]').all()) {
           if (await input.isDisabled()) continue;
           await input.press("ArrowDown");
           await expect(page.locator('[data-slot="combobox-content"]')).toBeVisible();
@@ -219,7 +237,7 @@ test("combobox placements, anchor sizing and loop boundaries", async ({ page }, 
   for (const name of ["sides", "alignments", "logical-sides"]) {
     for (const input of await page
       .locator(`[data-component-example="combobox/${name}"]`)
-      .getByRole("combobox", { includeHidden: true })
+      .locator('input[role="combobox"]')
       .all()) {
       await input.scrollIntoViewIfNeeded();
       await input.press("ArrowDown");
