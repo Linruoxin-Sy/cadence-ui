@@ -137,7 +137,7 @@ describe("installation authoring and AST", () => {
   it("preserves every command fence and note", () => {
     const expanded = expandInstallation(body, registry.items, "button");
     expect(expanded).toContain(command);
-    expect(expanded).toContain("npm install clsx tailwind-merge motion @base-ui/react class-variance-authority");
+    expect(expanded).toContain("npm install motion clsx tailwind-merge @base-ui/react class-variance-authority");
     expect(expanded).toContain("@components/cadence/lib/press-button.tsx");
     expect(expanded).toContain("[Source files: button](https://cadence.dev/r/button.json)");
   });
