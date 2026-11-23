@@ -159,7 +159,7 @@ function Checkbox({ className, style, ...props }: CheckboxProps) {
  * the invalid ring are part of that declared paint and settle with it.
  */
 const checkboxChrome =
-  "peer relative size-4 shrink-0 rounded-[4px] border border-input shadow-xs outline-none after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-disabled:cursor-not-allowed data-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:bg-input/30";
+  "peer relative size-4 shrink-0 rounded-[4px] border border-input shadow-xs focus-visible:[outline:2px_solid_transparent] focus-visible:[outline-offset:2px] after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 data-disabled:cursor-not-allowed data-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:bg-input/30";
 
 const shippedChrome = new Set([
   "border",

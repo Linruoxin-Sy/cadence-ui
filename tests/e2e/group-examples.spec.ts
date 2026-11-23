@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { effectiveMode, expectStaticSurface, MODES, pressScale } from "./helpers";
+import { effectiveMode, MODES, pressScale } from "./helpers";
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
@@ -135,10 +135,11 @@ for (const os of ["no-preference", "reduce"] as const)
       await vat.fill("supplied-value");
       const toggle = errors.getByRole("button", { name: "Toggle supplied error" });
       await toggle.scrollIntoViewIfNeeded();
-      expect(await pressScale(page, '[data-component-example="field/caller-error"] [data-slot="button"]')).toBeCloseTo(
-        effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
-        2,
-      );
+      // Button's contract keeps root hit/anchor geometry unscaled: the press decoration
+      // layer is the declared owner, so the measurement targets it, not `[data-slot="button"]`.
+      expect(
+        await pressScale(page, '[data-component-example="field/caller-error"] [data-slot="button-feedback"]'),
+      ).toBeCloseTo(effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1, 2);
       await expect(errors.getByRole("alert")).toHaveCount(0);
       await expect(vat).toHaveAttribute("aria-invalid", "false");
       await expect(vat).toHaveAccessibleDescription("Use the number on your invoice.");
@@ -182,13 +183,21 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(checkbox).toHaveAttribute("data-motion", "none");
       const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
       expect(new Set(ids).size).toBe(ids.length);
+      // The test just switched the mode to `none` live. `data-motion` is mandatory on an
+      // animated part, so the proof is that every Field root re-reads the downgrade and
+      // holds no live animation — not the absence of the attribute.
       expect(
-        await page
-          .locator('[data-slot="field"]')
-          .evaluateAll((nodes) =>
-            nodes.every((node) => !node.hasAttribute("data-motion") && node.getAnimations().length === 0),
-          ),
-      ).toBe(true);
+        await page.locator('[data-slot="field"]').evaluateAll((nodes) =>
+          nodes
+            .map((node, index) => ({
+              index,
+              motion: node.getAttribute("data-motion"),
+              animations: node.getAnimations().length,
+              example: node.closest("[data-component-example]")?.getAttribute("data-component-example") ?? "preview",
+            }))
+            .filter((entry) => entry.motion !== "none" || entry.animations !== 0),
+        ),
+      ).toEqual([]);
     });
 
 for (const os of ["no-preference", "reduce"] as const)
@@ -329,10 +338,11 @@ for (const os of ["no-preference", "reduce"] as const)
           expect(await clear.evaluate((node) => node.getBoundingClientRect().width)).toBe(size === "icon-xs" ? 24 : 32);
         await clear.scrollIntoViewIfNeeded();
         if (index === 0)
-          expect(await pressScale(page, '[data-component-example="input-group/button"] button')).toBeCloseTo(
-            effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
-            2,
-          );
+          // Same as the field example: the feedback layer owns press scale, the root
+          // keeps its hit geometry, so an unscaled root is correct rather than a miss.
+          expect(
+            await pressScale(page, '[data-component-example="input-group/button"] [data-slot="button-feedback"]'),
+          ).toBeCloseTo(effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1, 2);
         else {
           await clear.focus();
           await clear.press(index % 2 === 0 ? " " : "Enter");
@@ -385,5 +395,18 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(email).toHaveAttribute("aria-invalid", "true");
       const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
       expect(new Set(ids).size).toBe(ids.length);
-      await expectStaticSurface(page.locator('[data-slot="input-group"]'));
+      // `expectStaticSurface` still expects a T0 part with no `data-motion` at all, but v2
+      // requires every animated part to declare its mode. After this test's live downgrade the
+      // proof is the declared `none` plus no live animation, not a missing attribute.
+      expect(
+        await page.locator('[data-slot="input-group"]').evaluateAll((nodes) =>
+          nodes
+            .map((node, index) => ({
+              index,
+              motion: node.getAttribute("data-motion"),
+              animations: node.getAnimations().length,
+            }))
+            .filter((entry) => entry.motion !== "none" || entry.animations !== 0),
+        ),
+      ).toEqual([]);
     });

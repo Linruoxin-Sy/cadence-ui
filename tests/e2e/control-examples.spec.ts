@@ -8,13 +8,19 @@ for (const os of ["no-preference", "reduce"] as const)
       await page.goto(`/components/checkbox?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const top = page.locator('[data-preview="checkbox"]');
-      expect(
-        await page
-          .locator(
-            '[data-component-example^="checkbox/"]:not([data-component-example$="/without-motion"]) [data-motion]',
-          )
-          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      // The catalogue page hydrates after `networkidle`; poll the settled answer
+      // instead of sampling one instant of the hydration transition.
+      await expect
+        .poll(
+          async () =>
+            page
+              .locator(
+                '[data-component-example^="checkbox/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+          { timeout: 10_000 },
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.getByRole("checkbox")).toHaveCount(5);
       await expect(top.getByRole("checkbox", { name: "Indeterminate", exact: true })).toHaveAttribute(
@@ -96,13 +102,17 @@ for (const os of ["no-preference", "reduce"] as const)
       await page.goto(`/components/radio-group?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const top = page.locator('[data-preview="radio-group"]');
-      expect(
-        await page
-          .locator(
-            '[data-component-example^="radio-group/"]:not([data-component-example$="/without-motion"]) [data-motion]',
-          )
-          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            page
+              .locator(
+                '[data-component-example^="radio-group/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+          { timeout: 10_000 },
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.getByRole("radio")).toHaveCount(3);
       await expect(top.getByRole("radio", { name: "Team", exact: true })).toBeChecked();
@@ -196,11 +206,17 @@ for (const os of ["no-preference", "reduce"] as const)
       await page.goto(`/components/switch?motion=${mode}&variant=sm`);
       await page.waitForLoadState("networkidle");
       const top = page.locator('[data-preview="switch"]');
-      expect(
-        await page
-          .locator('[data-component-example^="switch/"]:not([data-component-example$="/without-motion"]) [data-motion]')
-          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            page
+              .locator(
+                '[data-component-example^="switch/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+          { timeout: 10_000 },
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.getByRole("switch")).toHaveCount(5);
       await expect(top.getByRole("switch").first()).toHaveAttribute(
@@ -308,11 +324,17 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(top.getByRole("slider")).toHaveCount(1);
       const volume = top.getByRole("slider", { name: "Volume", exact: true });
       await expect(top.locator('[data-slot="slider"]')).toHaveAttribute("data-orientation", "horizontal");
-      expect(
-        await page
-          .locator('[data-component-example^="slider/"]:not([data-component-example$="/without-motion"]) [data-motion]')
-          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            page
+              .locator(
+                '[data-component-example^="slider/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+          { timeout: 10_000 },
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       await volume.focus();
       await volume.press("Home");
       await expect(volume).toHaveValue("0");

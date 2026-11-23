@@ -145,10 +145,17 @@ export function ChoiceCard() {
       <FieldLabel htmlFor={id}>
         <Field orientation="horizontal">
           <FieldContent>
-            <FieldTitle>Team plan</FieldTitle>
+            <FieldTitle id={`${id}-title`}>Team plan</FieldTitle>
             <FieldDescription id={`${id}-help`}>Unlimited projects for your team.</FieldDescription>
           </FieldContent>
-          <Checkbox id={id} name="team-plan" value="team" aria-describedby={`${id}-help`} defaultChecked />
+          <Checkbox
+            id={id}
+            name="team-plan"
+            value="team"
+            aria-labelledby={`${id}-title`}
+            aria-describedby={`${id}-help`}
+            defaultChecked
+          />
         </Field>
       </FieldLabel>
     </FieldGroup>
