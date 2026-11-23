@@ -21,6 +21,7 @@
     "registry:build": "node scripts/build-registry.mjs",
     "motion:tokens": "node scripts/generate-motion-tokens.mjs",
     "registry:check": "node scripts/check-registry.mjs",
+    "install:check": "node scripts/install-matrix.mjs",
     "upstream:sync": "node scripts/sync-upstream.mjs",
     "parity:check": "node scripts/parity.mjs",
     "llms:build": "node scripts/build-llms.mjs",
@@ -29,7 +30,7 @@
     "test:gate": "vitest run --project cli-gates",
     "test:site-js": "pnpm build && playwright test tests/e2e/site-js-budget.spec.ts",
     "test:e2e": "pnpm build && playwright test",
-    "check:static": "pnpm typecheck && pnpm lint && pnpm registry:check && pnpm parity:check",
+    "check:static": "pnpm typecheck && pnpm lint && pnpm registry:check && pnpm install:check && pnpm parity:check",
     "check": "pnpm check:static && pnpm test"
   },
   "dependencies": {

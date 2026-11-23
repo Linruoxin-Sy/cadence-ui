@@ -29,7 +29,7 @@ pnpm dev              # the docs site renders every component from registry/cade
 Then prove the checkout before changing anything:
 
 ```bash
-pnpm check:static                                       # typecheck, Biome, registry, parity
+pnpm check:static                                       # typecheck, Biome, registry, install matrix, parity
 pnpm test:local tests/components/button.test.tsx        # one component suite
 ```
 
