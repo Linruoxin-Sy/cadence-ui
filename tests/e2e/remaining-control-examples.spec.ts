@@ -19,11 +19,16 @@ for (const os of ["no-preference", "reduce"] as const)
       expect(
         await sizes.getByRole("button").evaluateAll((nodes) => nodes.map((n) => getComputedStyle(n).height)),
       ).toEqual(["32px", "36px", "40px"]);
-      expect(
-        await page
-          .locator('[data-component-example^="toggle/"]:not([data-component-example$="/without-motion"]) [data-motion]')
-          .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            await page
+              .locator(
+                '[data-component-example^="toggle/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       const controlled = page.locator('[data-component-example="toggle/controlled"]');
       const italic = controlled.getByRole("button", { name: "Italic", exact: true });
       const saved = await italic.elementHandle();
@@ -156,13 +161,16 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.locator('[data-slot="input-otp-slot"]')).toHaveCount(6);
       await expect(top.locator('[data-slot="input-otp-separator"]')).toHaveCount(1);
-      expect(
-        await page
-          .locator(
-            '[data-component-example^="input-otp/"]:not([data-component-example$="/without-motion"]) [data-motion]',
-          )
-          .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            await page
+              .locator(
+                '[data-component-example^="input-otp/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       const controlled = page.locator('[data-component-example="input-otp/controlled"]');
       const input = controlled.getByRole("textbox", { name: "Login code", exact: true });
       await input.fill("012345");
@@ -234,13 +242,16 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(top.getByRole("slider")).toHaveCount(0);
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.getByRole("progressbar")).toHaveCount(3);
-      expect(
-        await page
-          .locator(
-            '[data-component-example^="progress/"]:not([data-component-example$="/without-motion"]) [data-motion]',
-          )
-          .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            await page
+              .locator(
+                '[data-component-example^="progress/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       const label = page.locator('[data-component-example="progress/labelled"]');
       await expect(label.getByRole("progressbar")).toHaveAccessibleName("Uploading assets");
       await expect(label.locator('[data-slot="progress-value"]')).toHaveText("62%");

@@ -155,7 +155,9 @@ function Slider<Value extends number | readonly number[] = number | readonly num
       value={value}
       min={min}
       max={max}
-      thumbAlignment="edge"
+      // `edge` is the documented default, not a replacement for the caller's choice:
+      // the three upstream alignments own their own thumb geometry.
+      thumbAlignment={props.thumbAlignment ?? "edge"}
       orientation={orientation}
       className={(state) =>
         cn(vertical ? "h-full" : "w-full", typeof className === "function" ? className(state) : className)

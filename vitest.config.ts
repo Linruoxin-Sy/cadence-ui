@@ -28,9 +28,17 @@ export default defineConfig({
     // fresh fixture, so their wall clock tracks host throughput (AV scanning, disk
     // pressure) far more than code regression. Vitest's 5s default is not a budget
     // this project ever adopted, so the floor is raised globally and explicit but
-    // tight values were lifted to match. A real hang still trips 120s.
-    testTimeout: 120_000,
-    hookTimeout: 120_000,
+    // tight values were lifted to match. A real hang still trips 240s.
+    //
+    // 240s, not 120s (2026-11-24, F02-B): the first v2 action case in each runtime
+    // worker pays the cold catalogue plan build. Measured here at 90.2s (switch) and
+    // 93.4s (pagination) for that single case on a 16-core Windows host, and two
+    // consecutive 4-vCPU CI runs reported `Test timed out in 120000ms` for exactly
+    // those cold-plan cases (switch is in the audited slice, pagination is not), so
+    // the ceiling sat inside normal host variance. No assertion moved; the workflow's
+    // 30-minute job ceiling remains the outer hang guard.
+    testTimeout: 240_000,
+    hookTimeout: 240_000,
     maxWorkers: 4,
     reporters: ["default", "./tests/motion-contract-reporter.mjs"],
     environment: "jsdom",
