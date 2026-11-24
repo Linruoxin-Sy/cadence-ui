@@ -117,6 +117,13 @@ for (const theme of ["light", "dark"] as const)
           await card.scrollIntoViewIfNeeded();
           await card.screenshot({ path: `.cache/b5-proof/toast-${name}-${theme}-${width}.png` });
           await card.getByRole("button").first().click();
+          await expect(page.locator('[data-slot="toast"]')).toHaveCount(1);
+          // `timers` opens a toast that dismisses itself 5 s from now, and axe plus the screenshot
+          // take longer than that on this host. Park the pointer on the stack before the slow
+          // read: hovering the viewport pauses the countdown — the behaviour `toast-timers.spec.ts`
+          // asserts — so the close button below is sampled on the timed toast that is still there
+          // instead of waiting for a locator whose toast has already removed itself.
+          if (name === "timers") await page.locator('[data-slot="toast"]').hover();
           expect(
             (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
           ).toEqual([]);
