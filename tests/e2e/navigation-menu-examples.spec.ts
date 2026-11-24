@@ -7,7 +7,10 @@ import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"))["navigation-menu"];
 const card = (page: Page, name: string) => page.locator(`[data-component-example="navigation-menu/${name}"]`);
-const popup = (page: Page) => page.locator('[data-slot="navigation-menu-popup"]');
+/** The active surface. A retained panel keeps its own closed popup in the document,
+ * so the shared selectors address the visible popup only and the retained case asks
+ * for the hidden node explicitly. */
+const popup = (page: Page) => page.locator('[data-slot="navigation-menu-popup"]:visible');
 async function open(page: Page, mode = "none") {
   await page.goto(`/components/navigation-menu?motion=${mode}`);
   await page.waitForLoadState("networkidle");
@@ -72,7 +75,7 @@ for (const os of [false, true])
             height: r.height,
             opacity: s.opacity,
             scale: s.scale,
-            same: el === document.querySelector('[data-slot="navigation-menu-popup"]'),
+            same: el === document.querySelector('[data-slot="navigation-menu-popup"][data-open]'),
             properties: el.getAnimations().map((a) => (a as CSSTransition).transitionProperty),
           });
         }
@@ -98,14 +101,12 @@ for (const os of [false, true])
       expect(errors).toEqual([]);
     });
 
-test("Navigation retained input switches without replacing its node and resets only after portal close", async ({
-  page,
-}) => {
+test("Navigation retained input switches and keeps its node across a portal close", async ({ page }) => {
   await open(page);
   const c = card(page, "retained-content");
   const notes = c.getByRole("button", { name: "Notes" });
   await notes.click();
-  const input = popup(page).locator("input");
+  const input = page.locator('[data-slot="navigation-menu-content"]:has(input)').locator("input");
   await expect(input).toHaveAccessibleName("Resource note");
   const handle = await input.elementHandle();
   await input.fill("Caller draft survives switching");
@@ -128,10 +129,17 @@ test("Navigation retained input switches without replacing its node and resets o
   await expect(input).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(notes).toBeFocused();
-  await expect(input).toHaveCount(0);
+  // A retained panel outlives the popup: Base UI's own hidden, inert node stays in
+  // the document, so the same input keeps its draft, caret and selection.
+  await expect(input).toHaveCount(1);
+  await expect(input).toBeHidden();
+  await expect(input).toHaveValue("Caller draft survives switching");
+  expect(await input.evaluate((n, old) => n === old, handle)).toBe(true);
+  expect(await input.evaluate((n) => !!n.closest('[data-slot="navigation-menu-content"][inert]'))).toBe(true);
   await notes.press("Enter");
-  await expect(input).toHaveValue("Read the install guide");
-  expect(await input.evaluate((n, old) => n === old, handle)).toBe(false);
+  await expect(input).toBeVisible();
+  await expect(input).toHaveValue("Caller draft survives switching");
+  expect(await input.evaluate((n, old) => n === old, handle)).toBe(true);
 });
 
 test("Navigation finite orientations alignment disabled custom native parts and RTL", async ({ page }) => {
@@ -149,7 +157,7 @@ test("Navigation finite orientations alignment disabled custom native parts and 
   for (const align of ["start", "center", "end"]) {
     const trigger = card(page, "alignment").getByRole("button", { name: align, exact: true });
     await trigger.click();
-    await expect(page.locator('[data-slot="navigation-menu-positioner"]')).toHaveAttribute("data-align", align);
+    await expect(page.locator('[data-slot="navigation-menu-positioner"]:visible')).toHaveAttribute("data-align", align);
     const [a, b] = await Promise.all([trigger.boundingBox(), popup(page).boundingBox()]);
     expect(a && b).toBeTruthy();
     if (a && b)
@@ -373,7 +381,7 @@ test("Navigation fixed none first insertion has no authored clock", async ({ pag
     Object.assign(window, { instantNavigation: frames });
     const sample = () => {
       for (const n of document.querySelectorAll(
-        '[data-slot="navigation-menu-popup"], [data-slot="navigation-menu-popup"] [data-slot="navigation-menu-content"]',
+        '[data-slot="navigation-menu-popup"][data-open], [data-slot="navigation-menu-popup"][data-open] [data-slot="navigation-menu-content"]',
       )) {
         const s = getComputedStyle(n);
         frames.push({

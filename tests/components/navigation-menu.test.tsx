@@ -77,6 +77,38 @@ describe("NavigationMenu", () => {
       expect(screen.getByRole("button", { name: "Disabled" })).toHaveAttribute("aria-expanded", "false");
     });
   }
+  it("retains a keepMounted panel as a hidden inert node across close and reopen", async () => {
+    const user = userEvent.setup();
+    render(
+      <CadenceProvider mode="full">
+        <NavigationMenu aria-label="Draft menu">
+          <Items />
+        </NavigationMenu>
+      </CadenceProvider>,
+    );
+    const trigger = screen.getByRole("button", { name: "Learn" });
+    await user.click(trigger);
+    const input = screen.getByLabelText("Retained");
+    const content = input.closest('[data-slot="navigation-menu-content"]') as HTMLElement;
+    await user.type(input, " and review");
+    expect(input).toHaveValue(" and review");
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(trigger).toHaveFocus());
+    await waitFor(() => expect(content).toHaveAttribute("data-closed"));
+    // A close must not destroy the retained node: it stays in the document as the
+    // primitive's own hidden, inert surface, so its draft can leave with it.
+    expect(content).toBeInTheDocument();
+    expect(content).toHaveAttribute("hidden");
+    expect(content).toHaveAttribute("inert");
+    expect(content.querySelector("input")).toBe(input);
+    expect(input).toHaveValue(" and review");
+    await user.click(trigger);
+    await waitFor(() => expect(trigger).toHaveAttribute("aria-expanded", "true"));
+    expect(document.querySelector('[data-slot="navigation-menu-content"][data-open]')).toBe(content);
+    expect(screen.getByLabelText("Retained")).toBe(input);
+    expect(input).toHaveValue(" and review");
+  });
+
   it("preserves refs, render, state callback classes/styles and cancellable controlled changes", async () => {
     const user = userEvent.setup();
     const triggerRef = createRef<HTMLButtonElement>();
