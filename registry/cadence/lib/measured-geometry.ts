@@ -490,16 +490,21 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       );
     const observer = new ResizeObserver((entries) => {
       if (delegated()) return;
+      // A descendant box that follows the owner's own in-flight geometry overlay
+      // is that owner's write, not an independent passive cause: a child layer
+      // that fills the animated axis necessarily shrinks and grows with it. A
+      // genuine later reflow still reports through its own delivery once no
+      // owned axis is emitting.
+      const flying = () => (["width", "height"] as const).some((axis) => owner.emitting(axis));
       if (
         adapter.observeChildren &&
         entries.some(({ target }) => {
           const baseline = naturalChildren.get(target);
-          return (
-            baseline &&
-            target instanceof HTMLElement &&
-            ((baseline.width !== target.offsetWidth && !emitted(target, "width")) ||
-              (baseline.height !== target.offsetHeight && !emitted(target, "height")))
-          );
+          if (!baseline || !(target instanceof HTMLElement)) return false;
+          const changed =
+            (baseline.width !== target.offsetWidth && !emitted(target, "width")) ||
+            (baseline.height !== target.offsetHeight && !emitted(target, "height"));
+          return changed && !flying();
         })
       ) {
         passive();
