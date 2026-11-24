@@ -170,11 +170,20 @@ function useRestingEntry(node: { readonly current: HTMLElement | null }, open: b
 function TooltipTrigger({ ref, ...props }: TooltipPrimitive.Trigger.Props) {
   const tooltip = useContext(TooltipContext);
   const node = useRef<HTMLButtonElement | null>(null);
+  // The caller's ref may hand React its own teardown instead of accepting `null`
+  // (React 19 ref cleanup); that teardown, not a second `null` call, detaches it.
+  const detach = useRef<(() => void) | null>(null);
   const setNode = useCallback(
     (element: HTMLButtonElement | null) => {
       node.current = element;
-      if (typeof ref === "function") ref(element);
-      else if (ref) (ref as { current: HTMLButtonElement | null }).current = element;
+      const attachedWithCleanup = detach.current !== null;
+      detach.current?.();
+      detach.current = null;
+      if (attachedWithCleanup && element === null) return;
+      if (typeof ref === "function") {
+        const returned = ref(element);
+        if (typeof returned === "function") detach.current = returned;
+      } else if (ref) (ref as { current: HTMLButtonElement | null }).current = element;
     },
     [ref],
   );
