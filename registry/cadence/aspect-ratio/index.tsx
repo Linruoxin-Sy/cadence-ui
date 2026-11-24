@@ -58,11 +58,13 @@ export interface AspectRatioProps extends React.ComponentProps<"div"> {
  * layout when it loads.
  *
  * An independent insertion fades the wrapper in on its own host. An intentional
- * `ratio` change interpolates the one physical dimension that the new ratio
- * moved — never the definite dimension and never the CSS ratio itself — and the
- * box returns to native sizing once that axis settles, so parent constraints
- * keep recomputing geometry. Media decode, passive resizing and an unsupported
- * constraint relationship stay native and immediate.
+ * `ratio` change measures the frame it replaced, interpolates the one physical
+ * dimension that the new ratio moved — never the CSS ratio itself — and holds
+ * the crossed dimension at its measured size for that flight, because an
+ * authored ratio would otherwise re-derive an auto dimension from the flown
+ * one. The box returns to native sizing once that axis settles, so parent
+ * constraints keep recomputing geometry. Media decode, passive resizing and an
+ * unsupported constraint relationship stay native and immediate.
  *
  * The `--ratio` custom property is written after the caller's `style`, so a
  * consumer can pass a background or a filter without losing the ratio.
@@ -117,10 +119,14 @@ function AspectRatio({ ratio, className, style: callerStyle, children, ...props 
   });
   const axis = useRef<RatioAxis | null>(null);
   const frame = useRef<RatioFrame | null>(null);
+  /** The accepted ratio change owns its axis and its measured origin; later
+   * renders of the same ratio must not re-derive either from the flight. */
+  const change = useRef<{ ratio: number; axis: RatioAxis | null }>({ ratio, axis: null });
+  const origin = useRef<RatioFrame | null>(null);
   const connection = useRef<{ host: HTMLElement; release(): void } | null>(null);
   const prepared = useRef({ ratio, policy: "" });
   useInsertionEffect(() => {
-    // Capture the pre-change frame before React writes the new ratio.
+    // Sample the in-progress flight before React writes the new ratio.
     const policy = JSON.stringify([cm.mode, cm.timeScale, cm.scope.signature]);
     if (prepared.current.ratio !== ratio || prepared.current.policy !== policy) geometry.controller.prepare();
     prepared.current = { ratio, policy };
@@ -143,7 +149,7 @@ function AspectRatio({ ratio, className, style: callerStyle, children, ...props 
         axes: ["width", "height"],
         observeChildren: true,
         textGeometry: true,
-        measure: () => ratioGeometry(node.current, axis.current),
+        measure: () => ratioGeometry(node.current, axis.current, origin.current?.[axis.current ?? "width"] ?? null),
       });
       connection.current = {
         host,
@@ -174,16 +180,25 @@ function AspectRatio({ ratio, className, style: callerStyle, children, ...props 
     consumed.current = true;
     const parameters = cm.parameters(bindMotionParameters(geometryCompact, "geometry.resize/measured"));
     if (parameters.kind !== "geometry") return;
-    const nextAxis = ratioAxis(host, frame.current);
+    // The axis and its measured origin belong to the ratio change itself: a
+    // later render must not re-derive either from the frame the flight produced.
+    const changed = change.current.ratio !== ratio;
+    const nextAxis = changed ? ratioAxis(host, frame.current) : change.current.axis;
+    if (changed) origin.current = frame.current;
+    change.current = { ratio, axis: nextAxis };
     axis.current = nextAxis;
     const next = ratioFrame(host);
     if (next) frame.current = next;
     // The destination is the native box itself, so box-sizing, intrinsic sizing
     // and caller min/max constraints are preserved rather than recomputed.
-    geometry.controller.commit(
-      geometry.transaction.revision("content", [ratio, nextAxis, next?.width ?? 0, next?.height ?? 0].join("/"), node),
-      { reduced: cm.reduced, transition: parameters.transition, available: present && !!next },
-    );
+    geometry.controller.commit(geometry.transaction.revision("content", [ratio, nextAxis].join("/"), node), {
+      reduced: cm.reduced,
+      transition: parameters.transition,
+      available: present && !!next,
+    });
+    // The origin describes that one accepted change; a later commit recomputes
+    // its own destination instead of replaying this start.
+    origin.current = null;
   });
   committed(
     () => () => {

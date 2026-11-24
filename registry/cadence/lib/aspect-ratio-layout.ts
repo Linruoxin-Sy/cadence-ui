@@ -42,8 +42,16 @@ export function ratioAxis(host: HTMLElement, previous: RatioFrame | null): Ratio
 }
 
 /** Resolve one native destination for the supported definite/auto layout. The
- * observed box already contains box-sizing, intrinsic and min/max results. */
-export function ratioGeometry(host: HTMLElement | null, axis: RatioAxis | null): GeometryDestination | null {
+ * observed box already contains box-sizing, intrinsic and min/max results.
+ * `origin` is the measured frame this ratio replaced, so the first change after
+ * a settlement still has a start. The crossed axis is held rather than
+ * interpolated: an authored ratio re-derives an auto dimension from its partner,
+ * so a bare height overlay would also resize the width. */
+export function ratioGeometry(
+  host: HTMLElement | null,
+  axis: RatioAxis | null,
+  origin: number | null,
+): GeometryDestination | null {
   if (!axis || !host || !host.isConnected) return null;
   if (host.closest("[hidden],[inert]")) return null;
   const box = ratioFrame(host);
@@ -51,10 +59,11 @@ export function ratioGeometry(host: HTMLElement | null, axis: RatioAxis | null):
   if (!box || !css) return null;
   if (css.display === "none" || css.visibility === "hidden" || css.boxSizing !== "border-box") return null;
   if (!ratioValue(host)) return null;
+  const crossed: RatioAxis = axis === "width" ? "height" : "width";
   const family = css.transitionProperty.split(",").map((name) => name.trim());
   const times = css.transitionDuration.split(",").map(Number.parseFloat);
   if (
-    family.some((name, index) => ["all", axis].includes(name) && (times[index % times.length] ?? 0) > 0) ||
+    family.some((name, index) => ["all", axis, crossed].includes(name) && (times[index % times.length] ?? 0) > 0) ||
     (host.getAnimations?.() ?? []).some(
       (handle) =>
         !knownTextGeometry(handle, "full") &&
@@ -65,8 +74,18 @@ export function ratioGeometry(host: HTMLElement | null, axis: RatioAxis | null):
   )
     return null;
   const size = box[axis];
-  if (!Number.isFinite(size) || size <= 0) return null;
-  return { [axis]: { size, min: 0, readable: mediaReadable(host), independent: true } };
+  const held = box[crossed];
+  if (!Number.isFinite(size) || size <= 0 || !Number.isFinite(held) || held <= 0) return null;
+  return {
+    [axis]: {
+      size,
+      min: 0,
+      readable: mediaReadable(host),
+      independent: true,
+      ...(origin !== null && Number.isFinite(origin) ? { origin } : {}),
+    },
+    [crossed]: { size: held, min: 0, hold: true },
+  };
 }
 
 /** Stretching replaced media through intermediate heights is not a readable
