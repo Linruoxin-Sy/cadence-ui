@@ -103,20 +103,25 @@ export async function computed(page: Page, selector: string, property: string): 
 /**
  * Presses and holds a control, then reports the scale it holds while pressed.
  *
+ * `target` is the host that owns the property under test: Button's `button-feedback` layer when
+ * a press pose is expected, or the native root when the assertion is that it stays at rest. A
+ * `Locator` is accepted as well, so the sampled element cannot drift to a sibling that happens
+ * to match a page-wide selector first.
+ *
  * Reading *during* the press is deterministic; sampling a window from the test
  * side races the gesture and loses. Motion reaches the press scale in well under
  * the 350 ms held here.
  */
-export async function pressScale(page: Page, selector: string): Promise<number> {
-  const target = page.locator(selector).first();
-  const box = await target.boundingBox();
-  if (!box) throw new Error(`nothing to press at ${selector}`);
+export async function pressScale(page: Page, target: string | Locator): Promise<number> {
+  const element = (typeof target === "string" ? page.locator(target) : target).first();
+  const box = await element.boundingBox();
+  if (!box) throw new Error(`nothing to press at ${typeof target === "string" ? target : "the passed locator"}`);
 
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.waitForTimeout(350);
-  const scale = await target.evaluate((element) => {
-    const transform = getComputedStyle(element).transform;
+  const scale = await element.evaluate((node) => {
+    const transform = getComputedStyle(node).transform;
     return transform === "none" ? 1 : new DOMMatrixReadOnly(transform).a;
   });
   await page.mouse.up();
@@ -251,8 +256,16 @@ export async function recordedPresence(
   };
 }
 
-/** T0 surfaces may animate color/shadow feedback, never authored motion or geometry. */
-export async function expectStaticSurface(surface: Locator) {
+/**
+ * T0 surfaces may animate color/shadow feedback, never authored motion or geometry.
+ *
+ * `data-motion` is mandatory on every animated part (AGENTS.md, motion conformance item 4),
+ * so after the v2 migrations a static surface declares the mode it resolved to — `none` after a
+ * live downgrade, `full` or `reduced` from the route — instead of carrying no attribute at all.
+ * "Static" therefore means *declared mode + no authored property in flight*, not "the attribute
+ * is missing": the absence shape is pre-migration and no longer describes this DOM.
+ */
+export async function expectStaticSurface(surface: Locator, mode: Mode) {
   const observed = await surface.evaluateAll((nodes) =>
     nodes.map((node) => ({
       motion: node.getAttribute("data-motion"),
@@ -264,7 +277,7 @@ export async function expectStaticSurface(surface: Locator) {
     })),
   );
   for (const node of observed) {
-    expect(node.motion).toBeNull();
+    expect(node.motion).toBe(mode);
     for (const property of node.properties)
       expect([
         "color",

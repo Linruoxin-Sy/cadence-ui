@@ -256,6 +256,13 @@ for (const mode of ["full", "reduced", "none"] as const)
       await expect(grid.locator("figure")).toHaveCount(3);
       await expect(grid.locator("figcaption")).toHaveText(["4 : 3", "1 : 1", "3 : 4"]);
       await expect(grid).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
+      // Nine frames on the published page: the preview's three, Square, Video, the grid's three
+      // and the "Switching the ratio" example. A tenth section must fail here rather than be
+      // appended to the ratio list below without anyone noticing.
+      await expect(page.locator('[data-slot="aspect-ratio"]')).toHaveCount(9);
+      await expect(
+        page.locator('[data-component-example="aspect-ratio/switch"] [data-slot="aspect-ratio"]'),
+      ).toHaveCount(1);
       for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 1000 });
         const ratios: number[] = [];
@@ -275,7 +282,9 @@ for (const mode of ["full", "reduced", "none"] as const)
           expect(geometry.animations).toBe(0);
           ratios.push(geometry.ratio);
         }
-        expect(ratios).toEqual([16 / 9, 1, 3 / 4, 1, 16 / 9, 4 / 3, 1, 3 / 4]);
+        // Top preview (16 : 9, 1, 3 : 4), then Square, Video, the grid's three and the published
+        // "Switching the ratio" example's own 16 : 9 box — nine frames in all.
+        expect(ratios).toEqual([16 / 9, 1, 3 / 4, 1, 16 / 9, 4 / 3, 1, 3 / 4, 16 / 9]);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       }
       const frame = grid.locator('[data-slot="aspect-ratio"]').first();
