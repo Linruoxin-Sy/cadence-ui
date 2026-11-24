@@ -35,6 +35,17 @@ import { useTextPresentation } from "../lib/use-text-presentation";
 
 const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
+/**
+ * A retained panel needs a surface that outlives the popup. Base UI's Portal drops
+ * the whole subtree when the root closes, and its Content only keeps a node while that
+ * portal is mounted (`hasMountedInPortal` never falls back inline), so the retained
+ * input leaves with the popup. The root therefore learns whether any Content asked to
+ * be kept mounted and tells the one Portal to stay; Retention is a memo, not a second
+ * lifecycle owner.
+ */
+type Retention = { count: number; retain(): () => void };
+const RetentionContext = createContext<Retention | null>(null);
+
 /** Base UI 1.6 focus sentinels are tabbable. They must not be aria-hidden.
  * Empty generic spans need no accessible name and keep their native focus redirection.
  * Scope observation to this menu's two surfaces; never change tabindex or event handlers.
@@ -106,6 +117,12 @@ function NavigationMenu({
   const guardRef = useNavigationGuards(ref);
   const activation = useRef<Activation | null>(null);
   const [, bump] = useState(0);
+  const [retained, setRetained] = useState(0);
+  const retain = useCallback(() => {
+    setRetained((value) => value + 1);
+    return () => setRetained((value) => value - 1);
+  }, []);
+  const retention = useMemo<Retention>(() => ({ count: retained, retain }), [retained, retain]);
   const store = useMemo<OrderStore>(
     () => ({
       read: () => activation.current,
@@ -129,8 +146,10 @@ function NavigationMenu({
       {...props}
     >
       <OrderContext.Provider value={store}>
-        {children}
-        <NavigationMenuPositioner align={align} />
+        <RetentionContext.Provider value={retention}>
+          {children}
+          <NavigationMenuPositioner align={align} />
+        </RetentionContext.Provider>
       </OrderContext.Provider>
     </NavigationMenuPrimitive.Root>
   );
@@ -312,6 +331,24 @@ function useSurfaceState(node: RefObject<HTMLElement | null>): SurfaceState {
   return state;
 }
 
+/**
+ * A retained panel at rest is closed, not exiting. Base UI owns `inert` for its own
+ * exit and switch states; this observes only the committed resting state so a hidden
+ * panel is not left actionable and does not fight the primitive's focus handoff.
+ */
+function useRestingClosed(node: RefObject<HTMLElement | null>) {
+  const [closed, setClosed] = useState(false);
+  useHostObserver(
+    node,
+    (host) => () => {
+      const next = host.hasAttribute("data-closed") && !host.hasAttribute("data-ending-style");
+      setClosed((previous) => (previous === next ? previous : next));
+    },
+    ["data-open", "data-closed", "data-ending-style"],
+  );
+  return closed;
+}
+
 /** The active content's own committed identity; a switch or a text revision bumps it. */
 function useContentRevision(node: RefObject<HTMLElement | null>) {
   const [key, setKey] = useState("");
@@ -348,14 +385,30 @@ const OrderContext = createContext<OrderStore | null>(null);
  * The active item's content. It carries the owned display slots only: the shared
  * viewport owns the switch paint, so a switch never multiplies one writer per item.
  */
-function NavigationMenuContent({ className, style, children, ref, ...props }: NavigationMenuPrimitive.Content.Props) {
+function NavigationMenuContent({
+  className,
+  style,
+  children,
+  keepMounted,
+  ref,
+  ...props
+}: NavigationMenuPrimitive.Content.Props) {
   const host = useMotionHostRef<HTMLDivElement>(ref);
   const cm = useCadenceMotion(host.node);
   const [entity] = useState(() => ({}));
+  const retention = useContext(RetentionContext);
+  const retain = retention?.retain;
+  const restingClosed = useRestingClosed(host.node);
+  committed(() => {
+    if (!keepMounted || !retain) return;
+    return retain();
+  }, [keepMounted, retain]);
   return withCadenceScope(
     cm,
     <NavigationMenuPrimitive.Content
       {...props}
+      {...(keepMounted && restingClosed ? { inert: true } : {})}
+      keepMounted={keepMounted}
       ref={host.ref}
       data-slot="navigation-menu-content"
       data-motion={cm.mode}
@@ -438,6 +491,7 @@ function NavigationMenuPositioner({
   );
   const state = useSurfaceState(host.node);
   const order = useContext(OrderContext);
+  const retained = useContext(RetentionContext)?.count ?? 0;
   const contentKey = useContentRevision(host.node);
   const controller = useRef<ReturnType<typeof createAnchoredPresence> | null>(null);
   const connected = useRef<HTMLElement | null>(null);
@@ -562,7 +616,7 @@ function NavigationMenuPositioner({
   );
 
   return (
-    <NavigationMenuPrimitive.Portal>
+    <NavigationMenuPrimitive.Portal keepMounted={retained > 0}>
       {withCadenceScope(
         cm,
         <NavigationMenuPrimitive.Positioner
