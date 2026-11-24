@@ -37,6 +37,12 @@ export type GeometryTarget = {
   resting?: string;
   /** Known intrinsic column-flex allocation; release with the height overlay. */
   flexBlock?: boolean;
+  /** The measured frame this destination replaced: a flight with no in-progress
+   * sample starts here instead of from an absent baseline. */
+  origin?: number;
+  /** A crossed axis that would natively follow the flown axis through an authored
+   * ratio is overlaid at `size` for that flight, then released with it. */
+  hold?: boolean;
 };
 export type GeometryDestination = Partial<Record<Axis, GeometryTarget>>;
 export type GeometryPolicy = { reduced: boolean; transition: Transition; available?: boolean };
@@ -148,6 +154,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     let contentWidth: Animation | null = null;
     let contentLease: MotionLease | null = null;
     let flexBlock: Animation | null = null;
+    let hold: Animation | null = null;
     const stops = new Set<() => void>();
     let baseline: GeometryDestination | null = null;
     let lease: MotionLease | null = null;
@@ -187,6 +194,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       contentLease = null;
       flexBlock?.cancel();
       flexBlock = null;
+      hold?.cancel();
+      hold = null;
       for (const stop of stops) stop();
       stops.clear();
       for (const axis of ["width", "height"] as const) {
@@ -331,6 +340,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           lease = null;
         }
         let pending = 0;
+        let held: { axis: Axis; size: number } | null = null;
         for (const axis of axes) {
           const target = destination[axis];
           if (!target) continue;
@@ -340,9 +350,15 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           if (!valid) continue;
           const size = Math.min(max, Math.max(min, target.size));
           if (baseline) baseline[axis] = { ...target, size };
+          // A crossed axis that would follow the flown axis natively is not a
+          // second interpolation: it is held at its measured size for the flight.
+          if (target.hold) {
+            held = { axis, size };
+            continue;
+          }
           // This maintained dimension belongs to the adapter, never caller CSS.
           if (target.resting !== undefined) node.style[axis] = target.resting;
-          const start = active ? sampled[axis]?.size : previous?.[axis]?.size;
+          const start = active ? sampled[axis]?.size : (target.origin ?? previous?.[axis]?.size);
           if (
             !lease?.current() ||
             !animated.has(axis) ||
@@ -419,11 +435,18 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
                 contentLease = null;
                 flexBlock?.cancel();
                 flexBlock = null;
+                hold?.cancel();
+                hold = null;
                 permit.finish();
               }
             },
           });
           stops.add(unsubscribe);
+        }
+        if (pending && held && lease?.current()) {
+          const pinned = { [held.axis]: `${held.size}px` };
+          hold = node.animate([pinned, pinned], { duration: 0, fill: "both" });
+          if (adapter.textGeometry) registerTextGeometry(hold, lease, "full");
         }
         if (!pending) lease?.finish();
       },
@@ -462,7 +485,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       return (
         handles.length <= motionLimits.collectionVisuals &&
         handles.every((handle) => {
-          if (Object.values(effects).includes(handle) || handle === flexBlock) return true;
+          if (Object.values(effects).includes(handle) || handle === flexBlock || handle === hold) return true;
           const frames = (handle.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
           return (
             frames.length <= motionLimits.collectionVisuals &&
