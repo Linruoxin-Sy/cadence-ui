@@ -5,7 +5,9 @@ import {
   MODES,
   openComponent,
   pressScale,
+  recordedPresence,
   recordedScale,
+  recordPresence,
   recordScale,
   scoped,
 } from "./helpers";
@@ -21,6 +23,29 @@ import {
 const PREFERENCES = [false, true] as const;
 const preferenceName = (prefersReduced: boolean) =>
   prefersReduced ? "prefers-reduced-motion: reduce" : "prefers-reduced-motion: no-preference";
+
+/**
+ * The declared clocks of the two modal surfaces, as the recipe resolves them per mode.
+ *
+ * A modal panel's entrance is the presence controller's Web Animation, not a CSS
+ * transition: the v2 panel deliberately carries no `transition` family so the controller
+ * is its only writer, and the only longhands left on it belong to the colour family, which
+ * settles to `0s` while the panel holds focus. `transition-duration` therefore reports a
+ * colour clock and can never prove `enter.pop/surface` ran — the writer itself is the
+ * observable, read before Base UI's own initial focus settles the envelope.
+ */
+const MODAL = {
+  full: { opacity: [220], spatial: [220] },
+  reduced: { opacity: [132], spatial: [] },
+  none: { opacity: [], spatial: [] },
+} as const;
+const BACKDROP = {
+  full: { opacity: [220], spatial: [] },
+  reduced: { opacity: [132], spatial: [] },
+  none: { opacity: [], spatial: [] },
+} as const;
+const PRESENCE =
+  '[data-slot="dialog-content"], [data-slot="dialog-overlay"], [data-slot="alert-dialog-content"], [data-slot="alert-dialog-overlay"]';
 
 test.describe("button", () => {
   for (const prefersReduced of PREFERENCES) {
@@ -67,6 +92,7 @@ test.describe("dialog", () => {
 
         test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await recordScale(page, '[data-slot="dialog-content"]');
+          await recordPresence(page, PRESENCE);
           await openComponent(page, "dialog", requested, "dialog-trigger", mode);
 
           await page.locator(scoped("dialog", "button")).filter({ hasText: "Rename project" }).click();
@@ -76,11 +102,11 @@ test.describe("dialog", () => {
           const popup = page.locator('[data-slot="dialog-content"]');
           await expect(popup).toHaveAttribute("data-motion", mode);
 
-          // Durations come from the tokens the component is wired to, so this also
-          // proves `none` zeroes them instead of falling back to `reduced`.
-          expect(await computed(page, '[data-slot="dialog-content"]', "transition-duration")).toBe(
-            { full: "0.22s", reduced: "0.132s", none: "0s" }[mode],
-          );
+          // The declared panel and backdrop clocks, read from the writers that ran. The
+          // backdrop's colour family is still a CSS transition, so its token binding is
+          // also asserted on the computed style; the panel's presence is not CSS at all.
+          expect(await recordedPresence(page, "initial", "dialog-content")).toEqual(MODAL[mode]);
+          expect(await recordedPresence(page, "initial", "dialog-overlay")).toEqual(BACKDROP[mode]);
           expect(await computed(page, '[data-slot="dialog-overlay"]', "transition-duration")).toBe(
             { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
           );
@@ -99,13 +125,15 @@ test.describe("dialog", () => {
 
     test("the panel fades without the 0.96 settle", async ({ page }) => {
       await recordScale(page, '[data-slot="dialog-content"]');
+      await recordPresence(page, PRESENCE);
       await openComponent(page, "dialog", "reduced", "dialog-trigger");
       await page.locator(scoped("dialog", "button")).filter({ hasText: "Rename project" }).click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await page.waitForTimeout(300);
 
-      expect(await computed(page, '[data-slot="dialog-content"]', "transition-property")).toContain("opacity");
-      expect(await computed(page, '[data-slot="dialog-content"]', "transition-duration")).toBe("0.132s");
+      // The short opacity path and no scale envelope: the panel's reduced writer, not a
+      // CSS family the v2 panel no longer installs.
+      expect(await recordedPresence(page, "initial", "dialog-content")).toEqual({ opacity: [132], spatial: [] });
       expect((await recordedScale(page)).min).toBe(1);
     });
   });
@@ -124,6 +152,7 @@ test.describe("alert-dialog", () => {
 
         test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await recordScale(page, '[data-slot="alert-dialog-content"]');
+          await recordPresence(page, PRESENCE);
           await openComponent(page, "alert-dialog", requested, "alert-dialog-trigger", mode);
 
           await page.locator(scoped("alert-dialog", '[data-slot="alert-dialog-trigger"]')).first().click();
@@ -133,14 +162,12 @@ test.describe("alert-dialog", () => {
           const popup = page.locator('[data-slot="alert-dialog-content"]');
           await expect(popup).toHaveAttribute("data-motion", mode);
 
-          // The same duration tokens as `dialog`: `none` must zero them on the
-          // element, not fall back to the reduced values.
-          expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-duration")).toBe(
-            { full: "0.22s", reduced: "0.132s", none: "0s" }[mode],
-          );
-          expect(await computed(page, '[data-slot="alert-dialog-overlay"]', "transition-duration")).toBe(
-            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
-          );
+          // The same writers as `dialog`: `none` must start no envelope at all rather
+          // than falling back to the reduced one. This backdrop owns no CSS colour
+          // family, so its computed clock is genuinely `0s` and only the writer is an
+          // observation.
+          expect(await recordedPresence(page, "initial", "alert-dialog-content")).toEqual(MODAL[mode]);
+          expect(await recordedPresence(page, "initial", "alert-dialog-overlay")).toEqual(BACKDROP[mode]);
 
           const enter = await recordedScale(page);
           expect(enter.frames).toBeGreaterThan(3);
@@ -156,13 +183,13 @@ test.describe("alert-dialog", () => {
 
     test("the panel fades without the 0.96 settle", async ({ page }) => {
       await recordScale(page, '[data-slot="alert-dialog-content"]');
+      await recordPresence(page, PRESENCE);
       await openComponent(page, "alert-dialog", "reduced", "alert-dialog-trigger");
       await page.locator(scoped("alert-dialog", '[data-slot="alert-dialog-trigger"]')).first().click();
       await expect(page.getByRole("alertdialog")).toBeVisible();
       await page.waitForTimeout(300);
 
-      expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-property")).toContain("opacity");
-      expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-duration")).toBe("0.132s");
+      expect(await recordedPresence(page, "initial", "alert-dialog-content")).toEqual({ opacity: [132], spatial: [] });
       expect((await recordedScale(page)).min).toBe(1);
     });
   });
