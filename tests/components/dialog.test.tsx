@@ -181,6 +181,63 @@ describe("Dialog", () => {
     await userEvent.keyboard("{Escape}");
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
+
+  /**
+   * `dialog.content.enter` and `dialog.overlay.enter` are Web Animations started by the
+   * shared modal presence controller, so `transition-duration` cannot report them and
+   * jsdom has no animation engine at all. Stubbing `animate` is what makes "the
+   * declared envelope actually started" observable in this suite; without it a surface
+   * that silently stopped writing its entrance would still pass every assertion above.
+   * jsdom also has no layout, so only the opacity half is reachable here: the `scale.in`
+   * envelope it writes on top is proven in `tests/e2e/motion-matrix.spec.ts`.
+   */
+  it.each(modes)("starts the declared panel and backdrop entrance in %s", async (mode) => {
+    const calls: { slot: string | null; properties: string[]; duration: number }[] = [];
+    const animate = vi.fn(function record(this: Element, frames: Keyframe[], timing: KeyframeAnimationOptions) {
+      calls.push({
+        slot: this.getAttribute("data-slot"),
+        properties: [...new Set(frames.flatMap((frame) => Object.keys(frame ?? {})))].sort(),
+        duration: Number(timing.duration),
+      });
+      return {
+        effect: { setKeyframes: () => {}, getKeyframes: () => [] },
+        cancel: vi.fn(),
+        playState: "running",
+        // The entrance never resolves here: the harness only cares that it started.
+        finished: new Promise(() => {}),
+      };
+    });
+    const previous = Element.prototype.animate;
+    Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+    const clock = { full: 220, reduced: 132, none: null }[mode];
+    const entrance = () =>
+      calls
+        .filter((call) => call.slot === "dialog-content" || call.slot === "dialog-overlay")
+        .map((call) => `${call.slot}:${call.properties.join("+")}@${call.duration}`)
+        // The backdrop is committed with the portal, the panel with its popup; the
+        // pair is what matters, not which effect ran first.
+        .sort();
+    try {
+      renderInMode(mode);
+      await userEvent.click(screen.getByRole("button", { name: "Rename project" }));
+      await screen.findByRole("dialog");
+      expect(entrance()).toEqual(
+        clock === null ? [] : [`dialog-content:opacity@${clock}`, `dialog-overlay:opacity@${clock}`].sort(),
+      );
+
+      // A reopen is a second entrance on a fresh surface, not an already-visible render.
+      await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      calls.length = 0;
+      await userEvent.click(screen.getByRole("button", { name: "Rename project" }));
+      await screen.findByRole("dialog");
+      expect(entrance()).toEqual(
+        clock === null ? [] : [`dialog-content:opacity@${clock}`, `dialog-overlay:opacity@${clock}`].sort(),
+      );
+    } finally {
+      Element.prototype.animate = previous;
+    }
+  });
 });
 
 describe("Dialog v2 owners", () => {

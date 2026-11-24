@@ -147,6 +147,55 @@ describe("AlertDialog", () => {
     expectMotionContract(mode, { policy: ["color"] });
   });
 
+  /**
+   * `alert-dialog.content.enter` and `.overlay.enter` are Web Animations started by the
+   * shared modal presence controller: no CSS duration reports them and jsdom has no
+   * animation engine, so the writer is only observable through `animate` itself. This is
+   * the check that would fail if the panel entrance ever stopped starting. jsdom has no
+   * layout, so the panel's `scale.in` half is proven in `tests/e2e/motion-matrix.spec.ts`.
+   */
+  it.each(modes)("starts the declared panel and backdrop entrance in %s", async (mode) => {
+    const calls: { slot: string | null; properties: string[]; duration: number }[] = [];
+    const animate = vi.fn(function record(this: Element, frames: Keyframe[], timing: KeyframeAnimationOptions) {
+      calls.push({
+        slot: this.getAttribute("data-slot"),
+        properties: [...new Set(frames.flatMap((frame) => Object.keys(frame ?? {})))].sort(),
+        duration: Number(timing.duration),
+      });
+      return {
+        effect: { setKeyframes: () => {}, getKeyframes: () => [] },
+        cancel: vi.fn(),
+        playState: "running",
+        // The entrance never resolves here: the harness only cares that it started.
+        finished: new Promise(() => {}),
+      };
+    });
+    const previous = Element.prototype.animate;
+    Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+    const clock = { full: 220, reduced: 132, none: null }[mode];
+    const entrance = () =>
+      calls
+        .filter((call) => call.slot === "alert-dialog-content" || call.slot === "alert-dialog-overlay")
+        .map((call) => `${call.slot}:${call.properties.join("+")}@${call.duration}`)
+        .sort();
+    const expected =
+      clock === null ? [] : [`alert-dialog-content:opacity@${clock}`, `alert-dialog-overlay:opacity@${clock}`].sort();
+    try {
+      renderInMode(mode);
+      await open();
+      expect(entrance()).toEqual(expected);
+
+      // A reopen is a second entrance on a fresh surface, not an already-visible render.
+      await userEvent.click(screen.getByRole("button", { name: "Keep project" }));
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+      calls.length = 0;
+      await open();
+      expect(entrance()).toEqual(expected);
+    } finally {
+      Element.prototype.animate = previous;
+    }
+  });
+
   it("preserves caller render, class/style callbacks and React 19 ref cleanup", () => {
     const cleanup = vi.fn();
     const ref = vi.fn(() => cleanup);
