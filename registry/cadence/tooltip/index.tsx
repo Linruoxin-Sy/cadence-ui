@@ -8,6 +8,7 @@ import {
   createContext,
   isValidElement,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useId,
@@ -133,14 +134,68 @@ function Tooltip({
   );
 }
 
-function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
+/**
+ * A trigger can appear under a pointer that is already resting on it — a streamed
+ * route mounts its preview seconds after the first pointer move, and any trigger
+ * rendered conditionally does the same. That pointer never sent this element an
+ * entry, and Base UI starts with hover moves blocked until it hears one, so the hint
+ * stays closed for as long as the pointer rests and no amount of movement inside the
+ * trigger re-arms it: only leaving and returning does.
+ *
+ * The trigger therefore completes the interaction the pointer already made, once per
+ * mount: on a device that can hover, with the pointer really over this element, it
+ * re-enters itself and Base UI's own intent delay, open state and unmount decide the
+ * rest. Nothing here opens the hint itself, so the primitive stays the only writer;
+ * a device without hover is left alone, where a sticky `:hover` after a tap would be
+ * a tap rather than an intent to read a hint.
+ */
+function useRestingEntry(node: { readonly current: HTMLElement | null }, open: boolean, disabled: boolean | undefined) {
+  const replayed = useRef(false);
+
+  useEffect(() => {
+    if (replayed.current) return;
+    replayed.current = true;
+    const element = node.current;
+    if (!element || open || disabled) return;
+    const view = element.ownerDocument.defaultView;
+    if (!view?.matchMedia("(hover: hover)").matches) return;
+    if (!element.matches(":hover")) return;
+    // `mouseenter` is what clears the primitive's blocked-move state; `mousemove` is
+    // what arms its rest delay, which a still pointer never sends on its own.
+    element.dispatchEvent(new MouseEvent("mouseenter", { relatedTarget: null }));
+    element.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, relatedTarget: null }));
+  }, [node, open, disabled]);
+}
+
+function TooltipTrigger({ ref, ...props }: TooltipPrimitive.Trigger.Props) {
   const tooltip = useContext(TooltipContext);
+  const node = useRef<HTMLButtonElement | null>(null);
+  // The caller's ref may hand React its own teardown instead of accepting `null`
+  // (React 19 ref cleanup); that teardown, not a second `null` call, detaches it.
+  const detach = useRef<(() => void) | null>(null);
+  const setNode = useCallback(
+    (element: HTMLButtonElement | null) => {
+      node.current = element;
+      const attachedWithCleanup = detach.current !== null;
+      detach.current?.();
+      detach.current = null;
+      if (attachedWithCleanup && element === null) return;
+      if (typeof ref === "function") {
+        const returned = ref(element);
+        if (typeof returned === "function") detach.current = returned;
+      } else if (ref) (ref as { current: HTMLButtonElement | null }).current = element;
+    },
+    [ref],
+  );
+
+  useRestingEntry(node, tooltip?.open ?? false, props.disabled);
 
   return (
     <TooltipPrimitive.Trigger
       data-slot="tooltip-trigger"
       aria-describedby={tooltip?.open ? tooltip.id : undefined}
       {...props}
+      ref={setNode}
     />
   );
 }
