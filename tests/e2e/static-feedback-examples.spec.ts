@@ -162,10 +162,18 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(top.getByRole("combobox")).toHaveCount(0);
       for (const name of ["text-lines", "avatar-name", "swap-content"]) {
         const card = page.locator(`[data-component-example="skeleton/${name}"]`);
-        await expect(card).toHaveAttribute("data-preview-motion", effectiveMode(mode, os === "reduce"));
+        const resolved = effectiveMode(mode, os === "reduce");
+        await expect(card).toHaveAttribute("data-preview-motion", resolved);
+        // The pulse pauses while the placeholder is offscreen — `docs/motion/components/skeleton.md`,
+        // "Offscreen/hidden: the pulse pauses and resumes without replaying anything". At 1280×720
+        // the `text-lines` shapes sit below the fold, so a sample taken before scrolling describes
+        // that pause rather than the loop: scroll the placeholder into view, then read its clock.
+        // Only the resolved `full` keeps the loop; the same contract table gives `reduced` a static
+        // final opacity with no loop and `none` the immediate shape.
         for (const shape of await card.locator('[data-slot="skeleton"]').all()) {
-          await expect(shape).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
-          await expect(shape).toHaveCSS("animation-name", mode === "none" ? "none" : "pulse");
+          await shape.scrollIntoViewIfNeeded();
+          await expect(shape).toHaveAttribute("data-motion", resolved);
+          await expect(shape).toHaveCSS("animation-name", resolved === "full" ? "pulse" : "none");
         }
       }
       const frames = await page.evaluate(
