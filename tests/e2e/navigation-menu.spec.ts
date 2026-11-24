@@ -66,9 +66,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(popup.getByRole("link", { name: "Installation", exact: true })).toBeFocused();
         await page.keyboard.press("Escape");
         await expect(learn).toBeFocused();
-        // A retained panel keeps Base UI's closed surface in the document, hidden.
-        await expect(popup).toHaveCount(1);
-        await expect(popup).toBeHidden();
+        // The preview menu has no keepMounted panel, so its portal is allowed to unmount.
+        await expect(popup).toHaveCount(0);
         await page.keyboard.press("Enter");
         await expect(learn).toHaveAttribute("aria-expanded", "true");
         await page.keyboard.press("ArrowRight");
@@ -179,7 +178,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         expect(r.x).toBeGreaterThanOrEqual(0);
         expect(r.x + r.width).toBeLessThanOrEqual(390);
         await page.locator("main").click({ position: { x: 2, y: 2 } });
-        await expect(popup).toBeHidden();
+        await expect(popup).toHaveCount(0);
         expect(errors).toEqual([]);
       });
     }
