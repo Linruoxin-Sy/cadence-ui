@@ -136,6 +136,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         );
       });
       test(`native controls, navigation and static surfaces ${mode}`, async ({ page }) => {
+        const actual = effectiveMode(mode, reducedMotion === "reduce");
         for (const id of [
           "alert",
           "empty",
@@ -216,18 +217,24 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           }
           const buttons = p.getByRole("button").and(p.locator('[data-slot="button"]'));
           if (await buttons.count()) {
-            await buttons.first().scrollIntoViewIfNeeded();
-            const scale = await pressScale(page, `[data-preview="${id}"] [data-slot="button"]`);
-            if (effectiveMode(mode, reducedMotion === "reduce") === "full") expect(scale).toBeLessThan(0.99);
-            else expect(scale).toBe(1);
             const button = buttons.first();
+            const feedback = button.locator('[data-slot="button-feedback"]');
+            await button.scrollIntoViewIfNeeded();
+            // Button keeps the native root's hit/anchor geometry unscaled and puts the press
+            // decoration on its own feedback layer. An icon-only or rich-label action authors no
+            // layer at all (button.md), so those two previews are measured at rest; asking any
+            // other preview for a missing layer fails in `pressScale` instead of passing quietly.
+            if (["item", "button-group"].includes(id)) {
+              await expect(feedback).toHaveCount(0);
+              expect(await pressScale(page, button)).toBe(1);
+            } else expect(await pressScale(page, feedback)).toBeCloseTo(actual === "full" ? 0.97 : 1, 2);
             await button.focus();
             await button.press("Enter");
             await button.press(" ");
             await expect(button).toBeFocused();
             expect(await button.evaluate((node) => getComputedStyle(node).boxShadow)).not.toBe("none");
           }
-          if (id === "input-group") await expectStaticSurface(p.locator('[data-slot="input-group"]'));
+          if (id === "input-group") await expectStaticSurface(p.locator('[data-slot="input-group"]'), actual);
           else {
             expect(
               await p
