@@ -165,6 +165,92 @@ export async function recordedScale(page: Page): Promise<{ min: number; max: num
   };
 }
 
+/**
+ * Records the presence writer a surface actually starts, and under which phase.
+ *
+ * A modal panel's entrance is a Web Animation (`createModalPresence`), not a CSS
+ * transition: `dialog-content` deliberately carries no `transition` shorthand, so
+ * `transition-duration` describes a colour clock rather than the presence. Reading the
+ * calls themselves is the only way to tell "the declared envelope ran" from "nothing
+ * started": the returned clock is the one the recipe resolved, and the property list is
+ * which half of `enter.pop/surface` the mode selected.
+ *
+ * Recording starts before the page loads because the envelope can be settled by Base
+ * UI's own initial focus a few frames after mount; a sampler started after the click
+ * would race it. `markPresencePhase` labels what follows, so one recording can prove a
+ * first open and a reopen separately.
+ */
+export async function recordPresence(page: Page, selector: string) {
+  await page.addInitScript((target: string) => {
+    const store = window as unknown as {
+      __presenceCalls: { phase: string; slot: string; duration: number; properties: string[] }[];
+      __presencePhase: string;
+    };
+    store.__presenceCalls = [];
+    store.__presencePhase = "initial";
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function patched(
+      this: Element,
+      keyframes: Keyframe[] | PropertyIndexedKeyframes,
+      timing: number | KeyframeAnimationOptions,
+    ) {
+      if (this.matches(target)) {
+        const frames = Array.isArray(keyframes) ? keyframes : [keyframes];
+        const properties = [
+          ...new Set(
+            frames.flatMap((frame) =>
+              Object.keys(frame ?? {}).filter(
+                (key) => !["offset", "computedOffset", "easing", "composite"].includes(key),
+              ),
+            ),
+          ),
+        ].sort();
+        store.__presenceCalls.push({
+          phase: store.__presencePhase,
+          slot: this.getAttribute("data-slot") ?? "",
+          duration: typeof timing === "number" ? timing : Number(timing?.duration ?? 0),
+          properties,
+        });
+      }
+      return animate.call(this, keyframes, timing);
+    } as typeof Element.prototype.animate;
+  }, selector);
+}
+
+/** Labels the calls that follow, so a reopen is not counted as part of the first open. */
+export async function markPresencePhase(page: Page, phase: string) {
+  await page.evaluate((value) => {
+    (window as unknown as { __presencePhase: string }).__presencePhase = value;
+  }, phase);
+}
+
+/**
+ * The clocks one surface started in one phase, split by the property each one writes.
+ *
+ * `enter.pop/surface` is opacity plus the `scale.in` envelope, `enter.pop/opacity` is the
+ * stationary fade a backdrop and a reduced panel keep. The two lists are separate because
+ * they are separate writers on separate properties.
+ */
+export async function recordedPresence(
+  page: Page,
+  phase: string,
+  slot: string,
+): Promise<{ opacity: number[]; spatial: number[] }> {
+  const calls = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __presenceCalls: { phase: string; slot: string; duration: number; properties: string[] }[];
+        }
+      ).__presenceCalls,
+  );
+  const mine = calls.filter((call) => call.phase === phase && call.slot === slot);
+  return {
+    opacity: mine.filter((call) => call.properties.includes("opacity")).map((call) => call.duration),
+    spatial: mine.filter((call) => call.properties.includes("transform")).map((call) => call.duration),
+  };
+}
+
 /** T0 surfaces may animate color/shadow feedback, never authored motion or geometry. */
 export async function expectStaticSurface(surface: Locator) {
   const observed = await surface.evaluateAll((nodes) =>
