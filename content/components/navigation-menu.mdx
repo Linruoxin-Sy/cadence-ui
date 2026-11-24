@@ -71,9 +71,10 @@ Provider imports are required; wrapping is optional. Standalone menus respect
 the system preference. Full mode scales/fades the popup and resizes its
 measured width/height; reduced keeps opacity and applies geometry instantly;
 none removes every authored transition. Keep the same popup through updates
-and mode changes. `keepMounted` retains inactive panels while the portal is
-open, but a complete close unmounts the default portal and resets uncontrolled
-input drafts on reopening. Store persistent drafts in caller state.
+and mode changes. `keepMounted` retains an inactive panel while the portal is
+open, and the same panel stays in the document as Base UI's hidden, inert node
+after a complete close, so its draft, caret and selection survive a reopen.
+Store persistent drafts in caller state.
 
 Without JavaScript, server-rendered top-level labels and standalone anchors
 remain available, and both installation methods expose complete source.
@@ -250,7 +251,7 @@ export function ActiveLinksExample() {
 
 ## Retained content
 
-Type a resource note, switch to Guides, and return to Notes. `keepMounted` retains the same input while another panel is active; inactive content is hidden after its exit. During exit, Base UI marks an outgoing panel inert when focus has left it; focus still inside the panel is handed off by the primitive. A complete close unmounts the default portal, so reopening starts a new input with its default draft. It is not persistent application storage.
+Type a resource note, switch to Guides, and return to Notes. `keepMounted` retains the same input while another panel is active, and a complete close keeps that node in the document hidden and inert, so the draft, caret and selection survive the reopen. During exit, Base UI marks an outgoing panel inert when focus has left it; focus still inside the panel is handed off by the primitive. A retained panel is not persistent application storage.
 
 <ComponentExample name="retained-content" />
 

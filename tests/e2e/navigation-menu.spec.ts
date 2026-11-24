@@ -66,7 +66,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(popup.getByRole("link", { name: "Installation", exact: true })).toBeFocused();
         await page.keyboard.press("Escape");
         await expect(learn).toBeFocused();
-        await expect(popup).toHaveCount(0);
+        // The fixture's panels are keepMounted, so the retained content keeps Base
+        // UI's closed popup in the document, hidden.
+        await expect(popup).toHaveCount(1);
+        await expect(popup).toBeHidden();
         await page.keyboard.press("Enter");
         await expect(learn).toHaveAttribute("aria-expanded", "true");
         await page.keyboard.press("ArrowRight");
@@ -177,7 +180,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         expect(r.x).toBeGreaterThanOrEqual(0);
         expect(r.x + r.width).toBeLessThanOrEqual(390);
         await page.locator("main").click({ position: { x: 2, y: 2 } });
-        await expect(popup).toHaveCount(0);
+        await expect(popup).toBeHidden();
         expect(errors).toEqual([]);
       });
     }
@@ -192,7 +195,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 1000 });
         await page.locator('[data-preview="navigation-menu"]').getByRole("button", { name: "Build" }).hover();
-        await expect(page.locator('[data-slot="navigation-menu-popup"]')).toBeVisible();
+        await expect(page.locator('[data-slot="navigation-menu-popup"]:visible')).toBeVisible();
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         expect(
           (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,

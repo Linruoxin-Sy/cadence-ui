@@ -325,12 +325,16 @@ for (const os of ["no-preference", "reduce"] as const)
     expect(f.filter((s) => s.mode === "none").every((s) => s.animations.length === 0 && s.opacity === "1")).toBe(true);
     await page.keyboard.press("Escape");
     await expect(learn).toBeFocused();
-    // keepMounted retains Content during a switch; closing the owning Portal unmounts it.
-    await expect(content).toHaveCount(0);
+    // A retained panel outlives the owning Portal: the same node stays in the
+    // document as Base UI's hidden, inert surface instead of being destroyed.
+    await expect(content).toHaveCount(1);
+    await expect(content).toBeHidden();
+    await expect(content).toHaveAttribute("hidden");
+    await expect(content).toHaveAttribute("inert");
     await record(page, '[data-slot="navigation-menu-content"]');
     await learn.press("Enter");
     await expect(content).toBeVisible();
-    expect(await content.evaluate((n) => n.hasAttribute("data-css-content"))).toBe(false);
+    expect(await content.evaluate((n) => n.hasAttribute("data-css-content"))).toBe(true);
     await page.waitForTimeout(60);
     const reopened = await finish(page, info);
     expect(reopened.some((s) => s.open)).toBe(true);
