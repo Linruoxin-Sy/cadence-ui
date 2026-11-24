@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { effectiveMode, MODES, pressScale } from "./helpers";
+import { effectiveMode, expectStaticSurface, MODES, pressScale } from "./helpers";
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
@@ -70,11 +70,14 @@ for (const os of ["no-preference", "reduce"] as const)
       const download = top.getByRole("button", { name: "Download plan.md" });
       await expect(download).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
       await download.scrollIntoViewIfNeeded();
+      // Button keeps the native root's hit/anchor geometry unscaled: the press decoration
+      // belongs to `[data-slot="button-feedback"]`, which Button authors only for a known
+      // plain label. This row's action is icon-only, so the page has no press pose to hold
+      // (button.md, Item's own "no press scale") — an at-rest root is the contract here,
+      // not a missed clock. Activation is the evidence this host owes.
+      await expect(download.locator('[data-slot="button-feedback"]')).toHaveCount(0);
       const pending = page.waitForEvent("download");
-      expect(await pressScale(page, '[data-preview="item"] [data-slot="button"]')).toBeCloseTo(
-        effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
-        2,
-      );
+      expect(await pressScale(page, download)).toBe(1);
       expect((await pending).suggestedFilename()).toBe("plan.md");
       await download.focus();
       const keyboardDownload = page.waitForEvent("download");
@@ -83,13 +86,9 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(download).toBeFocused();
       await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
       await expect(download).toHaveAttribute("data-motion", "none");
-      expect(
-        await page
-          .locator('[data-slot="item"]')
-          .evaluateAll((nodes) =>
-            nodes.every((node) => !node.hasAttribute("data-motion") && node.getAnimations().length === 0),
-          ),
-      ).toBe(true);
+      // The item roots are static surfaces: after this live downgrade they declare `none`
+      // and hold nothing in flight. Asking for an absent `data-motion` was the pre-v2 shape.
+      await expectStaticSurface(page.locator('[data-slot="item"]'), "none");
       const row = page.locator('[data-component-example="item/whole-row-link"]').getByRole("link");
       await expect(row.locator("a, button")).toHaveCount(0);
       await row.focus();
@@ -227,7 +226,17 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(vertical.getByRole("status")).toHaveText("100%");
       const plus = horizontal.getByRole("button", { name: "Zoom in" });
       await plus.scrollIntoViewIfNeeded();
-      expect(await pressScale(page, '[data-preview="button-group"] [aria-label="Zoom in"]')).toBeCloseTo(
+      // The group's zoom controls are icon-only, so their Button authors no feedback layer and
+      // keeps the native root unscaled in every mode (button.md). The declared press owner is
+      // still observable where a member has a plain label: Button's layer, not the group, holds
+      // that pose, and the group writes no child press transform.
+      await expect(plus.locator('[data-slot="button-feedback"]')).toHaveCount(0);
+      expect(await pressScale(page, plus)).toBe(1);
+      const feedback = page.locator(
+        '[data-component-example="button-group/changing"] button:has-text("Save") [data-slot="button-feedback"]',
+      );
+      await feedback.scrollIntoViewIfNeeded();
+      expect(await pressScale(page, feedback)).toBeCloseTo(
         effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
         2,
       );
@@ -280,13 +289,8 @@ for (const os of ["no-preference", "reduce"] as const)
       const text = page.locator('[data-component-example="button-group/static-text"]');
       await expect(text.locator('[data-slot="button-group-text"]')).toHaveJSProperty("tagName", "SPAN");
       await expect(text.locator('[data-slot="button-group-text"]')).not.toHaveAttribute("tabindex");
-      expect(
-        await page
-          .locator('[data-slot="button-group"]')
-          .evaluateAll((nodes) =>
-            nodes.every((node) => !node.hasAttribute("data-motion") && node.getAnimations().length === 0),
-          ),
-      ).toBe(true);
+      // Static surface: the group declares the downgraded mode and holds no authored property.
+      await expectStaticSurface(page.locator('[data-slot="button-group"]'), "none");
       await text.getByRole("link", { name: "Registry", exact: true }).focus();
       await page.keyboard.press("Enter");
       await expect(page).toHaveURL(/\/docs\/registry$/);
