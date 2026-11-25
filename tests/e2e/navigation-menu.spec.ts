@@ -36,6 +36,38 @@ async function recordEntrance(page: Page) {
   }, '[data-slot="navigation-menu-popup"]');
 }
 
+/**
+ * Samples the shell's committed box per frame, and every property its own Web
+ * Animations write, from before the document loads. A shared shell that consumes a
+ * new destination must paint the sizes between the two, not only the frame it lands
+ * on; the frame ring is the only honest place to see that.
+ */
+type ShellFrame = { width: number; height: number; written: string[] };
+
+async function recordShell(page: Page) {
+  await page.addInitScript((selector: string) => {
+    const frames: { width: number; height: number; written: string[] }[] = [];
+    (window as unknown as { shell: typeof frames }).shell = frames;
+    const tick = () => {
+      const popup = document.querySelector(selector);
+      if (popup) {
+        const box = popup.getBoundingClientRect();
+        // Recipes are Web Animations: the written property is in the effect's
+        // keyframes, never `transitionProperty`.
+        const written = popup.getAnimations().flatMap((animation) => {
+          const keyframes = (animation.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
+          return keyframes.flatMap((frame) =>
+            Object.keys(frame).filter((key) => !["offset", "computedOffset", "easing", "composite"].includes(key)),
+          );
+        });
+        frames.push({ width: box.width, height: box.height, written });
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, '[data-slot="navigation-menu-popup"]');
+}
+
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`navigation menu ${reducedMotion}`, () => {
     test.use({ reducedMotion });
@@ -44,6 +76,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         const errors: string[] = [];
         page.on("pageerror", (e) => errors.push(e.message));
         await recordEntrance(page);
+        await recordShell(page);
         await openPopupMotionFixture(page, "navigation-menu", mode);
         await page.waitForLoadState("networkidle");
         const preview = page.locator('[data-preview="navigation-menu"]');
@@ -74,12 +107,13 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         const opacity = entrance.map((f) => f.opacity);
         if (effective !== "none") expect(new Set(opacity).size).toBeGreaterThan(1);
         else expect(opacity.every((value) => value === "1")).toBe(true);
+        const shellMark = await page.evaluate(() => (window as unknown as { shell: ShellFrame[] }).shell.length);
+        const shellFrom = await popup.evaluate((el) => el.getBoundingClientRect().width);
         await moveToTrigger(page, build);
         await expect(build).toHaveAttribute("aria-expanded", "true");
         await expect(popup.getByRole("link", { name: "Templates", exact: true })).toBeVisible();
         // The shell owns width and height around the committed active content: the
         // primitive's destination is consumed and the next panel is never clipped.
-        // The declared tween for it is not installed yet; see #158.
         await expect
           .poll(() =>
             popup.evaluate((el) => {
@@ -91,6 +125,30 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             }),
           )
           .toBe(true);
+        // `navigation-menu.viewport.resize` is one measured shell writer: full mode
+        // follows the destination through the sizes between the two boxes (the frame
+        // the primitive publishes the destination for is the origin the writer
+        // replaces, never a one-frame jump), while reduced and none reach it immediately
+        // and install no geometry writer at all.
+        await expect.poll(() => popup.evaluate((el) => el.getAnimations().length)).toBe(0);
+        const shellFrames = await page.evaluate(
+          (at) => (window as unknown as { shell: ShellFrame[] }).shell.slice(at),
+          shellMark,
+        );
+        const settled = shellFrames.at(-1)?.width ?? Number.POSITIVE_INFINITY;
+        expect(settled).toBeGreaterThan(shellFrom + 10);
+        const between = shellFrames.filter((frame) => frame.width > shellFrom + 1 && frame.width < settled - 1);
+        if (effective === "full") {
+          expect(shellFrames.some((frame) => frame.written.includes("width") && frame.written.includes("height"))).toBe(
+            true,
+          );
+          expect(between.length, "the declared shell tween must paint intermediate sizes").toBeGreaterThan(1);
+        } else {
+          expect(
+            shellFrames.every((frame) => !frame.written.includes("width") && !frame.written.includes("height")),
+          ).toBe(true);
+          expect(between.length, "reduced and none settle the destination immediately").toBe(0);
+        }
         await moveToTrigger(page, learn);
         await expect(learn).toHaveAttribute("aria-expanded", "true");
         await learn.focus();
@@ -158,13 +216,13 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         expect(samples.every((s) => s.motion === effective)).toBe(true);
         // The switch paint is one writer on the shared viewport (`content.switch`); the
         // popup never replays its own presence for a switch inside it. On this panel pair
-        // the directional travel stays the space-constrained fallback #158 records, so
-        // full and reduced both resolve to the opacity layer; none installs no writer.
+        // the directional travel stays the space-constrained opacity fallback, so full
+        // and reduced both resolve to the opacity layer; none installs no writer.
         if (effective !== "none") expect(samples.some((s) => s.viewport.includes("opacity"))).toBe(true);
         else expect(samples.every((s) => s.viewport.length === 0 && s.popup.length === 0)).toBe(true);
         expect(samples.every((s) => !s.popup.includes("opacity") && !s.popup.includes("transform"))).toBe(true);
         // reduced and none install no geometry transition at all; the full-mode shell
-        // destination is asserted above, and its tween is tracked in #158.
+        // tween over a destination the primitive supplies is asserted above.
         if (effective !== "full")
           expect(samples.every((s) => !s.popup.some((p) => p === "width" || p === "height" || p === "scale"))).toBe(
             true,

@@ -559,14 +559,18 @@ function NavigationMenuPositioner({
           if (!css) return null;
           const supplied = (name: string) => Number.parseFloat(css.getPropertyValue(name));
           const box = naturalGeometry(node);
-          // The primitive's own destination is authoritative. A settled `auto` shell
-          // reports its natural box, so the destination is never read off an
-          // interpolated frame of this writer.
-          const width = supplied("--popup-width");
-          const height = supplied("--popup-height");
+          const published = { width: supplied("--popup-width"), height: supplied("--popup-height") };
+          const measured = { width: supplied("--positioner-width"), height: supplied("--positioner-height") };
+          // The primitive measures the destination, publishes it on the positioner, and
+          // holds the popup's own published size at the box it is about to replace for
+          // one frame — the state Base UI calls resizing. In that state the popup's own
+          // size is the origin the writer is replacing, so the destination is read from
+          // the primitive's measurement; a settled `auto` shell keeps its natural box,
+          // so a destination the primitive did not supply stays native.
+          const resizing = Number.isFinite(published.width) && Number.isFinite(published.height);
           const destination = {
-            width: Number.isFinite(width) ? width : (box?.width ?? 0),
-            height: Number.isFinite(height) ? height : (box?.height ?? 0),
+            width: Number.isFinite(measured.width) && resizing ? measured.width : (box?.width ?? 0),
+            height: Number.isFinite(measured.height) && resizing ? measured.height : (box?.height ?? 0),
           };
           if (!(destination.width > 0) || !(destination.height > 0)) return null;
           const availableWidth = supplied("--available-width");
