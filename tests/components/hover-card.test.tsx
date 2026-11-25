@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { CSSProperties } from "react";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/cadence/hover-card";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
@@ -51,6 +51,36 @@ describe("HoverCard", () => {
     expect(trigger).toHaveAccessibleName("@linruoxin");
     expect(trigger).not.toHaveAttribute("aria-describedby");
     expect(document.querySelector('[data-slot="hover-card-portal"]')).not.toBeNull();
+  });
+
+  it("opens for a pointer already resting on the trigger when it appeared", async () => {
+    // A trigger can mount under a pointer that is already on it: this route's preview
+    // mounts seconds after the reader's first pointer move, so the entry that pointer
+    // made was sent before this element could hear it, and a still pointer sends no
+    // second one. jsdom has neither a hover state nor a media query, so both facts are
+    // stated for this case instead of waited for.
+    const matches = HTMLElement.prototype.matches;
+    const hovered = vi.spyOn(HTMLElement.prototype, "matches").mockImplementation(function (
+      this: HTMLElement,
+      selector: string,
+    ) {
+      return selector === ":hover" ? true : matches.call(this, selector);
+    });
+    const media = window.matchMedia;
+    const hovering = vi
+      .spyOn(window, "matchMedia")
+      .mockImplementation((query: string) => ({ ...media(query), matches: query === "(hover: hover)" }));
+
+    try {
+      render(<Example />);
+      // No pointer event follows the mount: only completing the entry the pointer
+      // already made can open this preview.
+      await screen.findByText("Lin Ruoxin", undefined, { timeout: 3000 });
+      expect(panel()).toHaveAttribute("data-slot", "hover-card-content");
+    } finally {
+      hovered.mockRestore();
+      hovering.mockRestore();
+    }
   });
 
   it("opens on keyboard focus and keeps its interactive content reachable", async () => {

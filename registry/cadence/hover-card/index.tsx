@@ -8,6 +8,7 @@ import {
   createContext,
   isValidElement,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useId,
@@ -97,8 +98,64 @@ function HoverCard({ children, triggerId, ...props }: PreviewCardPrimitive.Root.
   );
 }
 
-function HoverCardTrigger({ ...props }: PreviewCardPrimitive.Trigger.Props) {
-  return <PreviewCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />;
+/**
+ * A trigger can appear under a pointer that is already resting on it: this route's
+ * preview mounts seconds after the reader's first pointer move, and a conditionally
+ * rendered trigger does the same. That pointer never sent this element an entry, and
+ * Base UI starts with hover moves blocked until it hears one, so the preview stays
+ * closed for as long as the pointer rests — no movement inside the trigger re-arms
+ * it, only leaving and returning does.
+ *
+ * The trigger therefore completes the entry the pointer already made, once per
+ * mount: on a device that can hover, with the pointer really over this element, it
+ * re-enters itself with `mouseenter`, the one event this primitive's hover
+ * interaction opens on (`move: false`). Base UI keeps its intent delay, the open
+ * state and the unmount, so nothing here opens a preview itself; the preview this
+ * trigger already owns and a control that cannot receive a hover are left alone.
+ */
+function useRestingEntry(node: { readonly current: HTMLElement | null }) {
+  const replayed = useRef(false);
+
+  useEffect(() => {
+    if (replayed.current) return;
+    replayed.current = true;
+    const element = node.current;
+    // `data-popup-open` is the primitive's own marker for the preview this trigger
+    // opened: the primitive remains the only owner of that state, so it is read, not
+    // mirrored into a second one.
+    if (!element || element.hasAttribute("data-popup-open") || element.matches(":disabled")) return;
+    const view = element.ownerDocument.defaultView;
+    if (!view?.matchMedia("(hover: hover)").matches) return;
+    if (!element.matches(":hover")) return;
+    element.dispatchEvent(new MouseEvent("mouseenter", { relatedTarget: null }));
+  }, [node]);
+}
+
+function HoverCardTrigger({ ref, ...props }: PreviewCardPrimitive.Trigger.Props) {
+  // The trigger's declared element is the anchor Base UI renders by default; a
+  // caller `render` may swap the tag, which the primitive's own types do not widen.
+  const node = useRef<HTMLAnchorElement | null>(null);
+  // The caller's ref may hand React its own teardown instead of accepting `null`
+  // (React 19 ref cleanup); that teardown, not a second `null` call, detaches it.
+  const detach = useRef<(() => void) | null>(null);
+  const setNode = useCallback(
+    (element: HTMLAnchorElement | null) => {
+      node.current = element;
+      const attachedWithCleanup = detach.current !== null;
+      detach.current?.();
+      detach.current = null;
+      if (attachedWithCleanup && element === null) return;
+      if (typeof ref === "function") {
+        const returned = ref(element);
+        if (typeof returned === "function") detach.current = returned;
+      } else if (ref) (ref as { current: HTMLAnchorElement | null }).current = element;
+    },
+    [ref],
+  );
+
+  useRestingEntry(node);
+
+  return <PreviewCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} ref={setNode} />;
 }
 
 /**
