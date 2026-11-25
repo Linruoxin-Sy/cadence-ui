@@ -49,7 +49,13 @@ export type GeometryPolicy = { reduced: boolean; transition: Transition; availab
 type Reason = "commit" | "passive" | "focus";
 type PixelCheck = { doc: Document; axis: Axis; size: number; used: number; accept(valid: boolean): void };
 
-/** Batch CSS-pixel round trips in empty display probes, never caller content. */
+/**
+ * Batch CSS-pixel round trips in empty display probes, never caller content. The
+ * probe declares the destination and reads back its used pixels, so the declaration
+ * is accepted when it resolves exactly as written; comparing the read-back with the
+ * element's current box would instead re-assert the no-change shortcut and delete
+ * every declared destination that differs from the frame it replaces.
+ */
 function verifyPixels(checks: PixelCheck[]) {
   for (const doc of new Set(checks.map((check) => check.doc))) {
     const batch = checks.filter((check) => check.doc === doc),
@@ -79,7 +85,7 @@ function verifyPixels(checks: PixelCheck[]) {
       doc.body.append(host);
       const results = new Map([...probes].map(([key, probe]) => [key, view.getComputedStyle(probe)]));
       for (const check of batch)
-        check.accept(Number.parseFloat(results.get(`${check.axis}/${check.size}`)?.[check.axis] ?? "") === check.used);
+        check.accept(Number.parseFloat(results.get(`${check.axis}/${check.size}`)?.[check.axis] ?? "") === check.size);
     } finally {
       host.remove();
     }
