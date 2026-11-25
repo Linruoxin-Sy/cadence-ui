@@ -251,6 +251,16 @@ test.describe("tooltip", () => {
   // Hover, not click: a tooltip is the one popup in the matrix that opens with a
   // pointer move, and it is also the component whose `aria-describedby` only exists
   // while the popup does.
+  //
+  // Unlike the anchored panels around it, the hint has no scale envelope and no CSS
+  // opacity longhand: `presence.tooltip` fades opacity through `element.animate()`,
+  // while the only CSS family on the popup belongs to the paint owner
+  // (`state.color` → `background-color, color`). So this block reads the fade from
+  // the writer that ran and the colour clock from the computed style, and asserts the
+  // hint's `scale`/`transform` stays at rest in every mode.
+  const FADE = { full: [100], reduced: [60] } as const;
+  const PAINT = { full: "0.16s", reduced: "0.096s", none: "0s" } as const;
+
   for (const prefersReduced of PREFERENCES) {
     test.describe(preferenceName(prefersReduced), () => {
       test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
@@ -260,6 +270,7 @@ test.describe("tooltip", () => {
 
         test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await recordScale(page, '[data-slot="tooltip-content"]');
+          await recordPresence(page, '[data-slot="tooltip-content"]');
           await openComponent(page, "tooltip", requested, "tooltip-trigger", mode);
 
           await page.locator(scoped("tooltip", '[data-slot="tooltip-trigger"]')).first().hover();
@@ -268,32 +279,61 @@ test.describe("tooltip", () => {
 
           const popup = page.locator('[data-slot="tooltip-content"]');
           await expect(popup).toHaveAttribute("data-motion", mode);
-          expect(await computed(page, '[data-slot="tooltip-content"]', "transition-duration")).toBe(
-            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
-          );
 
+          // The presence owner's own clock: one opacity animation over `duration.instant`
+          // (100 ms / 60 ms), and a zero clock under `none` — never a `transform` half in
+          // either mode. `none` may re-commit a zero-length animation while the portal
+          // mounts, so the claim there is "no envelope", not how many times it settled.
+          const presence = await recordedPresence(page, "initial", "tooltip-content");
+          expect(presence.spatial).toEqual([]);
+          if (mode === "none") {
+            expect(presence.opacity.length).toBeGreaterThan(0);
+            expect(presence.opacity.every((duration) => duration === 0)).toBe(true);
+          } else {
+            expect(presence.opacity).toEqual(FADE[mode]);
+          }
+
+          // The popup's computed family is the paint owner's, and it settles to the
+          // colour clock: this is not the fade, and must not be read as one.
+          expect(await computed(page, '[data-slot="tooltip-content"]', "transition-property")).toBe(
+            "background-color, color",
+          );
+          expect(await computed(page, '[data-slot="tooltip-content"]', "transition-duration")).toBe(PAINT[mode]);
+
+          // No scale at rest in any mode — the v2 hint has none to settle, so `full`
+          // must not be asked for a 0.96 envelope either.
           const enter = await recordedScale(page);
           expect(enter.frames).toBeGreaterThan(3);
-          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
-          else expect(enter.min).toBe(1);
+          expect(enter.min).toBe(1);
+          expect(enter.max).toBe(1);
         });
       }
     });
   }
 
-  test.describe("reduced keeps the fade and drops only the scale", () => {
+  test.describe("reduced keeps the fade and has no scale to drop", () => {
     test.use({ reducedMotion: "reduce" });
 
-    test("the label fades without the 0.96 settle", async ({ page }) => {
+    test("the label fades without a scale settle", async ({ page }) => {
       await recordScale(page, '[data-slot="tooltip-content"]');
+      await recordPresence(page, '[data-slot="tooltip-content"]');
       await openComponent(page, "tooltip", "reduced", "tooltip-trigger");
       await page.locator(scoped("tooltip", '[data-slot="tooltip-trigger"]')).first().hover();
       await expect(page.getByRole("tooltip")).toBeVisible();
       await page.waitForTimeout(300);
 
-      expect(await computed(page, '[data-slot="tooltip-content"]', "transition-property")).toContain("opacity");
+      // Reduced keeps the short opacity path through the same writer, and the popup
+      // still carries no opacity transition for a second writer to own.
+      expect(await recordedPresence(page, "initial", "tooltip-content")).toEqual({ opacity: [60], spatial: [] });
+      expect(await computed(page, '[data-slot="tooltip-content"]', "transition-property")).toBe(
+        "background-color, color",
+      );
       expect(await computed(page, '[data-slot="tooltip-content"]', "transition-duration")).toBe("0.096s");
-      expect((await recordedScale(page)).min).toBe(1);
+
+      const enter = await recordedScale(page);
+      expect(enter.frames).toBeGreaterThan(3);
+      expect(enter.min).toBe(1);
+      expect(enter.max).toBe(1);
     });
   });
 });
