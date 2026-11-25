@@ -39,16 +39,24 @@ output it is legacy enforcement, so it does not itself certify v2 runtime. That 
 the per-item `tests/components/<id>.test.tsx` suites and the v2 action plan they feed. This is a
 functional conclusion only.
 
-Read the two items below as part of the same conclusion, not as an afterthought: one id still declares
-a behaviour it does not run, and one matrix probe is wrong rather than its component.
+Read the three items below as part of the same conclusion, not as an afterthought: one id still declares
+a behaviour it does not run, one matrix probe is wrong rather than its component, and the browser smoke
+is red in one cell class across ten blocks.
 
 - **#168 — functional, open.** Navigation Menu does not run its declared shell size writer for a
-  content revision inside one open panel; three `navigation-menu-examples` cases depend on it.
+  content revision inside one open panel; the `navigation-menu-examples` geometry cases fail on it at
+  this HEAD.
 - **#165 — probe, open.** The hover-card matrix cell asserts a pose and a CSS family its v2 recipe
   does not own. The component matches its declaration; the test does not.
+- **#169 — probe, open.** 44 `motion-matrix` cells across ten blocks read the presence fade out of the
+  colour family: they expect a single `transition-duration` where the popup publishes six colour
+  longhands, or expect `opacity` in `transition-property` where opacity is a Web Animation. Six
+  code-block cells also match two `data-motion` spans. Popover is evidenced as a probe mismatch — its
+  contract requires immediate settlement for an unprovable palette — and the other blocks are counted,
+  not adjudicated one by one.
 
-Neither is counted as delivered. The four primitives, Carousel, Data Table and Sidebar also keep an
-explicit `legacy` migration marker by design; each contract records its reason.
+None of the three is counted as delivered. The four primitives, Carousel, Data Table and Sidebar also
+keep an explicit `legacy` migration marker by design; each contract records its reason.
 
 Performance governance is **not** complete. No budget, byte count or device measurement in this
 document is a passing result; S02 (#83) and F03 (#84) follow the functional migration under ADR-023.

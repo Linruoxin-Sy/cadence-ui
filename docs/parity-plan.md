@@ -182,18 +182,20 @@ contract, registry metadata, public MDX and executed evidence — see
 [where the rollout plan lives](animation-system-plan.md) for how that is judged and what it does not
 cover.
 
-Two non-performance items stay open and are **not** delivered: #168 (Navigation Menu does not run its
-declared shell size writer for a content revision inside one open panel) and #165 (the hover-card
-matrix probe asserts a pose and a CSS family its v2 recipe does not own, while the component matches
-its declaration). F02's audited defects #155, #156 and #158 are closed; the F02 browser passes remain
-the record of what those audit slices exercised.
+Three non-performance items stay open and are **not** delivered: #168 (Navigation Menu does not run its
+declared shell size writer for a content revision inside one open panel), #165 (the hover-card matrix
+probe asserts a pose and a CSS family its v2 recipe does not own, while the component matches its
+declaration) and #169 (44 `motion-matrix` cells across ten blocks read the presence fade out of the
+colour family, or match two `data-motion` spans; popover is evidenced as a probe mismatch and the other
+blocks are counted, not yet adjudicated). F02's audited defects #155, #156 and #158 are closed; the F02
+browser passes remain the record of what those audit slices exercised.
 
 Follow [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards): effects
 and full-library functional migration came first. Numeric source/compiled/runtime/page, FPS/CLS and
 workload budgets stay advisory, not functional completion gates. Do not trim effects or require
 repeated budget-only builds, page cost matrices or device performance acceptance. Preserve
 correctness, native/API/accessibility, mode/cancellation/ownership and genuine source/action
-evidence. The functional migration is complete apart from the two open items above; those stay open
+evidence. The functional migration is complete apart from the three open items above; those stay open
 until they are fixed or explicitly dispositioned.
 
 S02/F03 follow full functional migration: assess the migrated system, justify suitable v2 budgets,
