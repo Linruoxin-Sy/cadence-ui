@@ -11,10 +11,10 @@ can retain upstream JSX and gain the documented full/reduced/none contract witho
 semantics, accessibility, controlled state or source ownership.
 
 The target animation system gives every component its applicable baseline capabilities rather than
-granting them by tier. Its contract is in [animation-system.md](animation-system.md); the pending
-implementation, pilot sequence and full catalogue matrix are in
-[animation-system-plan.md](animation-system-plan.md). The target design does not claim that the
-current source, registry metadata or public component documentation has already migrated.
+granting them by tier. Its contract is in [animation-system.md](animation-system.md); the delivered
+migration, its open items and the deferred performance work are in
+[animation-system-plan.md](animation-system-plan.md). Source, registry metadata and public component
+documentation now carry that migrated surface; §8 records what is still unresolved.
 
 Every component also has an [individual target motion contract](motion/README.md#5-catalogue).
 Shared style is guidance; common execution requirements remain binding. Per-component files own
@@ -175,20 +175,26 @@ changes their role to button. Current parity exceptions otherwise live in regist
 
 ## 8. Next work
 
-Implement the target animation system through the dependency-ordered phases tracked as issues: five
-phase epics, each listing its own child issues, dependencies and acceptance evidence (see
-[where the rollout plan lives](animation-system-plan.md) for the entry points). Functional migration
-remains pending — shared recipes/controllers and checks, the Button/Badge/Card/Tabs/Select pilots,
-the 59-component rollout, the planned public primitives, and full distribution/performance
-acceptance. Keep actual registry declarations and public documentation truthful until each capability
-is implemented.
+The dependency-ordered rollout is delivered. Contract-to-tooling alignment, the shared capabilities
+and the four primitives, the five pilots and the catalogue rollout are closed by F04 (#106); F01
+(#82) rebuilt distribution from the implemented catalogue. Each of the 63 motion ids has a target
+contract, registry metadata, public MDX and executed evidence — see
+[where the rollout plan lives](animation-system-plan.md) for how that is judged and what it does not
+cover.
 
-Follow [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards): complete
-intended effects and full-library functional migration first. Numeric source/compiled/runtime/page,
-FPS/CLS and workload budgets are advisory, not shared/pilot/catalogue/functional completion gates.
-Do not trim effects or require repeated budget-only builds, page cost matrices or device performance
-acceptance. Preserve correctness, native/API/accessibility, mode/cancellation/ownership and genuine
-source/action evidence. F02 native behavior defects stay open.
+Two non-performance items stay open and are **not** delivered: #168 (Navigation Menu does not run its
+declared shell size writer for a content revision inside one open panel) and #165 (the hover-card
+matrix probe asserts a pose and a CSS family its v2 recipe does not own, while the component matches
+its declaration). F02's audited defects #155, #156 and #158 are closed; the F02 browser passes remain
+the record of what those audit slices exercised.
+
+Follow [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards): effects
+and full-library functional migration came first. Numeric source/compiled/runtime/page, FPS/CLS and
+workload budgets stay advisory, not functional completion gates. Do not trim effects or require
+repeated budget-only builds, page cost matrices or device performance acceptance. Preserve
+correctness, native/API/accessibility, mode/cancellation/ownership and genuine source/action
+evidence. The functional migration is complete apart from the two open items above; those stay open
+until they are fixed or explicitly dispositioned.
 
 S02/F03 follow full functional migration: assess the migrated system, justify suitable v2 budgets,
 optimize and accept performance separately. References below and prior failed/missing results remain

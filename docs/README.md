@@ -18,17 +18,19 @@ history records completed work and measurements, and each issue records how its 
 | [Architecture decisions](adr.md)                                | Revisiting a foundational decision                                                   |
 | [Scope and next work](parity-plan.md)                           | Choosing work, a tier or a batch, or checking unresolved requirements                |
 
-The animation system defines the accepted v2 target and identifies the existing implementation as
-the migration baseline. The tracker holds the remaining work; a task there is not a delivered API.
-Component source, registry metadata, public MDX and executable checks must continue to agree on what
-actually ships. Proposed recipes, shared primitives and capability metadata enter those outputs only
-with their implementation and evidence. ADR-020 records the partial supersession of older animation
+The animation system defines the accepted v2 target, and the implementation now delivers it for every
+motion id; [animation-system-plan.md](animation-system-plan.md) records what that completion covers and
+what it does not. Performance governance is still open (S02/F03) and no budget number here is a
+passing result. Component source, registry metadata, public MDX and executable checks must continue to
+agree on what actually ships: recipes, primitives and capability metadata enter those outputs only with
+their implementation and evidence. ADR-020 records the partial supersession of older animation
 decisions; their historical wording does not establish a second target contract.
 
 ADR-021 requires an individual motion design for every component. Global style provides direction;
 the execution contract remains mandatory. Target part-level designs live centrally under
 `motion/components/<id>.md`, one file per current UI/block id, with common parameter assignments in
-`motion/presets.md`. Public MDX continues to describe delivered behavior, not these pending targets.
+`motion/presets.md`. Public MDX describes delivered behaviour at the level a consumer can rely on, not
+the internal target detail.
 
 ADR-023 supersedes conflicting performance-stage requirements (including ADR-022): intended v2
 effects and full-library functional migration come first; numeric cost/workload budgets are advisory
