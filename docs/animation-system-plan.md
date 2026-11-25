@@ -33,7 +33,8 @@ reference catalogue, new application behaviour or optional animation engine is a
 ## Status
 
 Functional migration is delivered across the catalogue — the 59 components and the four standalone
-primitives — with a target contract, registry metadata, public MDX and executed evidence for each id.
+primitives — with a target contract, registry metadata, public MDX and executed evidence for each id,
+except in the respects the three items below record.
 `registry:check` walks all 63 reference graphs and keeps targets and payloads in sync; by its own
 output it is legacy enforcement, so it does not itself certify v2 runtime. That runtime evidence is
 the per-item `tests/components/<id>.test.tsx` suites and the v2 action plan they feed. This is a
