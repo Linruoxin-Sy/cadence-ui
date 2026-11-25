@@ -621,9 +621,8 @@ baseline. Numerical performance acceptance remains deferred under ADR-023.
 
 ### 3.0 Sidebar composition
 
-This and the following engine/part notes describe the delivered migration baseline. They preserve
-engine and native semantics while the rollout plan schedules additional capabilities; they do not
-exempt these components from v2 coverage.
+This and the following engine/part notes describe the delivered implementation. They preserve
+engine and native semantics; they do not exempt these components from v2 coverage.
 
 Sidebar's desktop offcanvas adapter uses `geometry.resize` with `geometry.compact` for actual
 reserved width. Its `layout.move/size-linked` panel transform projects that same clamped physical
@@ -688,7 +687,8 @@ that phase across its visible month slots. Native dimensions remain immediate in
 this does not claim a shared content size-host projection. Sidebar has a separate limited desktop
 offcanvas adapter. Tabs retains one list marker
 with a separate single transform writer; filled or unsafe paths use immediate native selected paint.
-The catalogue remains legacy until its other applicable capabilities and acceptance migrate.
+These integrations do not by themselves certify the rest of a component's capabilities: Tabs and
+Calendar carry their own v2 evidence, and Sidebar keeps an explicit `legacy` marker with its reason.
 
 The preset catalogue names the directional forms explicitly: `content.switch` for bounded panel
 content travel and `content.month` for the calendar grid. The generic `data.update` preset does not
@@ -1204,7 +1204,9 @@ suspension; restoration has no missed-revision queue. Loops use spin/pulse theme
 reduced/none or hidden/offscreen policy, and resume eligible full activity with a fresh clock.
 Framework pulse assumes resting opacity one: caller dimming from inline style or the cascade uses
 a static fallback, with class/environment changes sampled only at their committed boundary.
-Legacy Spinner/Skeleton callers retain their documented baseline until individually migrated.
+Spinner and Skeleton now follow that rule: Spinner stands still in reduced and none
+(`tests/components/spinner.test.tsx`), and Skeleton's pulse is asserted under the shared loop policy in
+every mode (`tests/components/skeleton.test.tsx`, `expectMotionContract(mode, { policy: ["loop", "color"] })`).
 
 The target popup coordinator distinguishes that conservative caller boundary from Cadence's own known
 presence owner. When registered library presence and explicitly adopted `state.color` share a real node, it combines their declared
@@ -2044,9 +2046,9 @@ the item's parts, including an allowed ownership connection, rather than unrelat
 `registry:check` requires the named animated test file to exist. Test-only pass-through
 observers preserve real Motion rendering and control methods. Neutral scale/translation is legal;
 Switch/Progress retain positional transforms with an instant clock under reduced/none. Static
-placement transforms and direct pointer geometry are not entrance animations. The current helper's
-Spinner reduced-spin exception is a migration baseline, not the v2 rule; remove it with the source,
-loop policy and consumer docs migration. Decorative glyph orientation (for example CodeBlock's
+placement transforms and direct pointer geometry are not entrance animations. The shipped Spinner
+stops rotation in reduced and none and keeps its named static glyph, so no reduced-spin exception
+remains. Decorative glyph orientation (for example CodeBlock's
 expanded chevron) may retain a rotation target with a zero clock; a timed rotation still fails.
 Imperative geometry fixtures opt into `instantImperative` for the reduced clock; none always checks
 observed imperative clocks. Engine and native WAAPI animation tests supply an

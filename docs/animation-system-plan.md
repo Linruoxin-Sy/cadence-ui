@@ -30,6 +30,38 @@ The original catalogue scope remains 59 components. AnimatedText, AnimatedNumber
 RevealGroup are additional standalone primitives with documented delivered subsets. No third-party
 reference catalogue, new application behaviour or optional animation engine is adopted implicitly.
 
+## Status
+
+Functional migration is delivered across the catalogue — the 59 components and the four standalone
+primitives — with a target contract, registry metadata, public MDX and executed evidence for each id,
+except in the respects the three items below record.
+`registry:check` walks all 63 reference graphs and keeps targets and payloads in sync; by its own
+output it is legacy enforcement, so it does not itself certify v2 runtime. That runtime evidence is
+the per-item `tests/components/<id>.test.tsx` suites and the v2 action plan they feed. This is a
+functional conclusion only.
+
+Read the three items below as part of the same conclusion, not as an afterthought: one id still declares
+a behaviour it does not run, one matrix probe is wrong rather than its component, and the browser smoke
+is red in one cell class across ten blocks.
+
+- **#168 — functional, open.** Navigation Menu does not run its declared shell size writer for a
+  content revision inside one open panel; the `navigation-menu-examples` geometry cases fail on it at
+  this HEAD.
+- **#165 — probe, open.** The hover-card matrix cell asserts a pose and a CSS family its v2 recipe
+  does not own. The component matches its declaration; the test does not.
+- **#169 — probe, open.** 44 `motion-matrix` cells across ten blocks read the presence fade out of the
+  colour family: they expect a single `transition-duration` where the popup publishes six colour
+  longhands, or expect `opacity` in `transition-property` where opacity is a Web Animation. Six
+  code-block cells also match two `data-motion` spans. Popover is evidenced as a probe mismatch — its
+  contract requires immediate settlement for an unprovable palette — and the other blocks are counted,
+  not adjudicated one by one.
+
+None of the three is counted as delivered. The four primitives, Carousel, Data Table and Sidebar also
+keep an explicit `legacy` migration marker by design; each contract records its reason.
+
+Performance governance is **not** complete. No budget, byte count or device measurement in this
+document is a passing result; S02 (#83) and F03 (#84) follow the functional migration under ADR-023.
+
 ## 1. Outcome and boundaries
 
 Every component must cover the six baseline capabilities where its semantic parts have the relevant
@@ -149,10 +181,11 @@ not remove the need to measure arbitrary content changes. Keep these engine deci
 test the promised behaviour rather than requiring all animation to use one API.
 
 The target reduced mode keeps short opacity/colour feedback where appropriate and removes spatial,
-layout, rolling and continuous motion. This includes stopping Spinner rotation and opacity loops;
-the current Spinner exception and continuous-loop reduced behaviour have not yet been migrated.
-The none target stops colour transitions as well as spatial, opacity and loop clocks. Existing colour
-utilities and the current contract helper do not yet prove that broader guarantee.
+layout, rolling and continuous motion. Spinner rotation and continuous opacity loops stop in reduced
+and none, proven on the shipped glyph and its status name (`tests/components/spinner.test.tsx`,
+`tests/e2e/b2.spec.ts`). The none target also stops colour transitions through the zeroed
+`--motion-duration-*` clocks; the colour utilities' per-owner browser proof of that broader guarantee
+is not yet recorded, so this page does not claim it as accepted.
 
 ### 3.1 Public primitives
 
@@ -210,7 +243,8 @@ safe fallback and containing-block/hit-region preservation. Use full-parent/none
 none-parent/full-child fixtures to prove owner-local modes, inherited envelopes and the OS ceiling.
 Chart's unknown-work controller path must not count as zero or invoke caller components for discovery;
 native browser scrolling and snap remain distinct from each engine's authored settling clock. These
-are pending acceptance requirements, not additional presets, public APIs or implementation claims.
+are acceptance requirements, not additional presets, public APIs or implementation claims, and the
+recorded browser audits are where their evidence lives.
 
 Position acceptance distinguishes page scrolling that preserves a local marker coordinate space from
 differential scroll, sticky relocation, portal movement and visual-viewport corrections that invalidate
@@ -220,7 +254,8 @@ Inspect scrollWidth/scrollHeight, current offsets and snap/anchor behavior durin
 row/text/reel paint; decorative retention must not create a second layout shift or scrollbar. Sidebar
 must settle its coupled gap/container transaction when it would disturb a known focused editor, and
 Toast's configurable visible limit must not bypass the shared active-collection work bound. These are
-pending browser acceptance cases; structural Markdown validation does not prove them.
+browser acceptance cases, whose evidence is a recorded browser pass rather than structural Markdown
+validation.
 
 For implementation changes, run `pnpm registry:build` before `pnpm check` when shipped source,
 metadata or content changes, then the affected behavioral browser/runtime checks. Performance-only

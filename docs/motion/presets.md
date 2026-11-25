@@ -181,9 +181,9 @@ assignments remain unchanged, and the CSS compatibility block retains its existi
 | `scroll.navigate`     | `scroll.navigate`                                                      | `duration.page` (450 ms), `ease.inOut`; explicit navigation only, user input cancels                                                                                                            | `scroll.navigate/scroll`                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `engine.native`       | Actual named primitive/native engine, not a new recipe                 | Native direct manipulation or existing engine-owned settling; no Cadence duration overlay; the component contract must identify engine, mode adapter and cancellation path                      | `native/css-layout`, `native/embla`, `native/recharts`, `native/base-ui-combobox`, `native/cmdk`, `native/base-ui-context-menu`, `native/base-ui-drawer`, `native/base-ui-menu`, `native/base-ui-preview-card`, `native/input`, `native/input-otp`, `native/base-ui-popover`, `native/resizable-panels`, `native/base-ui-scroll-area`, `native/base-ui-select`, `native/base-ui-slider`, `native/table`, `native/textarea`, `native/base-ui-toast`, `native/base-ui-tooltip` |
 
-The `layout.selection` assignment refines the general v2 layout default; the current runtime's
-`layout.shared` morph spring remains a migration baseline until implemented. Similarly, a number
-preset is not proof of a reel renderer or continuity support. `engine.native` cannot exempt authored
+The `layout.selection` assignment refines the general v2 layout default, and the `layout.shared` morph
+spring ships with its `selection` form on Code Block, Pagination, Tabs, Toc and Toggle Group. A number
+preset is still not proof of a reel renderer or continuity support. `engine.native` cannot exempt authored
 autonomous movement from modes or budgets; it distinguishes engine ownership from a competing writer.
 
 Bindings must name one actual recipe/form for each property. For example, a Base popup's CSS ending

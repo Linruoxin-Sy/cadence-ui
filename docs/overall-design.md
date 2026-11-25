@@ -156,8 +156,8 @@ The v2 target coordinates CSS state feedback, Motion geometry/content work and e
 third-party engine adapters through the same policy; it does not require a Motion wrapper on every
 DOM node. The target makes none stop all Cadence-authored transitions, including colour feedback,
 and makes reduced stop autonomous continuous motion while preserving a readable static state.
-Existing colour transitions and reduced loops are migration baselines, not permanent exemptions;
-the animation system and rollout plan define their replacement and verification.
+Colour transitions and reduced loops now follow that policy rather than a migration baseline; the
+animation system and its rollout plan record the verification and what remains open.
 
 MotionConfig is not a promise to control arbitrary caller-authored animations. LazyMotion/m is only
 an optimisation when required features, first paint and interactions remain intact; no blanket
