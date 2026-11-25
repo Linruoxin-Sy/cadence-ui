@@ -2048,7 +2048,7 @@ observers preserve real Motion rendering and control methods. Neutral scale/tran
 Switch/Progress retain positional transforms with an instant clock under reduced/none. Static
 placement transforms and direct pointer geometry are not entrance animations. The shipped Spinner
 stops rotation in reduced and none and keeps its named static glyph, so no reduced-spin exception
-remains; a timed rotation in either mode still fails. Decorative glyph orientation (for example CodeBlock's
+remains. Decorative glyph orientation (for example CodeBlock's
 expanded chevron) may retain a rotation target with a zero clock; a timed rotation still fails.
 Imperative geometry fixtures opt into `instantImperative` for the reduced clock; none always checks
 observed imperative clocks. Engine and native WAAPI animation tests supply an
