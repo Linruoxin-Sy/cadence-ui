@@ -215,13 +215,15 @@ class; monitored never means "not measured", and deployment never turns an excee
    367 600–503 400 B, of which 366 142 B is a 19-chunk shell all 63 routes load. The historical complete
    Button baseline of 221 511 B at source `4fe1a51` stays recorded as what the site cost before the
    catalogue grew; it is not a target and it authorizes no runtime adoption. Attribution of that shell is
-   [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177), and it must inform F03's acceptance.
+   [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177); the F03 run reproduced it at 366 142 B and
+   recorded it in [performance-acceptance.md](performance-acceptance.md) rather than attributing it.
    Keep the permanent `tests/e2e/site-js-budget.spec.ts` collector with its automatic-request, served-root
    hash, example-count, cold-layout and error assertions.
 2. **Six routes above the route remainder.** `chart` 137 300, `code-block` 87 600, `date-picker` 57 400,
    `data-table` 54 100, `sidebar` 47 300 and `command` 41 700 B are recorded exceedances, each dominated by
    the engine it wraps; [#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178) owns deciding them.
-   Until it does, the number stays on the record and F03 may not treat the page metrics as passed.
+   Until it does, the number stays on the record: the F03 run measured the same six and did not treat the page
+   metrics as passed.
 3. **Motion runtime union.** Kept at 48 000 B as a gate, not a reference: the shipped union compiles to
    44 207 B, 44 450 B with the site's `useInView`, and the import list is asserted against the source tree
    so the measurement cannot drift silently. A registry-only reference compilation still cannot certify
@@ -240,12 +242,13 @@ class; monitored never means "not measured", and deployment never turns an excee
    another relevant window; retain raw entries and action times, including recent-input shifts. The
    measured worst cell is 0.000 55, and these bounded scenarios still do not certify other routes, themes,
    clocks or lifetime behaviour.
-6. **Frames.** The ≥ 55 fps mid-range device criterion is unchanged and has no local collector, so it is
-   F03's: a debuggable device, environment/thermal/refresh metadata, presented-frame traces through real
-   motion windows and reduced/none behaviour. Until then the desktop proxies are recorded and compared —
-   p95 interval, share of frames over 25 ms and the longest long-animation-frame entry — and they are
-   labelled main-thread cadence, never presented frames. Desktop emulation and rAF frequency cannot close
-   this requirement.
+6. **Frames.** The ≥ 55 fps mid-range device criterion is unchanged and has no local collector, so it belongs
+   to the acceptance run, which had no device and recorded it as **unmeasured**, not as failed. That run records
+   environment and refresh metadata and main-thread cadence instead of presented frames; the desktop proxies —
+   p95 interval, share of frames over 25 ms and the longest long-animation-frame entry — are labelled that way
+   and never presented as frames. Both proxies are over their limits on the current source (`dialog` 1.18% at 390,
+   `select` 192 ms), tracked in [#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180). Desktop emulation
+   and rAF frequency cannot close this requirement.
 
 Before adoption, reconcile the implementation with API/motion/SSR/accessibility/docs/distribution
 contracts, current payloads and frozen snapshots. Reuse still-applicable tests; verify actual changed

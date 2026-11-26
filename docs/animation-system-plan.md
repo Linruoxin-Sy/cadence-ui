@@ -61,7 +61,8 @@ keep an explicit `legacy` migration marker by design; each contract records its 
 
 Performance governance is **decided but not accepted**. [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
 sets the v2 budgets and their classes on the S02-A matrix; no budget, byte count or device measurement
-in this document is a passing result, and F03 (#84) performs the acceptance.
+in this document is a passing result, and the F03 acceptance run is recorded in
+[performance-acceptance.md](performance-acceptance.md) with a not-met verdict.
 
 ## 1. Outcome and boundaries
 
@@ -239,11 +240,12 @@ fallbacks, coalescing and cancellation remain unconditional.
 Measured and gated are not the same list, and the difference is deliberate: the three bundle gates run
 inside `pnpm check` through `tests/lib/performance-budgets.test.tsx`, while the page and frame metrics
 need a production build and a 15-minute browser sweep that required CI does not run. Their values are
-recorded per sweep in `.cache/`, compared against the table, and accepted in F03 (#84) on real
-hardware, including a mid-range device trace for ≥ 55 fps. Historical failures and missing measurements
-stay source-bound: the 120 KB page bar was never met, 23 of 63 items exceeded the retired tier ladder,
-and no device frame trace exists. [parity-plan.md](parity-plan.md#8-next-work) records what is still
-open against that decision.
+recorded per sweep in `.cache/` and compared against the table; the acceptance run that reads them is
+[performance-acceptance.md](performance-acceptance.md), and it did not meet ADR-026's conditions: three
+monitored metrics are over their limits and no mid-range device trace exists for ≥ 55 fps. Historical
+failures and missing measurements stay source-bound: the 120 KB page bar was never met, 23 of 63 items
+exceeded the retired tier ladder, and no device frame trace exists.
+[parity-plan.md](parity-plan.md#8-next-work) records what is still open against that decision.
 
 Cross-component geometry acceptance also checks the frame after temporary constraints are released:
 natural auto/percentage/flex/grid/ratio/field-sizing remains responsive, valid empty geometry is not

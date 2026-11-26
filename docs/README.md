@@ -17,11 +17,13 @@ history records completed work and measurements, and each issue records how its 
 | [Site and distribution](documentation-site-and-distribution.md) | Changing MDX, previews, site controls, registry HTTP or snapshots                    |
 | [Architecture decisions](adr.md)                                | Revisiting a foundational decision                                                   |
 | [Scope and next work](parity-plan.md)                           | Choosing work, a tier or a batch, or checking unresolved requirements                |
+| [Performance acceptance](performance-acceptance.md)             | Reading a budget verdict, or rerunning the sweep behind one                          |
 
 The animation system defines the accepted v2 target, and the implementation now delivers it for every
 motion id; [animation-system-plan.md](animation-system-plan.md) records what that completion covers and
-what it does not. Performance governance is still open (S02/F03) and no budget number here is a
-passing result. Component source, registry metadata, public MDX and executable checks must continue to
+what it does not. Performance governance is open and no budget number here is a passing result; the first
+acceptance run against ADR-026 is recorded in [performance-acceptance.md](performance-acceptance.md) and it
+did not grant acceptance. Component source, registry metadata, public MDX and executable checks must continue to
 agree on what actually ships: recipes, primitives and capability metadata enter those outputs only with
 their implementation and evidence. ADR-020 records the partial supersession of older animation
 decisions; their historical wording does not establish a second target contract.
@@ -35,7 +37,9 @@ the internal target detail.
 ADR-023 superseded conflicting performance-stage requirements (including ADR-022) so the migration
 could finish; [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
 now decides the v2 budgets and classifies each metric as a hard gate, monitored or retired, on the S02-A
-cost matrix. Acceptance is F03's and has not happened. Historical failures and missing measurements stay
+cost matrix. The run that was supposed to accept them is recorded in
+[performance-acceptance.md](performance-acceptance.md): hard gates green, three monitored metrics over, the
+device criterion unmeasured, so acceptance is not met. Historical failures and missing measurements stay
 recorded. See animation-system §7 and the rollout plan before interpreting older budget wording.
 
 Keep rules in their owning document and link to them. Update future work by replacing resolved items,
