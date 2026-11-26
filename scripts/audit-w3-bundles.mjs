@@ -34,8 +34,13 @@ const common = {
   define: { "process.env.NODE_ENV": '"production"' },
   logLevel: "error",
 };
+// The union the shipped registry source actually imports. S02-A found the previous
+// list stale after the v2 migration (LayoutGroup/animate/useMotionValue/useTransform
+// were replaced by direct value handles and presence hooks), which made this audit
+// abort before measuring anything. The assertion below still guards the same thing:
+// every value the registry imports from motion/react is in the reference compilation.
 const motionExports =
-  "motion,animate,useMotionValue,useTransform,useAnimationControls,LayoutGroup,MotionConfig,frame,cancelFrame,cubicBezier";
+  "motion,AnimatePresence,GroupAnimationWithThen,MotionConfig,PresenceContext,animateSingleValue,cancelFrame,cubicBezier,frame,getValueTransition,motionValue,useAnimationControls,useIsPresent,usePresence";
 const runtime = `export { ${motionExports} } from "motion/react";`;
 await writeFile(path.join(dir, "runtime.js"), runtime);
 const result = {
@@ -121,7 +126,7 @@ result.requiredMotionImports = {
   site: await motionImports(siteFiles),
 };
 assert.deepEqual(result.requiredMotionImports.registry, motionExports.split(",").sort());
-assert.deepEqual(result.requiredMotionImports.site, ["motion", "useInView"]);
+assert.deepEqual(result.requiredMotionImports.site, ["AnimatePresence"]);
 for (const file of [
   ...registryFiles,
   ...siteFiles,
