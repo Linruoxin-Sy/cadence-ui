@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 
-export const COMPONENT_ADDITION_LIMIT = 8000;
-
 /** @typedef {{path: string, kind: string, external?: boolean}} ImportEdge */
 /** @typedef {{imports: ImportEdge[], inputs: Record<string, {bytesInOutput: number}>}} EmittedOutput */
 /** @typedef {{file: string, gzip: number, bytes?: number, sha256?: string}} MeasuredOutput */
@@ -79,7 +77,6 @@ export function analyzeConsumerBundles({ outputs, files, baseline, entries }) {
       gzip,
       initialGzip,
       reachableAsyncGzip: gzip - initialGzip,
-      passed: gzip <= COMPONENT_ADDITION_LIMIT,
       addedOutputPackages: [...new Set(measured.flatMap((file) => file.inputs.map((input) => input.package)))]
         .filter((name) => name !== null)
         .sort(),

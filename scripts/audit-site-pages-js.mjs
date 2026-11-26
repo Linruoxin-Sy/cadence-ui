@@ -4,7 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { chromium } from "@playwright/test";
-import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget, requireBudgets } from "./performance-policy.mjs";
 import { measureInitialScripts } from "./site-js-budget.mjs";
 
 // Run from the repository root after an isolated production build/start.
@@ -15,6 +15,7 @@ const ids = (process.argv[4] ?? "button,chart,calendar,code-block").split(",");
 const dist = process.env.CADENCE_DIST_DIR ?? ".next";
 const manifest = JSON.parse(readFileSync(path.join(dist, "build-manifest.json"), "utf8"));
 const reports = [];
+const assessments = [];
 for (const id of ids) {
   const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL, headless: true });
   try {
@@ -32,13 +33,15 @@ for (const id of ids) {
     assert.ok(report.files.length > 0);
     assert.ok(report.files.every((entry) => entry.status === 200));
     assert.deepEqual(report.errors, []);
+    const budgetAssessment = reportBudget(assessBudget("page-total", report.gzipBytes));
+    assessments.push(budgetAssessment);
     reports.push({
       id,
       ...report,
       roots,
       browser: browser.version(),
-      budgetPassed: report.gzipBytes <= report.limit,
-      budgetAssessment: reportBudget(assessBudget(`${id} initial JS gzip bytes`, report.gzipBytes, report.limit)),
+      budgetPassed: budgetAssessment.comparisonPassed,
+      budgetAssessment,
     });
     console.log(`${id}: ${report.gzipBytes}/${report.limit} gzip bytes, ${report.files.length} scripts`);
   } finally {
@@ -61,7 +64,8 @@ writeFileSync(
     2,
   )}\n`,
 );
-// Measurement/provenance assertions still throw; numeric exceedances remain advisory.
+// The raw report is on disk before a hard gate decides the exit status (ADR-026).
+requireBudgets(assessments);
 console.log(
-  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (${PERFORMANCE_POLICY.authority}).`,
 );

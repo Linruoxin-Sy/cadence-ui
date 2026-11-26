@@ -4,13 +4,14 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { chromium } from "@playwright/test";
-import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget, requireBudgets } from "./performance-policy.mjs";
 import { measureInitialScripts, summarizeLayoutShifts } from "./site-js-budget.mjs";
 
 const dist = process.env.CADENCE_DIST_DIR ?? ".next-motion-runtime";
 const base = process.argv[2] ?? "http://127.0.0.1:3183";
 const output = process.argv[3] ?? ".cache/w3-site.json";
 const manifest = JSON.parse(readFileSync(path.join(dist, "build-manifest.json"), "utf8"));
+const assessments = [];
 const routes = Object.keys(JSON.parse(readFileSync(path.join(dist, "prerender-manifest.json"), "utf8")).routes);
 const applicable = routes.filter((route) => route === "/" || /^\/(components|docs)(\/|$)/.test(route));
 const report = {
@@ -66,6 +67,9 @@ await Promise.all(
         const layout = await page.evaluate(() => ({ supported: window.__w3CLSSupported, shifts: window.__w3Shifts }));
         assert.ok(layout.supported);
         const cls = summarizeLayoutShifts(layout.shifts);
+        const pageAssessment = reportBudget(assessBudget("page-total", scripts.gzipBytes));
+        const clsAssessment = reportBudget(assessBudget("cls", cls));
+        assessments.push(pageAssessment, clsAssessment);
         report.reports.push({
           route,
           viewport,
@@ -74,12 +78,9 @@ await Promise.all(
           roots,
           layout,
           cls,
-          clsPassed: cls < 0.02,
-          jsPassed: scripts.gzipBytes <= scripts.limit,
-          budgetAssessments: [
-            reportBudget(assessBudget(`${route} JS gzip bytes`, scripts.gzipBytes, scripts.limit)),
-            reportBudget(assessBudget(`${route} cold CLS`, cls, 0.02, "below")),
-          ],
+          clsPassed: clsAssessment.comparisonPassed,
+          jsPassed: pageAssessment.comparisonPassed,
+          budgetAssessments: [pageAssessment, clsAssessment],
         });
         writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
         console.log(`${viewport.width} ${route}: JS ${scripts.gzipBytes}, CLS ${cls}`);
@@ -89,7 +90,8 @@ await Promise.all(
     }
   }),
 );
-// Structural/browser/provenance assertions remain blocking; numerical comparisons do not.
+// Structural/browser/provenance failures already abort; ADR-026's hard gates decide the rest.
+requireBudgets(assessments);
 console.log(
-  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (${PERFORMANCE_POLICY.authority}).`,
 );

@@ -155,6 +155,7 @@ jobs:
           - tests/lib/motion-v2-projection.test.tsx
           - tests/lib/motion-targets.test.tsx
           - tests/lib/joint-motion-reporter.test.tsx
+          - tests/lib/performance-budgets.test.tsx
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

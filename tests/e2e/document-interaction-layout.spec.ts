@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { assessBudget, reportBudget } from "../../scripts/performance-policy.mjs";
+import { assessBudget, reportBudget, requireBudgets } from "../../scripts/performance-policy.mjs";
 import { summarizeLayoutShifts } from "../../scripts/site-js-budget.mjs";
 import { openComponentSource } from "./installation-helpers";
 
@@ -193,6 +193,8 @@ for (const width of [1440, 390])
           endTime: performance.now(),
         }));
         const cls = summarizeLayoutShifts(proof.shifts);
+        // ADR-026: CLS is a hard gate, so a breach fails this window instead of attaching a red number.
+        const budgetAssessment = requireBudgets([reportBudget(assessBudget("cls", cls))])[0];
         await info.attach("complete-route-layout-window", {
           body: JSON.stringify(
             {
@@ -202,7 +204,7 @@ for (const width of [1440, 390])
               cls,
               errors,
               proof,
-              budgetAssessment: reportBudget(assessBudget(`${id} interaction CLS`, cls, 0.02, "below")),
+              budgetAssessment,
             },
             null,
             2,
@@ -213,5 +215,5 @@ for (const width of [1440, 390])
         expect(proof.trustedInputs.some((event) => event.type === "pointerdown")).toBe(true);
         expect(errors).toEqual([]);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        // Numeric CLS comparison is advisory; native interaction/layout assertions remain above.
+        // CLS is a hard gate (ADR-026) and is asserted before this point; native layout checks stay above.
       });

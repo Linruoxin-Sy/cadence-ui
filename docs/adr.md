@@ -4,8 +4,10 @@ These are the current decisions and their enduring rationale, not a delivery log
 stable. A future reversal adds a new decision with an explicit supersession; implementation outcomes
 and open work belong in the plan and test suite, not appended experiment histories.
 
-ADR-023 is current authority for Motion v2 budget sequencing. Earlier ADR text remains historical;
-conflicting numerical budget/performance-stage requirements no longer gate migration.
+[ADR-026](#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired) is current
+authority for Motion v2 budgets and enforcement; [ADR-023](#adr-023--effects-first-migration-performance-governance-afterwards)
+remains the record of why they were advisory during migration. Earlier ADR text remains historical;
+conflicting numerical budget/performance-stage requirements do not gate migration.
 
 ## ADR-001 · Distribute registry-first
 
@@ -335,3 +337,206 @@ Does not change the semantics of a frozen snapshot or the HTTP/ETag contract of 
 out of scope in the original decision, is decided by the part above. The "载荷随仓库提交" reading of
 the distribution guide is superseded for the llms files only; per-component payloads stay committed
 and reviewed.
+
+## ADR-026 · v2 performance budgets: what is gated, what is monitored, what is retired
+
+Accepted by S02 (#83), slice S02-B (#172), on the measurement S02-A recorded (#171). The decision
+covers the library's own cost and the site that documents it; it does not re-open any effect, API or
+compatibility claim. The evidence base is the S02-A matrix: 63 registry ids, 73 production routes,
+two viewports, commit `bff69e6c`, one `next build`, one `next start`. Every number below is a cell in
+that matrix; `.cache/s02-a/` is its raw form and is not committed.
+
+ADR-023 made the old numbers advisory so the migration could finish. That phase is over, so each number
+has to become either a decision or a retirement. This ADR does not restore them: four survive on a basis
+the matrix supports, one was never met, and one measured something other than what it named.
+
+### What the historical numbers measured, and what happened to each
+
+**Complete-page initial JS ≤ 120,000 B — replaced.** The limit was introduced on 2026-11-02 with the
+audit that recorded it as already red: the complete Button route was 221,511 B at source `4fe1a51`,
+1.85× the limit, and no candidate in that investigation came near it. It has never been met, by any
+route, at any commit. The reason is now measurable rather than speculative: 366,100 B of every
+component route is a 19-chunk shell that all 63 component routes load, so the whole catalogue sits
+between 367,600 B and 503,400 B and the ten shared documentation routes sit at 352,800 B. No component
+author can move that number, and applying it per route means 63 permanent red cells that no pull
+request can turn green — the same failure mode ADR-023 had to legislate away.
+
+**Per-component added JS ≤ 8,000 B, shared runtime excluded — kept, with the basis corrected.** The
+number was right and the measurement was wrong. `consumer-bundle-budget.mjs` applied it to the
+reference-graph addition, a basis that subtracts the shared runtime but still charges the component for
+every dedicated dependency it wraps: Recharts for `chart` (120,936 B), DayPicker for `date-picker`
+(91,690 B), the highlighter for `code-block` (201,238 B). That is not the component's addition; it is
+the dependency's cost, and the component exists in order to have it. 39 of 63 ids exceeded the bar and
+none of them could have been fixed by editing the component — `button-group` lost by 28 B. On the basis
+the words actually describe — the item's own entry compiled with every other module external — the
+population is 0.2 KB to 6.8 KB, median 2.8 KB, and 63 of 63 pass. 6,800 of 8,000 B (85%) is consumed by
+`code-block`, so the limit still binds. Same number, same intent, a basis on which a violation is
+something an author can act on.
+
+**Initial Motion ≤ 48,000 B — kept unchanged.** It holds and it binds: the production compilation of
+the union the registry really imports is 44,207 B, 44,450 B with the site's `useInView`, and 46,533 B
+for the unshipped `domMax` candidate. 92% of the budget is consumed by the shipped union, so any new
+Motion export has to be argued. No basis change: the collector compiles the actual import list, and
+the import list is asserted against the source tree, so it cannot drift silently.
+
+**Tier source gzip 4/6/10/12/14/12 KB — retired as a budget.** Two separate defects. First, the ladder
+is keyed on tier, and tier is motion complexity, not size: ADR-021 and parity §6.3 already say a tier
+is not an animation allowance, and a T0 item is now routinely larger than a T4 one (T0 max 24.0 KB,
+T4 max 10.7 KB). Second, and decisively, the basis includes the shared helpers an item copies:
+`registry/cadence/lib/inline-entrance.ts` (2,164 B gzip) plus `label-layout.ts` (3,814 B) already
+exceed T0's 4,096 B before the component contains a line, because `item.files` lists those helpers.
+16 of 20 T0 items therefore "violate" a rule they cannot satisfy, and 23 of 63 overall. The measurement
+itself is not wrong — a consumer does receive those files — it just answers a different question
+("what does this item's file list weigh") from the one the budget was believed to answer. The number
+stays reported per item; no comparison is made and the ladder is no longer a target. The cost that
+mattered is bounded twice by the two budgets above, which do not double-count the shared helpers.
+
+**CLS < 0.02 — kept unchanged.** Measured maximum 0.00055 (`pagination` at 390×844, one shift), 0.00000
+on all fourteen interaction windows, four route-viewport cells with a single shift each. The limit is
+36× the worst observation: it is a catastrophe detector, not a tuning target, and Web Vitals' own
+"good" bound (0.1) is five times looser. Keeping it costs nothing and removes a layout-shift regression
+from ever being arguable.
+
+**≥ 55 fps on a mid-range mobile device — kept as the device criterion, with a desktop proxy added.**
+It was never measured: no physical device was ever available, so the matrix has no cell for it and this
+ADR does not pretend otherwise. Retiring it would let F03 skip the only measurement that speaks to
+smoothness on the devices consumers hold; keeping it alone would leave every regression until then
+invisible. So the device criterion is unchanged and F03 owns it, and the host that does exist gets a
+proxy the matrix can actually produce: the 2-second rAF window's p95 frame interval, the share of
+frames over 25 ms, and the longest long-animation-frame entry. Measured today: p95 6.10–6.20 ms on a
+165 Hz host, 0.33% (1280) and 0.48% (390) of frames over 25 ms, longest block 133.9 ms. That is
+main-thread cadence on this host, not presented frames on a phone, and it is labelled that way wherever
+it is recorded.
+
+### The budgets
+
+Nine entries, one classification each. "Hard gate" means a failing comparison fails the run that
+measures it and must be fixed or the budget amended by a new ADR. "Monitored" means the value is
+recorded and compared, a breach is reported and tracked, and the run does not fail. "Retired" means no
+comparison is made. A measurement that is invalid — missing responses, page errors, a body that was
+not captured, a graph the accounting cannot explain — is a **correctness failure under every class**,
+including monitored and retired; it is never downgraded to "no result".
+
+| id                     | limit                                            | class     | protects                              | measured today                   |
+| ---------------------- | ------------------------------------------------ | --------- | ------------------------------------- | -------------------------------- |
+| `component-local-code` | ≤ 8,000 B gzip per id                            | hard gate | one component's authored code         | 0.2–6.8 KB, max 85% consumed     |
+| `component-addition`   | ≤ recorded per id + 1,024 B; new ids ≤ 224,000 B | hard gate | one component's install cost          | 0.3–201.2 KB, median 14.9 KB     |
+| `motion-union`         | ≤ 48,000 B gzip                                  | hard gate | the runtime union all ids import      | 44,207 / 44,450 / 46,533 B       |
+| `cls`                  | < 0.02 session maximum, cold and interaction     | hard gate | interaction and first-paint stability | max 0.00055                      |
+| `route-remainder`      | ≤ 40,000 B gzip per route                        | monitored | the first-load cost a route adds      | 1.4–137.3 KB, p50 10.0, p90 38.3 |
+| `page-total`           | ≤ 550,000 B gzip per route                       | monitored | first load as the user pays it        | 367.6–503.4 KB, shell 366.1 KB   |
+| `frame-share`          | ≤ 1% of frames over 25 ms                        | monitored | interaction smoothness on this host   | 0.33% / 0.48%                    |
+| `frame-block`          | ≤ 150 ms longest long-animation-frame entry      | monitored | no visible main-thread stall          | 133.9 ms                         |
+| `tier-source`          | none (reported, not compared)                    | retired   | —                                     | 0.5–24.0 KB per item             |
+
+Why these numbers, where they are new:
+
+- **`component-addition` is a ratchet, not a bar.** The population spans 0.3 KB (`reveal-group`) to
+  201.2 KB (`code-block`), and the spread is not sloppiness: it is which engine the component wraps. A
+  flat ceiling either blesses `code-block` (anything above 201 KB) or condemns `chart` (anything below
+  120 KB), and both are decisions about scope, not about cost. What is actionable is _change_: an item
+  may not grow by more than 1,024 B without the growth appearing in the diff, and a new item may not
+  enter above 224,000 B — the current maximum plus 11%, roughly one dependency. The recorded values
+  live in `tests/fixtures/performance/consumer-addition.json` with their source commit, so a change is
+  a reviewed number rather than an invisible one, exactly as `registry-snapshots.json` already works.
+- **`route-remainder` is the 90th percentile of the population.** Nine routes in ten add ≤ 38,300 B, so
+  40,000 B is where the outliers are named instead of blessed. Six routes exceed it today (`chart`
+  137,300, `code-block` 87,600, `date-picker` 57,400, `data-table` 54,100, `sidebar` 47,300,
+  `command` 41,700) and all six are dedicated-engine routes; they are recorded as exceedances and
+  filed, not silently tolerated. `chart` alone is 137,000 B of Recharts in one chunk.
+- **`page-total` is a drift ceiling, not a quality claim.** 503,400 B (the worst route today) plus 9.3%,
+  about one large chunk. It is the number that catches "someone added 40 KB to the shared layout", and
+  it is emphatically not a statement that 503 KB is good; see "What this does not claim".
+- **The device criterion is separate from the proxy.** ≥ 55 fps on a real mid-range device is unchanged and
+  is F03's to measure; it has no entry in the table because no collector in this repository can produce
+  it. The two desktop proxies stand in between measurements.
+- **The 25 ms / 150 ms / 1% proxy** comes from what 55 fps means on a 60 Hz device: an 18.2 ms frame
+  period, so a frame over 25 ms has already missed a vsync and a 150 ms block has dropped eight. Measured
+  margin is 2× on the share and 12% on the longest block, so a regression shows up before a person
+  would call the page slow.
+
+`installed` (the real copy-install minus an empty React app: 6.1–279.1 KB, median 78.9 KB) is measured
+and recorded but **not budgeted**: it is the reference-graph addition plus the Motion runtime that
+budget subtracts, so gating it would gate one cost twice, and its harness needs a networked `pnpm
+install` that `pnpm check` cannot promise.
+
+### Measurement
+
+Every metric keeps the protocol it was measured with; nothing was redefined to look better. The one
+addition is an attribution, not a re-measurement: `route-remainder` is `page-total` minus the gzip of
+the chunk set present on all 63 component routes, computed from the same sweep and reported beside it,
+so the total is still recorded and still compared.
+
+| metric                                                       | command                                                                                                                                         | environment                                                                                                                                                              |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `component-local-code`, `component-addition`, `motion-union` | `node scripts/audit-w3-bundles.mjs .cache/audits/<dir>`                                                                                         | local `node_modules` from the lockfile; esbuild version recorded in the report                                                                                           |
+| `cls`, `page-total`, `route-remainder`                       | `pnpm build && pnpm start --port 3100`, then `node scripts/measure-routes.mjs page --base http://127.0.0.1:3100 --width 1280` and `--width 390` | production build, fresh context per route, CDP cache disabled, load + networkidle + 10 s + networkidle, no interaction, `deviceScaleFactor` 1                            |
+| `frame-share`, `frame-block`                                 | `node scripts/measure-routes.mjs frames --base http://127.0.0.1:3100 --width 1280` and `--width 390`                                            | as above, plus a 2 s window after a scripted interaction or a 240 px scroll; the display refresh rate must be recorded because absolute fps is a property of the display |
+| `cls` (interaction)                                          | `pnpm exec playwright test tests/e2e/document-interaction-layout.spec.ts tests/e2e/data-table-layout.spec.ts`                                   | the browser matrix already defined there                                                                                                                                 |
+
+Bundles are gzip level 6 on each separately served or separately emitted entity, decimal KB. CLS is the
+maximum session window (gap < 1 s, span < 5 s) excluding recent-input shifts. Frame cells are a single
+2-second window: repeated runs differ by < 1.5% in fps and ±1 long frame, which is the tolerance this
+instrument has — a breach of the 25 ms share by less than a tenth of a point is noise, and the ADR
+says so rather than inventing precision. The path `tests/fixtures/performance/` holds the executable
+inputs; audit output stays in ignored `.cache/`.
+
+### Enforcement
+
+`scripts/performance-policy.mjs` carries the decision: `PERFORMANCE_POLICY` moves from
+`functional-migration` / `advisory` / `deferred` to `performance-governance` / `budgeted` /
+`pending-f03`, and `PERFORMANCE_BUDGETS` is the table above. `assessBudget` refuses a metric that is not
+in that table, so a collector cannot introduce a gate the ADR does not justify, and it refuses a retired
+one outright. `reportBudget` labels a monitored breach with its class; `requireBudgets` is what makes the
+hard gates real, and every collector that measures one calls it after writing its raw report, so a
+failure exits non-zero with all breaches listed. The tier ladder's comparison is removed from
+`registry:check`, which keeps reporting the per-item figure.
+
+`pnpm check` is the only required status, so a hard gate is only real if it runs there. `audit-w3-bundles`
+measures the three bundle metrics in about four seconds from local `node_modules`, and
+`tests/lib/performance-budgets.test.tsx` runs it as a gate. `cls` is a hard gate enforced by the suites
+that measure it — `tests/e2e/site-js-budget.spec.ts`, `tests/e2e/document-interaction-layout.spec.ts`
+and `tests/e2e/data-table-layout.spec.ts` — which run in `pnpm test:e2e` and in CI's evidence job, not in
+required CI. `page-total` and `route-remainder` need a production build and a 15-minute browser sweep,
+which required CI deliberately does not run, so they are monitored; the sweep is what F03 must record.
+That split is the honest consequence of where the measurements can run, and it is why F03 — not a pull
+request — accepts the page metrics.
+
+An amendment is a new ADR. Editing `tests/fixtures/performance/consumer-addition.json` is not one: it
+records what was measured, and a pull request that raises a number must say why in its body. A compiler
+or lockfile upgrade is a budget event — re-record in that pull request and attach the report.
+
+### What this does not claim
+
+- **Not a performance acceptance.** Nothing here certifies the current cost as good. The library is
+  inside every bar this ADR sets, and the _site_ is 3.1× to 4.2× the historical page bar because of a
+  shared shell nobody has attributed yet. That is filed as its own issue with these numbers.
+- **No component is accepted.** Per-component device and interaction evidence is still missing for
+  almost every id; ADR-023's separation of functional completion from performance governance stands,
+  and F03 owns the second half.
+- **No effect was reduced.** No animation, recipe, mode, clamp or fallback changed. The only source
+  touched by S02-B is measurement and policy code.
+- **Silence is not a pass.** The two monitored page metrics have never been green against a bar that
+  anyone can meet; they are recorded so that F03 argues with data instead of impressions.
+
+### What F03 accepts against
+
+F03 (#84) records, on one commit, in one report:
+
+1. `node scripts/audit-w3-bundles.mjs` green on all three bundle metrics, including the ratchet.
+2. Both `measure-routes.mjs page` sweeps and both `frames` sweeps, with environment metadata (CPU, RAM,
+   OS, browser build, refresh rate, headless or not) and the production `BUILD_ID`.
+3. A **real mid-range Android device** — a 2023–2024 mid-tier phone, 60 Hz, unthrottled, cold cache,
+   production build over the network, screen recorded or traced with presented-frame timestamps — for
+   the ≥ 55 fps criterion. Desktop emulation, rAF cadence and DevTools CPU throttling are not
+   substitutes; they are the proxy in this table, nothing more.
+4. `tests/e2e/document-interaction-layout.spec.ts` and `tests/e2e/data-table-layout.spec.ts` green for
+   the interaction CLS windows they cover.
+
+Acceptance requires every hard gate green and every monitored metric at or under its limit on that
+commit, or an ADR naming the exception with the measurement that justifies it. The two issues S02-B
+filed must be closed or explicitly dispositioned in that decision, because they are the reason the page
+metrics sit where they do: [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177) attributes the
+366 142 B shared shell, and
+[#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178) decides the six routes above
+`route-remainder`.

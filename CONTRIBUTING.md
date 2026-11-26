@@ -1,11 +1,13 @@
 # Contributing to Cadence
 
-Motion v2 follows [ADR-023](docs/adr.md#adr-023--effects-first-migration-performance-governance-afterwards):
-complete intended effects and full-library functional migration before separate performance assessment,
-budget redesign, optimization and acceptance. Numeric source/runtime/page/FPS/CLS/workload budgets are
-advisory during migration. Retain historical comparisons, bounded work and all behavior, API/native,
-accessibility, mode/cancellation/ownership and source/action proof. No repeated budget-only build,
-page-cost matrix or device performance acceptance is required per migration change.
+Motion v2 budgets follow [ADR-026](docs/adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired),
+which fixed them on the S02-A cost matrix after [ADR-023](docs/adr.md#adr-023--effects-first-migration-performance-governance-afterwards)
+finished the migration: four hard gates run inside `pnpm check` (own compiled code, the per-id install
+addition ratchet, the Motion runtime union, CLS), two page metrics are monitored per recorded sweep, and
+the tier source ladder is retired. Retain historical comparisons, bounded work and all behavior,
+API/native, accessibility, mode/cancellation/ownership and source/action proof. A change that moves a
+bundle gate updates the recorded value in the same commit and says why in the pull request; page and
+device remeasurement belongs to a recorded acceptance run, not to every change.
 
 
 Thanks for helping. Cadence mirrors shadcn's component API and adds a motion contract. Motion has to
@@ -225,7 +227,7 @@ pnpm registry:build && pnpm check
 ```
 
 which runs typecheck, Biome (lint, formatting, and import order), the registry checks (targets, payload
-freshness, docs, export names, advisory tier budgets, P11), the install matrix (every plan resolves only
+freshness, docs, export names, the reported per-item source gzip, P11), the install matrix (every plan resolves only
 declared relative/namespaced/package dependencies), and the unit tests. `registry:check` verifies recipe
 declarations and requires animated test files; the test reporter
 requires three-mode helper adoption. Neither replaces the animation review or browser evidence for

@@ -7,8 +7,14 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
-import { analyzeConsumerBundles, COMPONENT_ADDITION_LIMIT } from "./consumer-bundle-budget.mjs";
-import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
+import { analyzeConsumerBundles } from "./consumer-bundle-budget.mjs";
+import {
+  assessBudget,
+  PERFORMANCE_BUDGETS,
+  PERFORMANCE_POLICY,
+  reportBudget,
+  requireBudgets,
+} from "./performance-policy.mjs";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
@@ -43,6 +49,12 @@ const motionExports =
   "motion,AnimatePresence,GroupAnimationWithThen,MotionConfig,PresenceContext,animateSingleValue,cancelFrame,cubicBezier,frame,getValueTransition,motionValue,useAnimationControls,useIsPresent,usePresence";
 const runtime = `export { ${motionExports} } from "motion/react";`;
 await writeFile(path.join(dir, "runtime.js"), runtime);
+const localCode = PERFORMANCE_BUDGETS["component-local-code"];
+const addition = PERFORMANCE_BUDGETS["component-addition"];
+const motionUnion = PERFORMANCE_BUDGETS["motion-union"];
+// The ratchet reference. An id that is not recorded yet enters against the cap only,
+// which is what the fixture records on the next run of record-performance-baseline.mjs.
+const ratchet = JSON.parse(await readFile(addition.ratchetFixture, "utf8"));
 const result = {
   performancePolicy: PERFORMANCE_POLICY,
   source: process.env.CADENCE_RUNTIME_SOURCE ?? "unspecified",
@@ -50,7 +62,13 @@ const result = {
   esbuild: version,
   protocol:
     "production minified ES2020 ESM; React/ReactDOM external; all public value exports retained; gzip6 per output; no source-byte surrogate",
-  limits: { motion: 48000, component: COMPONENT_ADDITION_LIMIT },
+  limits: {
+    motion: motionUnion.limit,
+    localCode: localCode.limit,
+    additionCap: addition.limit,
+    additionRatchet: ratchet.ids,
+    additionTolerance: addition.ratchetTolerance,
+  },
   motion: [],
   components: [],
   sources: [],
@@ -193,28 +211,45 @@ for (const item of items) {
   component.localOnly = local.outputFiles.map(summarize);
   await mkdir(path.dirname(local.outputFiles[0].path), { recursive: true });
   for (const file of local.outputFiles) await writeFile(file.path, file.contents);
-  console.log(`${item.name}: ${component.gzip}/${COMPONENT_ADDITION_LIMIT}`);
+  component.localGzip = component.localOnly.reduce((sum, file) => sum + file.gzip, 0);
+  const recorded = ratchet.ids[item.name];
+  console.log(
+    `${item.name}: local ${component.localGzip}/${localCode.limit}, addition ${component.gzip}/${recorded ?? `${addition.limit} (new)`}`,
+  );
 }
 result.graph = graph.metafile;
 await mkdir(path.join(dir, "graph"), { recursive: true });
 for (const file of graph.outputFiles) await writeFile(file.path, file.contents);
+// ADR-026: the addition is a ratchet per id — the recorded value plus a tolerance that
+// absorbs compiler drift — and the cap only bounds an id the fixture does not know yet.
 result.budgetAssessments = [
-  ...result.components.map((item) =>
-    reportBudget(assessBudget(`${item.id} added gzip bytes`, item.gzip, COMPONENT_ADDITION_LIMIT)),
-  ),
-  ...result.motion
-    .slice(0, 2)
-    .map((item) => reportBudget(assessBudget(`${item.name} Motion gzip bytes`, item.gzip, 48000))),
+  ...result.components.flatMap((item) => [
+    reportBudget(assessBudget("component-local-code", item.localGzip)),
+    reportBudget(
+      assessBudget(
+        "component-addition",
+        item.gzip,
+        ratchet.ids[item.id] === undefined ? addition.limit : ratchet.ids[item.id] + addition.ratchetTolerance,
+      ),
+    ),
+  ]),
+  ...result.motion.slice(0, 2).map((item) => reportBudget(assessBudget("motion-union", item.gzip))),
 ];
 await writeFile(path.join(dir, "report.json"), `${JSON.stringify(result, null, 2)}\n`);
 console.log(
   JSON.stringify({
     motion: result.motion.map(({ name, gzip }) => ({ name, gzip })),
-    componentsPassed: result.components.filter((item) => item.passed).length,
+    localWithin: result.components.filter((item) => item.localGzip <= localCode.limit).length,
+    additionRatchetWithin: result.components.filter(
+      (item) =>
+        item.gzip <=
+        (ratchet.ids[item.id] ?? addition.limit) + (ratchet.ids[item.id] === undefined ? 0 : addition.ratchetTolerance),
+    ).length,
     total: items.length,
   }),
 );
-// Original failed comparisons remain in the report; compilation/accounting failures still throw.
+// Raw comparisons stay in the report; the hard gates decide the exit status.
+requireBudgets(result.budgetAssessments);
 console.log(
-  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (${PERFORMANCE_POLICY.authority}).`,
 );

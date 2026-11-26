@@ -551,14 +551,13 @@ rules, not additional presets, duration values or runtime availability claims.
 
 ### 5.2 Shared work limits
 
-**Migration phase policy — ADR-023:** numerical workload values here and in component contracts
-are current implementation/advisory references, not fixed effect permissions. Implement intended
-effects first. Later effect tasks may adjust shared settings/presets and relevant tests with finite-work
-reasoning and behavior/visual evidence, without budget-only builds or device performance proof.
-This decision alone changes no runtime constant. Retain bounded work, latest-target coalescing,
-cancellation, native safety, exact semantic output and no infinite queues. After full-library functional
-migration, assess performance and justify v2 budgets separately; old numbers are not immutable final
-standards. This policy overrides conflicting historical numerical restrictions below.
+**Workload policy — ADR-023, budgets — ADR-026:** numerical workload values here and in component
+contracts are adjustable settings, not fixed effect permissions and not budgets. An effect task may
+adjust shared settings/presets and relevant tests with finite-work reasoning and behavior/visual
+evidence, without budget-only builds or device performance proof. No such change moves a runtime
+constant by itself. Retain bounded work, latest-target coalescing, cancellation, native safety, exact
+semantic output and no infinite queues. ADR-026 owns the numbers that are actually compared (own
+compiled code, install addition, Motion union, CLS) and the two page metrics it monitors.
 
 References to a "list budget", "visible-list budget" or "overload" in component prose mean the
 applicable limits below, not an additional unspecified item count or update-rate threshold. The
@@ -575,8 +574,8 @@ timers or a rule that every interrupted tween is overload. Reassess a later inde
 normally, without replaying suppressed changes.
 
 All bindings inherit [the system budgets](../animation-system.md#7-performance-budgets-and-implementation-rules):
-historical per-item source ceilings, consumer/runtime/page limits, real-device frame rate and CLS
-as advisory references during migration.
+own compiled code, install addition and the Motion union as hard gates, page and frame cost as
+monitored, and CLS as a hard gate wherever it is measured. Workload caps below are not budgets.
 The 20-element concurrency limit is for stagger scenarios, and the 400 ms limit is total stagger,
 not the maximum duration of every animation. Components may set stricter visible-work bounds. On
 overflow, reduce the moving set or show the latest final state; never delay semantic data or grow a

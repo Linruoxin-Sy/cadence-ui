@@ -32,11 +32,11 @@ the execution contract remains mandatory. Target part-level designs live central
 `motion/presets.md`. Public MDX describes delivered behaviour at the level a consumer can rely on, not
 the internal target detail.
 
-ADR-023 supersedes conflicting performance-stage requirements (including ADR-022): intended v2
-effects and full-library functional migration come first; numeric cost/workload budgets are advisory
-and adjustable with bounded work and correctness retained. Separate post-migration performance
-assessment, budget redesign, optimization and acceptance; historical failures remain unresolved.
-See animation-system §7 and its rollout plan before interpreting older budget wording.
+ADR-023 superseded conflicting performance-stage requirements (including ADR-022) so the migration
+could finish; [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+now decides the v2 budgets and classifies each metric as a hard gate, monitored or retired, on the S02-A
+cost matrix. Acceptance is F03's and has not happened. Historical failures and missing measurements stay
+recorded. See animation-system §7 and the rollout plan before interpreting older budget wording.
 
 Keep rules in their owning document and link to them. Update future work by replacing resolved items,
 not appending completion logs. Add no task-status, evidence or archive directory here. Test inputs belong

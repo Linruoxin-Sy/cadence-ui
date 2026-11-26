@@ -333,9 +333,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir, { com
             await p.waitForTimeout(15000);
             const detail = await p.evaluate(() => ({ shifts: window.__shifts, firstFrames: window.__firstFrames }));
             detail.cls = summarizeLayoutShifts(detail.shifts);
-            detail.budgetAssessment = reportBudget(
-              assessBudget("prototype interaction CLS", detail.cls, 0.02, "below"),
-            );
+            detail.budgetAssessment = reportBudget(assessBudget("cls", detail.cls));
             assert.equal(detail.firstFrames.length, 3);
             return detail;
           } finally {

@@ -160,6 +160,25 @@ try {
       console.log(`${entry.route} js=${report.gzipBytes} cls=${coldCls} errors=${report.errors.length}`);
       await page.close();
     }
+    // ADR-026 attributes the same bytes two ways: the total the user pays, and the part one
+    // route adds above the chunk set every component route loads. The shell is a union of
+    // observed URLs, not a build-manifest guess, and the total is still recorded unchanged.
+    const componentRows = rows.filter((row) => row.kind === "component");
+    const seen = new Map();
+    for (const row of componentRows) {
+      for (const file of row.scriptsDetail) seen.set(file.url, (seen.get(file.url) ?? 0) + 1);
+    }
+    const shellUrls = new Set(
+      [...seen.entries()].filter(([, count]) => count === componentRows.length).map(([url]) => url),
+    );
+    const shellGzip = componentRows
+      .flatMap((row) => row.scriptsDetail.filter((file) => shellUrls.has(file.url)))
+      .filter((file, index, files) => files.findIndex((other) => other.url === file.url) === index)
+      .reduce((sum, file) => sum + file.gzip, 0);
+    for (const row of componentRows) {
+      row.shellGzip = shellGzip;
+      row.routeRemainderGzip = row.jsGzip - shellGzip;
+    }
     await writeFile(
       path.join(out, `page-${width}.json`),
       `${JSON.stringify(
@@ -169,6 +188,13 @@ try {
             "production next start; per route a fresh page in one context, cache disabled, load + networkidle + 10s + networkidle with no interaction; default motion mode (no query parameter); JS total = gzip6 of every JavaScript HTTP entity the page fetched (measureInitialScripts, prefetch and async included); declaredJs = the scripts the document declares with <script src>, fetchedJs = the remainder fetched afterwards; cold CLS = session-window CLS of layout-shift entries with no recent input, from navigation to the end of the observation window",
           environment,
           browserVersion: browser.version(),
+          shell: {
+            scope: `URLs present on all ${componentRows.length} component routes`,
+            files: shellUrls.size,
+            gzip: shellGzip,
+            protocol:
+              "route remainder = page total minus the shell union above; the total is recorded unchanged, and the shared documentation routes are not part of the shell",
+          },
           routes: rows.length,
           rows,
         },

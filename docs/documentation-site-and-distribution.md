@@ -47,7 +47,9 @@ names the reached integration owners of exact declared forms; the internal six-c
 retains its separate default/inherited/composed/not-applicable assessments and reasons. Neither is
 full v2 acceptance. Do not expose hypothetical filters, automatic capabilities or runtime intensity
 controls. Navigation serializes only names/links, not these metadata objects or document bodies.
-Tier remains a compatibility field for source budgets and documentation profiles; historical numeric budgets are advisory during migration under ADR-023.
+Tier remains a compatibility field for documentation profiles; the source ladder it used to carry is
+retired as a budget by [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired),
+and the per-item figure is reported without a comparison.
 
 ---
 
@@ -117,10 +119,10 @@ label, not a prohibition on authored animation. Until a component migrates, desc
 static or animated baseline rather than inferring capability from the target. Base UI interaction,
 react-resizable-panels and Card's optional ResizeObserver already demonstrate why T0 never implied
 zero JavaScript. Composed children retain their own motion contracts. Performance claims refer to
-actual APIs and the historical advisory source budget (T0: 4 KiB gzip per item's own shipped sources,
-excluding dependencies), never a zero-byte bundle or a cross-library certification. SSR markup does
-not imply hydrated interactions work without JavaScript. Every profile describes its real runtime
-and motion costs; functional migration precedes separate v2 performance assessment and budget redesign.
+actual APIs and the compiled budgets in ADR-026 (own code ≤ 8 KiB per id, the per-id install ratchet,
+the Motion union), never a zero-byte bundle or a cross-library certification. The historical tier
+source figure is still reported per item and no longer compared. SSR markup does not imply hydrated
+interactions work without JavaScript. Every profile describes its real runtime and motion costs.
 
 `scripts/doc-template.mjs` enforces this membership/order through both registry:build
 and registry:check (therefore pnpm check); new-item validates its generated body with
@@ -301,7 +303,7 @@ example-name catalogue stay outside that client boundary. Selection does not cha
 client ownership, state, IDs, portals or inherited provider. Await selection before returning the
 frame, with no local loading fallback, so the real specimen remains in SSR and no-JS HTML.
 Verify per-page loading against a complete production route: a server import alone does not prove
-client code splitting, and all automatic scripts still count in the historical advisory page comparison under ADR-023.
+client code splitting, and all automatic scripts still count in the monitored page total of ADR-026.
 Shared navigation links opt out of automatic destination prefetching, so visible catalogue links
 do not load another page's preview graph. Navigation still uses Next links and loads the requested
 destination normally. Every specimen on the current page is rendered and loaded immediately;

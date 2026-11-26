@@ -5,7 +5,7 @@
  *   - every item has a fresh payload with embedded content, docs and its own content hash
  *   - the untracked llms files exist (build output); the full one matches the expanded docs
  *   - UI and block items declare `meta.tier`, `meta.batch`, `meta.upstream`, `meta.motion`, `meta.intensity`
- *   - tier gzip comparisons (including meta.budget references) are advisory under ADR-023
+ *   - the per-item source gzip is reported, not compared: ADR-026 retired the tier ladder
  *   - no component imports a validation library or an alias, and every animated file has a reduced branch
  *   - intra-registry dependencies are namespaced (`@cadence/<id>`) and exist
  *   - the three copies of the CSS motion tokens agree (globals.css, cadence-theme, animation-system.md §2.3)
@@ -35,7 +35,7 @@ import {
 import { checkMotionTargets } from "./motion-targets.mjs";
 import { authoredCssTokens, loadMotionSource } from "./motion-token-source.mjs";
 import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
-import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
+import { PERFORMANCE_BUDGETS, PERFORMANCE_POLICY } from "./performance-policy.mjs";
 import { duplicateItemProblems, registryOrderProblems } from "./registry-order.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
@@ -93,7 +93,7 @@ async function docFrontmatter(name) {
   }
 }
 
-const TIER_BUDGET = { T0: 4, T1: 6, T2: 10, T3: 12, T4: 14, T5: 12 };
+const TIERS = ["T0", "T1", "T2", "T3", "T4", "T5"];
 const NAMESPACE = "@cadence/";
 const VALIDATION_DEPS = ["zod", "react-hook-form", "@hookform/resolvers", "yup", "valibot", "joi", "superstruct"];
 const VALIDATION_IMPORT =
@@ -117,6 +117,8 @@ const exists = async (file) => {
 
 const expectedTarget = (file) => `@components/cadence/${file.slice("registry/cadence/".length)}`;
 const isComponent = (item) => item.type === "registry:ui" || item.type === "registry:block";
+/** @type {{id: string, tier: string, gzip: number}[]} */
+const sourceBytes = [];
 
 for (const item of registry.items) {
   const payloadPath = path.join(root, "public", "r", `${item.name}.json`);
@@ -170,8 +172,8 @@ for (const item of registry.items) {
       problems.push(`${item.name}: missing animated contract suite tests/components/${item.name}.test.tsx`);
     }
     const tier = item.meta?.tier;
-    if (!tier || !(tier in TIER_BUDGET)) {
-      problems.push(`${item.name}: meta.tier must be one of ${Object.keys(TIER_BUDGET).join(", ")}`);
+    if (!TIERS.includes(tier)) {
+      problems.push(`${item.name}: meta.tier must be one of ${TIERS.join(", ")}`);
     }
     if (isComponent(item)) {
       if (!Array.isArray(item.meta?.motion)) problems.push(`${item.name}: meta.motion must be an array`);
@@ -256,11 +258,10 @@ for (const item of registry.items) {
     if (isComponent(item)) bytes += gzipSync(source).length;
   }
 
-  if (isComponent(item)) {
-    const tier = item.meta?.tier ?? "T0";
-    const budgetKb = item.meta?.budget ? item.meta.budget / 1024 : (TIER_BUDGET[tier] ?? 8);
-    reportBudget(assessBudget(`${item.name} source gzip bytes (${tier})`, bytes, budgetKb * 1024));
-  }
+  // ADR-026 retired the tier ladder: `item.files` includes the shared registry/cadence/lib
+  // helpers an item copies, so the figure answers "what this item's file list weighs", not
+  // "what this component costs". It stays reported; the compiled budgets bound the cost.
+  if (isComponent(item)) sourceBytes.push({ id: item.name, tier: item.meta?.tier ?? "T0", gzip: bytes });
 
   if (isComponent(item)) {
     // Declared = documented. The frontmatter is what readers and agents see.
@@ -411,7 +412,11 @@ if (problems.length) {
 
 const componentCount = registry.items.filter(isComponent).length;
 console.log(
-  `Registry OK: ${registry.items.length} items (${componentCount} components), ${docFiles.size} docs, ${previewFiles.size} previews, targets and payloads in sync, tier budgets ${PERFORMANCE_POLICY.enforcement} (performance ${PERFORMANCE_POLICY.performanceAcceptance}), P11 clean.`,
+  `Registry OK: ${registry.items.length} items (${componentCount} components), ${docFiles.size} docs, ${previewFiles.size} previews, targets and payloads in sync, performance ${PERFORMANCE_POLICY.enforcement} (acceptance ${PERFORMANCE_POLICY.performanceAcceptance}, ${PERFORMANCE_POLICY.authority}), P11 clean.`,
+);
+const sourceGzip = sourceBytes.map((item) => item.gzip);
+console.log(
+  `Source gzip reported, not compared (${PERFORMANCE_BUDGETS["tier-source"].class}, ADR-026): ${sourceBytes.length} items, ${Math.min(...sourceGzip)}–${Math.max(...sourceGzip)} B.`,
 );
 console.log(
   `Motion targets: ${targets.contracts.size} reference graphs checked; legacy enforcement, no v2 runtime certification.`,
