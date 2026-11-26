@@ -67,8 +67,16 @@ test.describe("button", () => {
 
         test(`press scale: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await openComponent(page, "button", requested, "button", mode);
-          const scale = await pressScale(page, scoped("button", '[data-slot="button"]'));
+          // `feedback.press/scale` owns a safe label layer inside the button, never the
+          // root: the root keeps its hit, focus and anchor geometry at rest in every mode.
+          // The preview's first button pairs an icon with its label, and a rich label keeps
+          // its own structure instead of gaining a feedback wrapper — the contract omits the
+          // pose there rather than inserting an incompatible layer. So the sample is the
+          // first button that owns a plain label, and therefore a feedback layer at all.
+          const feedback = page.locator(scoped("button", '[data-slot="button-feedback"]')).first();
+          await expect(feedback).toBeVisible();
 
+          const scale = await pressScale(page, feedback);
           if (mode === "full") {
             // `scale.press` is 0.97; a spring that has not quite arrived is still a
             // press, so the assertion is "visibly below 1", not "exactly 0.97".
