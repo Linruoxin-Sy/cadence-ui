@@ -103,6 +103,10 @@ type Adapter = {
   textGeometry?: boolean;
   /** Wrapper-free hosts observe bounded real child boxes for passive reflow. */
   observeChildren?: boolean;
+  /** Bounded identity of the committed content this owner follows. A change means
+   * the observed box is a content revision the commit path measures, not passive
+   * reflow, so the shell is never settled before that destination is known. */
+  revision?: () => string;
   /** Exact adapter-owned, inert out-of-flow decoration; never caller content.
    * Its finite visual lifecycle cannot reclassify a semantic resize as passive. */
   decoration?: HTMLElement | null;
@@ -168,6 +172,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     let running = false;
     let restricted = false;
     let stamp = "";
+    let contentRevision = adapter.revision?.() ?? "";
     let writingMode = "";
     let naturalWidth = 0;
     let naturalHeight = 0;
@@ -297,6 +302,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         stamp = vertical
           ? `${Math.round(intrinsic.height)}/${Math.round(intrinsic.width)}`
           : `${Math.round(intrinsic.width)}/${Math.round(intrinsic.height)}`;
+        contentRevision = adapter.revision?.() ?? "";
         return result;
       },
       release,
@@ -371,7 +377,10 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
             !target.readable ||
             !target.independent ||
             !Number.isFinite(start) ||
-            start === size ||
+            // A box the writer already occupies is a settled size, not a flight:
+            // installing a zero-length effect for a sub-pixel difference would
+            // report a finished animation where nothing moved.
+            Math.round(start as number) === Math.round(size) ||
             (target.flexBlock && Math.min(max, Math.max(min, start as number)) === size) ||
             typeof node.animate !== "function"
           ) {
@@ -476,7 +485,17 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         if (host.invalidate === owner.dispose) host.invalidate = undefined;
       },
     };
-    const passive = () => flush(null, "passive");
+    // An adapter that can name its committed content distinguishes the two causes
+    // behind the same box change. A new identity is the content revision the commit
+    // path measures: the primitive still holds the box it is about to replace and
+    // publishes this revision's destination afterwards, so settling here would jump
+    // the shell and leave the commit nothing to animate. Every other box change
+    // stays a passive reflow.
+    const revisionPending = () => adapter.revision !== undefined && adapter.revision() !== contentRevision;
+    const passive = () => {
+      if (revisionPending()) return;
+      flush(null, "passive");
+    };
     const delegated = () =>
       !adapter.maintained &&
       adapter.axes.every((axis) =>
