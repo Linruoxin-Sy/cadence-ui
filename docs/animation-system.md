@@ -3,7 +3,7 @@
 Cadence Motion v2 gives every component the motion capabilities appropriate to its content and
 interactions. Components report changes; shared policy coordinates them; recipes and tokens define
 their presentation; CSS, Motion and existing engine adapters execute it. T0–T5 no longer grant or
-deny animation capabilities. Numerical budgets are advisory during migration under ADR-023 (§7).
+deny animation capabilities. Numerical budgets and their classes are decided in §7 (ADR-026).
 
 This is the accepted target design, replacing the tier-gated animation design. It is not a claim that
 v2 has shipped. The [implementation plan](animation-system-plan.md) owns rollout dependencies and
@@ -108,7 +108,7 @@ Global visual guidance covers causality, rhythm, restraint, readability and spat
 Components choose their own meaningful actions and may select different reviewed presets. Global
 requirements cover semantics and upstream compatibility, mode ceilings, SSR visibility, unchanged
 text identity, one property writer, cancellation and finite-work protections. Numerical performance
-requirements follow the advisory migration policy in §7. A component cannot make the correctness
+requirements follow the budget decision in §7. A component cannot make the correctness
 requirements optional in the name of visual customisation. Six applicable baseline capabilities
 remain default integration after migration, not six opt-in switches for every consumer.
 
@@ -617,7 +617,7 @@ request token do not retain an origin. A frozen source may retire with its popup
 Changed destination/paint-layer mapping cancels a running transfer and reveals the
 already-current value without replaying a local replacement. The independently owned
 trigger/value transaction survives popup closure; hidden option updates establish a
-baseline. Numerical performance acceptance remains deferred under ADR-023.
+baseline. Numerical acceptance is pending F03 against the §7 budgets.
 
 ### 3.0 Sidebar composition
 
@@ -1876,43 +1876,56 @@ idempotent cleanup and property-scoped cancellation follow the
 
 ## 7. Performance budgets and implementation rules
 
-### Current phase: effects first, performance governance afterwards
+### v2 budgets: gated, monitored, retired
 
-[ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards) supersedes
-conflicting budget/performance-stage wording throughout these contracts, including numerical
-bounds in component files and presets. Complete intended v2 effects and full-library functional
-migration before separate performance assessment, budget redesign, optimization and acceptance.
-Tier source sizes, component/runtime/page costs, FPS/CLS and workload numbers below are historical
-advisory references, not functional migration gates or immutable final v2 standards. Do not reduce
-required effects or optimize prematurely to meet those numbers.
+[ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+decided the numbers on the S02-A cost matrix, after the migration ADR-023 sequenced. The classification
+is part of the decision, not a status note: a **hard gate** fails the run that measures it, a
+**monitored** metric is recorded and compared and a breach is reported and tracked, and a **retired**
+metric is reported without comparison. An invalid measurement — a missing response, a page error, a
+graph the accounting cannot explain — is a correctness failure under every class, including monitored
+and retired. `scripts/performance-policy.mjs` carries the table, and `assessBudget` refuses a metric
+that is not in it, so a collector cannot add a gate the ADR does not justify.
 
-Concurrency, text/digit/sample counts, stagger, drawing areas and similar workload settings may be
-revised for intended effects in shared source/presets and relevant tests, with finite-work reasoning
-and behavioral/visual evidence. Existing runtime caps retain current behavior until explicitly
-changed; this decision does not blindly increase constants. Preserve bounded work, latest targets,
-cancellation, safe input/geometry/provenance fallbacks, native editing and semantic convergence.
+| Metric               | v2 limit                                         | Class     | Protects                              |
+| -------------------- | ------------------------------------------------ | --------- | ------------------------------------- |
+| Own compiled code    | ≤ 8 000 B gzip per id                            | hard gate | one component's authored code         |
+| Install addition     | ≤ recorded per id + 1 024 B; new ids ≤ 224 000 B | hard gate | one component's install cost          |
+| Motion runtime union | ≤ 48 000 B gzip                                  | hard gate | the runtime every animated id imports |
+| CLS                  | < 0.02 session maximum, cold and interaction     | hard gate | layout stability                      |
+| Route remainder      | ≤ 40 000 B gzip per route                        | monitored | the first-load cost one route adds    |
+| Page total           | ≤ 550 000 B gzip per route                       | monitored | first load as the user pays it        |
+| Frame share / block  | ≤ 1% of frames over 25 ms, no block over 150 ms  | monitored | interaction smoothness on this host   |
+| Tier source gzip     | reported, not compared                           | retired   | —                                     |
 
-Retain historical measured values, exceeded comparisons and missing evidence as unresolved inputs.
-No migration stage requires repeated budget-only builds, full-page cost matrices or real-device
-performance acceptance. When a collector is explicitly run, retain its protocol, raw results and
-source binding; label budget comparisons advisory/deferred, never turn an exceedance into a pass.
-Functional migration completion and performance governance completion are distinct. Genuine source,
-action, three-mode, native/API/accessibility, ownership, interruption, compatibility and correctness
-proof still gates functional claims; this decision does not enable an unproven v2 marker.
+The page metrics are monitored rather than gated because their collector needs a production build and
+a 15-minute browser sweep that required CI does not run; `cls` is gated wherever a suite measures it. The device criterion — ≥ 55 fps on a real mid-range phone, with presented-frame traces — is
+unchanged and belongs to F03: no collector here can produce it, and desktop cadence is a proxy, never a
+substitute.
 
-### Historical numerical references (advisory during migration)
+### What happened to the historical values
 
-| Metric                            | Budget                                             | How it is checked                                           |
-| --------------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
-| Motion runtime (initial)          | ≤ 48 KB gzip (measure the actual required runtime) | Build analysis                                              |
-| Per-component added JS            | ≤ 8 KB gzip (shared runtime excluded)              | Build script                                                |
-| Initial JS per page               | ≤ 120 KB gzip                                      | Production browser request audit (`site-js-budget.spec.ts`) |
-| Frame rate                        | ≥ 55 fps on a mid-range mobile device              | Playwright trace / manual                                   |
-| CLS                               | < 0.02                                             | Lighthouse / Playwright                                     |
-| Simultaneously animating elements | ≤ 20 (stagger scenarios)                           | Code review                                                 |
-| Total stagger duration            | ≤ 400 ms                                           | Code review                                                 |
+Kept because they hold: Motion 48 KB (44 207 B used by the shipped union), CLS 0.02 (worst cell
+0.000 55), compiled component addition 8 000 B — the last one with its measurement basis corrected, from
+a graph that charged a component for the engines it wraps to the item's own entry, where the population
+is 0.2–6.8 KB and the limit still binds at 85%.
 
-Implementation rules (engineering protections remain mandatory; numerical tuning follows the phase policy above):
+Replaced or retired because the measurement was wrong or the object changed: **page 120 KB gzip**, which
+was red when it was written (221 511 B on the Button route at source `4fe1a51`) and which no route has
+met since, because a 366 100 B shell shared by all 63 component routes dominates every page; and the
+**T0–T5 source ladder**, which counts the shared `registry/cadence/lib/**` helpers an item copies, so
+two helpers already exceed a T0 ceiling before the component contains a line.
+
+Historical failures and missing measurements stay recorded and source-bound: the page comparison was
+never met, the tier ladder was exceeded by 23 of 63 items, and no real-device frame measurement has ever
+been taken. Retirement is not a pass.
+
+Workload settings are not budgets. Participant counts, stagger, grapheme/sample/column caps and drawing
+areas stay where [presets §5.2](motion/presets.md#52-shared-work-limits) puts them, remain adjustable for
+an intended effect with finite-work reasoning and behaviour/visual evidence, and keep the 400 ms
+stagger ceiling that rule 10 below applies after `timeScale`.
+
+Implementation rules (engineering protections remain mandatory; numerical tuning follows the decision above):
 
 1. **Budget properties explicitly.** Spatial presentation uses transform/opacity; optional filter blur is limited to reviewed small text areas at ≤4 px and is off by default. Colour/border/fill/stroke and declared shadow feedback use state.color. Measured width/height uses geometry.resize, clamped and immediate under reduced/none at any legacy tier. Chart SVG geometry (§3.1.2) and explicit native scroll offsets (§3.1.5) retain their documented exceptions. No generic padding/font-size/radius/path animation is implied by a recipe name.
 2. **No layout-read loops**: read `getBoundingClientRect`/`offsetWidth` only in a committed client layout phase, an event measurement transaction or a `ResizeObserver` callback. Batch reads before writes; never read during render, in an abandoned render, or once per animation frame/glyph. A shared layout scheduler may batch a known transaction but must not turn it into polling.
@@ -1939,7 +1952,7 @@ Implementation rules (engineering protections remain mandatory; numerical tuning
 
 ### Measurement protocol
 
-KB is decimal: page initial JS ≤120000 bytes, Motion ≤48000, component addition ≤8000.
+Limits and their classes are ADR-026's; this section is the protocol, not the numbers. KB is decimal.
 Measure a production page in a fresh browser/context with CDP cache disabled and no storage,
 interaction, scrolling, request blocking or script exclusions. Wait for the page, load/networkidle,
 another 10 seconds, then networkidle. Count all automatic script/prefetch/async JS responses,
@@ -1960,9 +1973,13 @@ prove untested interactions. FPS needs a real midrange device, environment/therm
 and presented-frame traces across actual motion windows; desktop emulation or rAF frequency is not
 equivalent. Repeat meaningful windows without averaging in idle time.
 
+The route remainder is an attribution, not a second measurement: it is the same sweep's page total
+minus the gzip of the chunk set observed on every component route, so the total is still recorded and
+still compared.
+
 Reusable collectors: scripts/site-js-budget.mjs, audit-site-pages-js.mjs, audit-w3-site.mjs,
-audit-w3-bundles.mjs and audit-w4-interaction-cls.mjs. Save results under .cache/audits; current
-gates and future work belong to [the plan](parity-plan.md#8-next-work).
+audit-w3-bundles.mjs, audit-w4-interaction-cls.mjs, measure-routes.mjs and measure-catalogue.mjs. Save
+results under .cache/audits; current gates and remaining work belong to [the plan](parity-plan.md#8-next-work).
 
 ## 8. SSR and hydration
 
@@ -2086,7 +2103,7 @@ Raw engine props and unbound authored CSS clocks (including nested and pseudo-el
 cannot hide behind native/N/A declarations. Unsupported executors remain rejected, rather than being
 inferred from matching token names. This is a conservative test gate; semantic applicability and the
 browser/installation correctness requirements below remain mandatory before component migration;
-numerical performance acceptance is deferred under §7 / ADR-023.
+numerical acceptance is pending F03 against the §7 budgets.
 
 ### 9.4 a11y and visual regression
 

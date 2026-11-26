@@ -18,14 +18,17 @@ The current runtime,
 registry metadata, MDX and test helpers remain the compatibility surface until migrated together; this design
 update does not make v2 complete or make planned recipes and public helpers installable.
 
-## Motion v2 migration priority (ADR-023)
+## Motion v2 priorities (ADR-023) and budgets (ADR-026)
 
-Complete the intended new animation effects and full-library functional migration first.
-During migration, tier source ceilings, 8 KB component addition, 48 KB Motion, 120 KB page JS,
-FPS/CLS and other numerical performance budgets are advisory references. They do not block
-component, shared-stage or overall **functional migration completion**. Do not reduce required
-effects or optimize prematurely to meet old limits. Preserve historical values, failed comparisons
-and missing measurements truthfully; advisory/deferred never means performance passed.
+The functional migration is complete; [ADR-026](docs/adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+now decides the budgets on the S02-A cost matrix. Four hard gates run in `pnpm check` — own compiled
+code ≤ 8 KB per id, the per-id install addition ratchet, the Motion runtime union ≤ 48 KB, and CLS
+< 0.02 — while page total, route remainder and the desktop frame proxies are monitored and accepted
+only in F03. The tier source ladder is retired and its per-item figure is still reported.
+`scripts/performance-policy.mjs` carries the table, and a metric that is not in it cannot be assessed.
+Preserve historical values, failed comparisons and missing measurements truthfully: monitored or
+retired never means passed, and an invalid measurement fails under every class. Do not reduce required
+effects to meet a number.
 
 Numerical workload limits (concurrency, stagger, text/digit counts, drawing area and similar caps)
 are adjustable settings, not fixed effect permissions. Subsequent effect tasks may revise shared
@@ -34,19 +37,18 @@ budget-specific builds or device performance proof are not prerequisites. This d
 no runtime constant automatically. Keep bounded work, latest-target coalescing, cancellation and
 semantic convergence; no infinite backlog or removal of native-safety/invalid-input fallbacks.
 
-After full-library functional migration, separately assess performance, justify budgets suited to
-v2, optimize and perform performance acceptance. Historical limits are inputs, not immutable final
-standards or automatically restored hard gates. Distinguish functional migration completion from
-performance governance completion. Retain existing records; no repeated budget-only build, full-page
-cost matrix or real-device performance acceptance is required per migration change. Run behavioral,
-browser and visual verification as appropriate to the task.
+ADR-026 replaced that advisory phase with a decision; acceptance is F03's and has not happened.
+Historical limits remain inputs, and one of them (the 120 KB page bar) is recorded as never met.
+Distinguish functional completion from performance acceptance: a merged feature is not a measured
+result. Page and device remeasurement belongs to a recorded sweep or the acceptance run, not to every
+change; run behavioral, browser and visual verification as appropriate to the task.
 
 API/native interaction/accessibility, full/reduced/none, cancellation/interruption, one property
 owner, genuine source/action evidence, declaration = implementation = documentation, compatibility
 and correctness checks remain mandatory. Functional v2 markers still require actual functional
 evidence; this policy grants none. This section overrides conflicting budget/performance-stage
-wording in older contracts, component bounds, retired task briefs and ADR-022; see
-[ADR-023](docs/adr.md#adr-023--effects-first-migration-performance-governance-afterwards).
+wording in older contracts, component bounds, retired task briefs and ADR-022; the budget numbers
+themselves are [ADR-026](docs/adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired).
 
 ## Read the design record first
 
@@ -150,7 +152,7 @@ accurate while implementing the target; a passing legacy check alone does not es
 5. **Properties keep explicit ownership.** Visual motion uses `transform`, `opacity`, bounded `filter`, and measured
    width/height through `geometry.resize` (clamped, instant under `reduced`/`none`). Applicable colour,
    border and shadow feedback must use scoped properties and the v2 mode contract when migrated. Capabilities
-   do not permit two engines to own the same property. Numerical budgets follow ADR-023 and do not block functional migration.
+   do not permit two engines to own the same property. Numerical budgets follow ADR-026.
 6. **Tests prove the modes.** Every animated `tests/components/<id>.test.tsx` must execute the shared
    `expectMotionContract(mode)` after rendering/exercising the actual parts in full, reduced and none.
    The mandatory Vitest reporter counts successful runtime calls, never imports, dead calls or skipped
@@ -176,7 +178,7 @@ pnpm lint             # biome check: lint + formatting + import order
 pnpm lint:fix         # biome check --write
 pnpm format           # biome format --write
 pnpm registry:build   # rebuild public/r, the payload hashes and the untracked llms files
-pnpm registry:check   # targets, payload freshness, docs coverage, exports, advisory tier budgets, P11
+pnpm registry:check   # targets, payload freshness, docs coverage, exports, reported source gzip, P11
 pnpm test             # unit tests
 pnpm check            # typecheck + lint + registry:check + tests
 node scripts/new-item.mjs --name <id> --tier <T0..T5> --title "Title" --description "Sentence."

@@ -93,11 +93,11 @@ The MDX frontmatter matches registry metadata; the body is injected into registr
 Categories are layout/form/navigation/overlay/feedback/data/ai/utility. Recipe, intensity and
 complexity describe different things; intensity is authored behaviour, not a runtime multiplier.
 
-For the v2 target, tier remains a compatibility field for the current schema, source budget and
-documentation profile; it is not permission to use or deny an animation capability. Keep historical
-budget values traceable as advisory comparisons under ADR-023 (animation-system §7). Complete v2
-effects and functional migration before separate performance assessment, budget redesign, optimization
-and acceptance; old values are not immutable final v2 standards. Any obsolete tier-to-recipe checks must migrate explicitly with the corresponding
+For the v2 target, tier remains a compatibility field for the current schema and documentation
+profile; it is not permission to use or deny an animation capability, and ADR-026 retired the tier
+source ladder as a budget because it counted the shared helpers an item copies. The v2 budgets and
+their classes live in animation-system §7 and ADR-026; old values are historical, not automatically
+final standards. Any obsolete tier-to-recipe check must migrate explicitly with the corresponding
 implementation, rather than be bypassed by relabelling components.
 
 The target capability matrix records whether each applicable behaviour is provided by default,
@@ -166,8 +166,8 @@ domAnimation replacement for layout/drag users. See the animation system for the
 ## 10. Build and validation
 
 - `pnpm registry:build`: shadcn build using the explicit registry, then docs/meta/sourceSha finalisation.
-- `pnpm registry:check`: targets, imports, metadata, recipes, docs, payload freshness, advisory tier budgets,
-  P11 and snapshot integrity.
+- `pnpm registry:check`: targets, imports, metadata, recipes, docs, payload freshness, the per-item
+  source gzip (reported, no comparison), P11 and snapshot integrity.
 - `pnpm parity:check`: pinned upstream exports/slots/props/defaults and declared deviations.
 - `pnpm check`: typecheck, lint, registry, parity and unit tests in sequence.
 - `pnpm test:e2e`: production build and browser behaviour/accessibility checks.
@@ -188,9 +188,9 @@ A component requires source, matching metadata/MDX, a registered preview, meanin
 accessibility tests and motion conformance where applicable. Verify actual full/reduced/none behaviour,
 same-node cancellation and relevant browser paths, not only helper imports or data attributes.
 Required correctness checks, current payloads and dual-theme visual review must
-agree. Missing or failed functional evidence remains open even when unit tests pass. Numeric
-performance comparisons/missing performance evidence are deferred under ADR-023; functional completion
-does not certify performance governance. CONTRIBUTING.md
+agree. Missing or failed functional evidence remains open even when unit tests pass. Performance
+compares against ADR-026: a hard-gate failure blocks its run, a monitored breach is recorded, and
+functional completion certifies no numerical acceptance. CONTRIBUTING.md
 owns the PR checklist; [scope and future work](parity-plan.md) owns remaining tasks.
 
 ## 12. Security and scope

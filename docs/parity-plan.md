@@ -12,7 +12,7 @@ semantics, accessibility, controlled state or source ownership.
 
 The target animation system gives every component its applicable baseline capabilities rather than
 granting them by tier. Its contract is in [animation-system.md](animation-system.md); the delivered
-migration, its open items and the deferred performance work are in
+migration, its open items and the performance work still open against the budget decision are in
 [animation-system-plan.md](animation-system-plan.md). Source, registry metadata and public component
 documentation now carry that migrated surface; §8 records what is still unresolved.
 
@@ -82,7 +82,7 @@ T0–T5 remain legacy schema values during migration because the current registr
 and source budget mapping use them. They are not motion levels or recipe allowlists in the target
 design. Do not promote a component to a higher tier to enable text, colour or geometry, and do not
 raise a tier merely to obtain a larger budget. Each item's historical source ceiling remains traceable
-but advisory under ADR-023; reassess appropriate v2 budgets after functional migration.
+reported per item under ADR-026 but no longer compared, and no longer a target.
 
 Disclosure height uses the measured, clamped `geometry.resize` recipe (including its documented
 Base UI CSS form); there is no separate `disclosure.height` recipe. `data.transition` is also
@@ -101,9 +101,12 @@ ownership, semantic cause and its mode/performance contract, not a T3 threshold.
 | T5        | 12 KB                                                         |
 | Exception | `meta.budget` with a written reason (sidebar, chart, command) |
 
-This historical source-budget mapping is advisory during migration under ADR-023, not an animation
-permission table or immutable final v2 standard. It remains separate from compiled component, runtime
-and complete-page budgets.
+This is a historical mapping, not a v2 budget. ADR-026 retired it as a comparison: `item.files`
+includes the shared `registry/cadence/lib/**` helpers an item copies, so two of them exceed a T0
+ceiling before the component contains a line, and 23 of 63 items sit above their tier today. The per-item
+figure is still reported by `registry:check`; the compiled, runtime and page budgets in §8 are what is
+gated or monitored. `meta.budget` is also historical — no item declares it. A tier is motion complexity,
+never permission to animate or an allowance to spend.
 
 ### 6.5 Acceptance
 
@@ -111,7 +114,8 @@ Preserve upstream/API/native semantics and the documented recipe contract. Requi
 applicable actual browser/engine paths, SSR/noJS, keyboard/focus/axe and dual-theme visual review must
 support the change. Source-tier checks do not prove the separate compiled/runtime/page budgets.
 Behavioral/correctness failures and missing functional evidence block functional acceptance.
-Numerical performance failures and missing performance measurements remain deferred governance work.
+Numerical performance follows ADR-026: a hard-gate failure blocks its run, a monitored breach is
+recorded and tracked in §8, and an invalid measurement blocks regardless of class.
 
 For preview-route or provider-boundary changes, exercise actual client navigation and browser history
 with a pending timer, an active portal and an exercised engine. The bounded regression in
@@ -190,50 +194,58 @@ colour family, or match two `data-motion` spans; popover is evidenced as a probe
 blocks are counted, not yet adjudicated). F02's audited defects #155, #156 and #158 are closed; the F02
 browser passes remain the record of what those audit slices exercised.
 
-Follow [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards): effects
-and full-library functional migration came first. Numeric source/compiled/runtime/page, FPS/CLS and
-workload budgets stay advisory, not functional completion gates. Do not trim effects or require
-repeated budget-only builds, page cost matrices or device performance acceptance. Preserve
-correctness, native/API/accessibility, mode/cancellation/ownership and genuine source/action
-evidence. The functional migration is complete apart from the three open items above; those stay open
-until they are fixed or explicitly dispositioned.
+[ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards) put effects first
+and made the old numbers advisory so the migration could finish; it stays the record of that decision.
+[ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired) now
+decides the v2 budgets on the S02-A matrix and classifies each metric. This section is the open work
+against that decision, in the order the old list recorded it — it does not restate the numbers, and
+neither document holds a second copy of them: `scripts/performance-policy.mjs` carries the table and
+`tests/lib/performance-budgets.test.tsx` fails when a hard gate is exceeded.
 
-S02/F03 follow full functional migration: assess the migrated system, justify suitable v2 budgets,
-optimize and accept performance separately. References below and prior failed/missing results remain
-source-bound inputs, not automatic final standards or passing evidence. Explicitly run collectors
-retain raw values and protocols. Workload settings may change with finite-work and behavior/visual
-evidence; keep no unbounded work/queues and exact semantic convergence.
+Gated inside `pnpm check`: own compiled code ≤ 8 000 B per id, install addition ≤ its recorded value per
+id (a ratchet; new ids ≤ 224 000 B), the Motion runtime union ≤ 48 000 B, and CLS < 0.02 wherever a suite
+measures it. Monitored, because their collector needs a production build and a 15-minute browser sweep
+that required CI does not run: page total ≤ 550 000 B and route remainder ≤ 40 000 B per route, plus the
+desktop frame share and longest block. Retired: the per-item tier source ladder, still reported by
+`registry:check` and no longer compared. An invalid measurement is a correctness failure under every
+class; monitored never means "not measured", and deployment never turns an exceedance into a pass.
 
-1. **Historical complete-page initial JS ≤120000 bytes (advisory).** Resolve the remaining full-route cost with specifically
-   scoped, measured work before final performance acceptance. This is not a prerequisite for shared
-   capability development. The complete Button research baseline at source
-   4fe1a51 was 221511 bytes; it does not authorize adopting that runtime or rolling out other routes.
-   Keep all site functions, SSR/noJS and required Motion features. Repeat full-route measurement and
-   functional/visual/a11y validation before asking for a product migration decision.
-   Keep the permanent `tests/e2e/site-js-budget.spec.ts` collector and advisory comparison on complete Button and Data Table routes
-   at desktop and narrow widths. Preserve automatic requests, exact served root hashes, complete
-   example counts, cold-layout entries and browser/resource errors when evaluating a candidate.
-2. **Historical initial Motion ≤48000 bytes (advisory).** Establish the actual required production runtime scope, including
-   site-exclusive APIs. A registry-only reference compilation or proportional mixed-chunk estimate
-   cannot certify the page metric.
-3. **Historical compiled component addition ≤8000 bytes, shared runtime excluded (advisory).** Revalidate dedicated
-   dependency and async boundaries with a declared baseline; local-only code passing is insufficient.
-   Dedicated dependencies remain counted unless the budget contract is explicitly revised.
-   Use the consumer audit's emitted import paths and source composition to locate counted costs.
-   Retain static initial paths and reachable async output separately; source `bytesInOutput`
-   explains a mixed file's contents and cannot allocate its gzip to individual packages.
-   A dependency-level fix must reach consumers through a supported package release. An authoring-only
-   `node_modules` patch or compiler override is diagnostic and cannot certify copied registry source.
-4. **Historical CLS <0.02 (advisory).** Keep cold-load and interaction windows distinct. The complete-route regression in
-   `tests/e2e/document-interaction-layout.spec.ts` covers Button's composition/source/install/Toc path
-   and Data Table filtering, pagination, selection, column visibility and record updates at two widths
-   in all three modes. Extend coverage when a changed layout introduces another relevant window;
-   retain raw entries and action times, including recent-input shifts. These bounded scenarios do
-   not certify other routes, themes, clocks or lifetime behaviour, and historical negatives retain
-   their original source binding.
-5. **Historical real midrange mobile ≥55 fps (advisory).** Obtain a debuggable device and environment metadata, collect real
-   presented-frame traces through meaningful motion windows and retain reduced/none behaviour.
-   Desktop emulation and rAF frequency cannot close this requirement.
+1. **First load.** ADR-026 replaced the 120 000 B page bar with a monitored 550 000 B drift ceiling and a
+   40 000 B route remainder, and does not claim the current cost is good: every component route costs
+   367 600–503 400 B, of which 366 142 B is a 19-chunk shell all 63 routes load. The historical complete
+   Button baseline of 221 511 B at source `4fe1a51` stays recorded as what the site cost before the
+   catalogue grew; it is not a target and it authorizes no runtime adoption. Attribution of that shell is
+   [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177), and it must inform F03's acceptance.
+   Keep the permanent `tests/e2e/site-js-budget.spec.ts` collector with its automatic-request, served-root
+   hash, example-count, cold-layout and error assertions.
+2. **Six routes above the route remainder.** `chart` 137 300, `code-block` 87 600, `date-picker` 57 400,
+   `data-table` 54 100, `sidebar` 47 300 and `command` 41 700 B are recorded exceedances, each dominated by
+   the engine it wraps; [#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178) owns deciding them.
+   Until it does, the number stays on the record and F03 may not treat the page metrics as passed.
+3. **Motion runtime union.** Kept at 48 000 B as a gate, not a reference: the shipped union compiles to
+   44 207 B, 44 450 B with the site's `useInView`, and the import list is asserted against the source tree
+   so the measurement cannot drift silently. A registry-only reference compilation still cannot certify
+   bytes inside a mixed Next chunk; that separation is unchanged.
+4. **Install addition.** Kept at 8 000 B for the item's own compiled code, where the population is
+   0.2–6.8 KB and the limit binds at 85%, and moved to a per-id ratchet for the dependency-inclusive
+   addition, where the population spans 0.3–201.2 KB because it is the wrapped engines. Dedicated
+   dependencies stay counted. Use the audit's emitted import paths and source composition to locate a
+   counted cost; source `bytesInOutput` explains a mixed file and cannot allocate its gzip to a package.
+   A dependency-level fix must reach consumers through a supported release; an authoring-only
+   `node_modules` patch or compiler override is diagnostic and certifies nothing.
+5. **CLS.** Kept at 0.02, cold and interaction windows distinct, and now a hard gate wherever a suite
+   measures it. `tests/e2e/document-interaction-layout.spec.ts` covers Button's
+   composition/source/install/Toc path and Data Table filtering, pagination, selection, column visibility
+   and record updates at two widths in all three modes. Extend coverage when a changed layout introduces
+   another relevant window; retain raw entries and action times, including recent-input shifts. The
+   measured worst cell is 0.000 55, and these bounded scenarios still do not certify other routes, themes,
+   clocks or lifetime behaviour.
+6. **Frames.** The ≥ 55 fps mid-range device criterion is unchanged and has no local collector, so it is
+   F03's: a debuggable device, environment/thermal/refresh metadata, presented-frame traces through real
+   motion windows and reduced/none behaviour. Until then the desktop proxies are recorded and compared —
+   p95 interval, share of frames over 25 ms and the longest long-animation-frame entry — and they are
+   labelled main-thread cadence, never presented frames. Desktop emulation and rAF frequency cannot close
+   this requirement.
 
 Before adoption, reconcile the implementation with API/motion/SSR/accessibility/docs/distribution
 contracts, current payloads and frozen snapshots. Reuse still-applicable tests; verify actual changed

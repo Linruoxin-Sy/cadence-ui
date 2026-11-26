@@ -101,8 +101,9 @@ not replace it.
   `browser-evidence` artifact for the components the pull request touched, so link that instead of
   describing a local run. Anything kept locally belongs under the ignored `.cache/` and is not evidence
   anyone else can see.
-- Report missing or failed measurements as missing or failed. ADR-023 makes numeric budgets advisory
-  during functional migration; it does not make an unmeasured claim a pass.
+- Report missing or failed measurements as missing or failed. ADR-026 decides which budgets gate and
+  which are monitored, and an invalid measurement fails under either class; neither outcome makes an
+  unmeasured claim a pass.
 
 ## 7. Common failures
 

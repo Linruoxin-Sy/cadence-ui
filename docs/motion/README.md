@@ -214,8 +214,8 @@ with `relationship`, `owner` (the registry component id integrating the executor
 glyphs, for example); all are listed once, with no conflicting/duplicate owner. No per-part matrix is copied.
 Empty effects explicitly means no declared installed recipe; it never means the six targets are
 inapplicable or complete. Existing recipe strings/forms, origin, dependencies and tier retain their
-compatibility meanings. Source ceilings remain traceable advisory comparisons during migration
-under ADR-023. Public frontmatter, item payload, catalog and registry index mirror
+compatibility meanings. The per-item source figure is still reported but no longer compared:
+ADR-026 retired the tier ladder as a budget. Public frontmatter, item payload, catalog and registry index mirror
 both coverage and authored profile/intensity; stale published metadata fails registry checking.
 
 `default` identifies the local component adapter, including an adapter calling a shared lib
@@ -293,11 +293,12 @@ These obligations are inherited by every file; local action tables make their co
   Destination-width layout must not introduce extra cropping of a required label, caret or active
   control while the shell is smaller. Use valid existing overflow or settle that axis immediately.
   Explicit disclosure body reveal remains allowed; focus into clipped content forces it visible.
-- **Bounds:** [ADR-023](../adr.md#adr-023--effects-first-migration-performance-governance-afterwards)
-  makes numeric source/compiled/runtime/page, CLS/FPS and workload limits advisory during migration.
-  Implement intended effects first, then assess and redesign budgets after full functional migration.
-  The following numbers are adjustable tuning references, not fixed effect permissions. Preserve
-  finite work, latest targets, cancellation, native safety and semantic convergence. Historical stagger tuning allows 20 concurrent moving elements
+- **Bounds:** [ADR-026](../adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+  decides which numeric limits gate, which are monitored and which is retired, and every per-component
+  contract's status line records that item's own missing measurement rather than a second budget
+  regime. The workload numbers below are adjustable tuning references, not fixed effect permissions;
+  the compiled, runtime, page and CLS budgets are the ones that are compared. Preserve finite work,
+  latest targets, cancellation, native safety and semantic convergence. Historical stagger tuning allows 20 concurrent moving elements
   and 400 ms total delay after timeScale; character stagger also has a final 120 ms delay ceiling after
   timeScale. Automatic collection presence/layout uses the
   [participant bound](presets.md#52-shared-work-limits), determined before per-member measurement or

@@ -17,8 +17,8 @@ and shared-parameter designs, and [parity-plan.md](parity-plan.md) records scope
 and catalogue-level future work.
 
 Progress and evidence live in Git history and in the issue that closed the work. An issue marked done
-is not a performance acceptance; ADR-023 separates functional migration completion from performance
-governance. A design decision, or a closed task, is not evidence that a component already supplies the
+is not a performance acceptance; ADR-023 separated functional migration from performance governance,
+and ADR-026 now decides what that governance gates. A design decision, or a closed task, is not evidence that a component already supplies the
 new behaviour.
 
 The design inputs include the [59 individual component contracts](motion/README.md#5-catalogue) and the
@@ -59,8 +59,9 @@ is red in one cell class across ten blocks.
 None of the three is counted as delivered. The four primitives, Carousel, Data Table and Sidebar also
 keep an explicit `legacy` migration marker by design; each contract records its reason.
 
-Performance governance is **not** complete. No budget, byte count or device measurement in this
-document is a passing result; S02 (#83) and F03 (#84) follow the functional migration under ADR-023.
+Performance governance is **decided but not accepted**. [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+sets the v2 budgets and their classes on the S02-A matrix; no budget, byte count or device measurement
+in this document is a passing result, and F03 (#84) performs the acceptance.
 
 ## 1. Outcome and boundaries
 
@@ -132,8 +133,10 @@ component's rolling implementation.
 Tier is no longer permission to animate. During the schema transition, retain existing `meta.tier`
 and matching frontmatter because current checks, source budgets and templates depend on them.
 Retain tier and historical budget values/reasons for traceability; do not relabel tiers to hide costs.
-Under ADR-023 these comparisons are advisory and do not constrain functional migration. Reassess
-the budget representation and appropriate limits in post-migration performance governance.
+ADR-026 retired these comparisons as a budget: the item's file list includes the shared
+`registry/cadence/lib/**` helpers it copies, so the ladder measured "what this item's file list
+weighs" rather than what the component costs. The number is still reported per item by
+`registry:check`, and the compiled budgets in §4 bound the cost that matters.
 
 Keep the declaration small: recipe names and implementation forms, existing origin/dependency
 metadata, and any justified additive fields. Put part-level causes, property ownership, mode outcomes
@@ -213,7 +216,7 @@ when that root changes size; amount is the target's intersection-area ratio. Exp
 uses repeating 0/55/110 ms slots, not a three-animation concurrency limit. Test once/repeat policy
 separately, including skipped or already consumed first-screen reveals.
 
-## 4. Functional acceptance and deferred performance governance
+## 4. Functional acceptance and the v2 budget decision
 
 The acceptance matrix includes full/reduced/none against both system preferences, live mode/clock
 changes, nested providers, content changes during exit, rapid reversal, pointer/keyboard paths,
@@ -222,18 +225,25 @@ properties and retained identity; a `data-motion` attribute alone is insufficien
 checks cover readable names, duplicate outgoing text, selection/copy, native editing, focus and
 errors. Test light and dark themes and realistic narrow/wide layouts.
 
-Historical references are per-item tier source gzip, initial Motion 48000 bytes, component addition
-8000 bytes excluding declared shared runtime, full-page initial JS 120000 bytes, CLS <0.02,
-real-midrange presented frame rate ≥55 fps, and recorded concurrency/stagger/renderer limits.
-They remain traceable advisory comparisons, never fixed effect permissions. Shared workload settings
-may change with finite-work reasoning and behavior/visual evidence; no blind constant increase is
-authorized. Invalid/unsupported-input and native-safety fallbacks, coalescing and cancellation remain.
+[ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+replaced the advisory phase with a decision, and §4 is the summary of it rather than a second copy.
+Four metrics are hard gates: own compiled code ≤ 8 000 B per id, install addition ≤ its recorded value
+per id (new ids ≤ 224 000 B), the Motion runtime union ≤ 48 000 B, and CLS < 0.02 wherever a suite
+measures it. Three are monitored: the route remainder ≤ 40 000 B and the page total ≤ 550 000 B per
+route, plus the share of frames over 25 ms and the longest block on this host. One is retired: the
+per-item source gzip, still reported and no longer compared. Workload settings — participants, stagger, grapheme/sample/column caps,
+drawing area — are not budgets; they stay adjustable with finite-work reasoning and behaviour/visual
+evidence, and no blind constant increase is authorized. Invalid/unsupported-input and native-safety
+fallbacks, coalescing and cancellation remain unconditional.
 
-Performance is unresolved in [parity-plan.md](parity-plan.md#8-next-work). Existing failures and
-measurement protocols remain retained; old measurements cannot certify changed source. No repeated
-budget-specific builds, complete cost matrices or device performance audits are required per migration
-change. After full-library functional migration, assess costs, redesign/justify v2 budgets, optimize
-and perform separate performance acceptance. Framework/product-adoption restrictions remain intact.
+Measured and gated are not the same list, and the difference is deliberate: the three bundle gates run
+inside `pnpm check` through `tests/lib/performance-budgets.test.tsx`, while the page and frame metrics
+need a production build and a 15-minute browser sweep that required CI does not run. Their values are
+recorded per sweep in `.cache/`, compared against the table, and accepted in F03 (#84) on real
+hardware, including a mid-range device trace for ≥ 55 fps. Historical failures and missing measurements
+stay source-bound: the 120 KB page bar was never met, 23 of 63 items exceeded the retired tier ladder,
+and no device frame trace exists. [parity-plan.md](parity-plan.md#8-next-work) records what is still
+open against that decision.
 
 Cross-component geometry acceptance also checks the frame after temporary constraints are released:
 natural auto/percentage/flex/grid/ratio/field-sizing remains responsive, valid empty geometry is not
@@ -258,8 +268,9 @@ browser acceptance cases, whose evidence is a recorded browser pass rather than 
 validation.
 
 For implementation changes, run `pnpm registry:build` before `pnpm check` when shipped source,
-metadata or content changes, then the affected behavioral browser/runtime checks. Performance-only
-remeasurement is deferred under ADR-023. Documentation
+metadata or content changes, then the affected behavioral browser/runtime checks. A change that moves a
+bundle gate re-runs `tests/lib/performance-budgets.test.tsx` with it; page and frame remeasurement
+belongs to a recorded sweep (ADR-026), not to every pull request. Documentation
 design work alone does not regenerate payloads or claim runtime conformance. Keep regression inputs
 in `tests/fixtures/`, audit output in `.cache/`, and delivered provenance in Git and retained registry
 snapshots.
