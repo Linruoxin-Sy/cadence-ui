@@ -617,7 +617,8 @@ request token do not retain an origin. A frozen source may retire with its popup
 Changed destination/paint-layer mapping cancels a running transfer and reveals the
 already-current value without replaying a local replacement. The independently owned
 trigger/value transaction survives popup closure; hidden option updates establish a
-baseline. Numerical acceptance is pending F03 against the §7 budgets.
+baseline. Numerical acceptance is not established by the F03 run against the §7 budgets; see
+[performance-acceptance.md](performance-acceptance.md).
 
 ### 3.0 Sidebar composition
 
@@ -2103,7 +2104,8 @@ Raw engine props and unbound authored CSS clocks (including nested and pseudo-el
 cannot hide behind native/N/A declarations. Unsupported executors remain rejected, rather than being
 inferred from matching token names. This is a conservative test gate; semantic applicability and the
 browser/installation correctness requirements below remain mandatory before component migration;
-numerical acceptance is pending F03 against the §7 budgets.
+numerical acceptance is not established by the F03 run against the §7 budgets; see
+[performance-acceptance.md](performance-acceptance.md).
 
 ### 9.4 a11y and visual regression
 

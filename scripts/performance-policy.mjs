@@ -1,5 +1,11 @@
 // ADR-026: the v2 budget decision. Changing phase/enforcement requires a new ADR, and
 // changing a limit here without one is a documentation bug, not a tuning step.
+//
+// `performanceAcceptance` stays `pending-f03` after that acceptance was recorded: F03 ran
+// it (docs/performance-acceptance.md) and did not meet ADR-026's conditions — three
+// monitored metrics are over their limits and the device criterion is unmeasured — so
+// acceptance has not been granted to anyone yet. The value records who owed the run, not
+// that the run passed; a passed run is a later decision, not an edit to this string.
 export const PERFORMANCE_POLICY = Object.freeze({
   phase: "performance-governance",
   enforcement: "budgeted",

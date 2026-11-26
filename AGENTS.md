@@ -37,7 +37,9 @@ budget-specific builds or device performance proof are not prerequisites. This d
 no runtime constant automatically. Keep bounded work, latest-target coalescing, cancellation and
 semantic convergence; no infinite backlog or removal of native-safety/invalid-input fallbacks.
 
-ADR-026 replaced that advisory phase with a decision; acceptance is F03's and has not happened.
+ADR-026 replaced that advisory phase with a decision. Its acceptance run has happened and is recorded in
+[docs/performance-acceptance.md](docs/performance-acceptance.md): every hard gate is green, three monitored
+metrics are over their limits and the device criterion is unmeasured, so acceptance was **not** granted.
 Historical limits remain inputs, and one of them (the 120 KB page bar) is recorded as never met.
 Distinguish functional completion from performance acceptance: a merged feature is not a measured
 result. Page and device remeasurement belongs to a recorded sweep or the acceptance run, not to every
