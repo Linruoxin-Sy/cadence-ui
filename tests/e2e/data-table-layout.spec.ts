@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { assessBudget, reportBudget } from "../../scripts/performance-policy.mjs";
+import { assessBudget, reportBudget, requireBudgets } from "../../scripts/performance-policy.mjs";
 import { summarizeLayoutShifts } from "../../scripts/site-js-budget.mjs";
 
 for (const width of [1280, 390])
@@ -75,6 +75,8 @@ for (const width of [1280, 390])
           ).tableLayoutProof,
       );
       const cls = summarizeLayoutShifts(proof.shifts);
+      // ADR-026: CLS is a hard gate, so a breach fails this window instead of attaching a red number.
+      const budgetAssessment = requireBudgets([reportBudget(assessBudget("cls", cls))])[0];
       await info.attach("no-key-filter-layout", {
         body: JSON.stringify(
           {
@@ -83,7 +85,7 @@ for (const width of [1280, 390])
             before,
             proof,
             cls,
-            budgetAssessment: reportBudget(assessBudget("Data Table interaction CLS", cls, 0.02, "below")),
+            budgetAssessment,
           },
           null,
           2,
@@ -92,7 +94,7 @@ for (const width of [1280, 390])
       });
       expect(proof.keys).toBe(0);
       expect(proof.pointers).toBe(0);
-      // Numeric CLS comparison is advisory; native interaction/layout assertions remain above.
+      // CLS is a hard gate (ADR-026) and is asserted before this point; native layout checks stay above.
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });
 

@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
-import { assessBudget, reportBudget } from "../../scripts/performance-policy.mjs";
+import { assessBudget, reportBudget, requireBudgets } from "../../scripts/performance-policy.mjs";
 import { measureInitialScripts, summarizeLayoutShifts } from "../../scripts/site-js-budget.mjs";
 
 type ShiftRect = Pick<DOMRectReadOnly, "x" | "y" | "width" | "height">;
@@ -25,7 +25,7 @@ for (const width of [1280, 390]) {
     test.use({ viewport: { width, height: width === 390 ? 844 : 720 }, isMobile: width === 390 });
 
     for (const id of ["button", "data-table"]) {
-      test(`${id} initial JavaScript and cold CLS advisory report`, async ({ page, baseURL }, testInfo) => {
+      test(`${id} initial JavaScript (monitored) and cold CLS (gated) report`, async ({ page, baseURL }, testInfo) => {
         const consoleErrors: string[] = [];
         const httpErrors: { url: string; status: number }[] = [];
         page.on("console", (message) => {
@@ -93,6 +93,11 @@ for (const width of [1280, 390]) {
         const examples = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
         const exampleCount = await page.locator(`[data-component-example^="${id}/"]`).count();
         const scrollY = await page.evaluate(() => window.scrollY);
+        const budgetAssessments = [
+          reportBudget(assessBudget("cls", coldCLS)),
+          reportBudget(assessBudget("page-total", report.gzipBytes)),
+        ];
+        requireBudgets(budgetAssessments);
         Object.assign(report, {
           buildId,
           buildManifest: manifest,
@@ -103,10 +108,7 @@ for (const width of [1280, 390]) {
           exampleCount,
           shifts,
           coldCLS,
-          budgetAssessments: [
-            reportBudget(assessBudget(`${id} cold CLS`, coldCLS, 0.02, "below")),
-            reportBudget(assessBudget(`${id} initial JS gzip bytes`, report.gzipBytes, report.limit)),
-          ],
+          budgetAssessments,
           consoleErrors,
           httpErrors,
           scrollY,

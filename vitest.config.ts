@@ -12,6 +12,7 @@ const cliSuites = [
   "tests/lib/joint-motion-reporter.test.tsx",
   "tests/lib/motion-v2-reporter.test.tsx",
   "tests/lib/motion-v2-projection.test.tsx",
+  "tests/lib/performance-budgets.test.tsx",
 ];
 
 export default defineConfig({

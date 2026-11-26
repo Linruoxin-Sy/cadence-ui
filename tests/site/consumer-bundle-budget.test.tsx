@@ -1,7 +1,7 @@
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
-import { analyzeConsumerBundles, COMPONENT_ADDITION_LIMIT } from "../../scripts/consumer-bundle-budget.mjs";
-import { assessBudget } from "../../scripts/performance-policy.mjs";
+import { analyzeConsumerBundles } from "../../scripts/consumer-bundle-budget.mjs";
+import { assessBudget, PERFORMANCE_BUDGETS, requireBudgets } from "../../scripts/performance-policy.mjs";
 
 type Edge = { path: string; kind: string; external?: boolean };
 function required<T>(value: T | undefined): T {
@@ -52,11 +52,9 @@ describe("compiled consumer addition accounting", () => {
     const result = analyzeConsumerBundles(fixture());
     expect(result.shared.map((file) => file.file).sort()).toEqual(["runtime.js", "shared-async.js", "shared.js"]);
     const component = required(result.components[0]);
-    expect(COMPONENT_ADDITION_LIMIT).toBe(8000);
     expect(component.gzip).toBe(8000);
     expect(component.initialGzip).toBe(6000);
     expect(component.reachableAsyncGzip).toBe(2000);
-    expect(component.passed).toBe(true);
     expect(component.addedOutputPackages).toEqual(["@base-ui/react", "highlighter"]);
     const dedicated = required(component.files.find((file) => file.file === "dedicated.js"));
     expect(dedicated.initial).toBe(true);
@@ -70,15 +68,24 @@ describe("compiled consumer addition accounting", () => {
     const over = fixture();
     required(over.files["async-only.js"]).gzip += 1;
     const exceeded = required(analyzeConsumerBundles(over).components[0]);
-    expect(exceeded).toMatchObject({ gzip: 8001, passed: false });
-    expect(assessBudget("consumer addition", exceeded.gzip, COMPONENT_ADDITION_LIMIT)).toMatchObject({
+    expect(exceeded.gzip).toBe(8001);
+    // The accounting module reports bytes; ADR-026 decides what a byte means. An addition
+    // is judged against its own recorded value (a ratchet), never against a flat bar.
+    expect(assessBudget("component-addition", exceeded.gzip, 8000)).toMatchObject({
       actual: 8001,
       reference: 8000,
       comparisonPassed: false,
-      status: "advisory-exceeded",
-      blocking: false,
-      performanceAcceptance: "deferred",
+      class: "hard-gate",
+      blocking: true,
+      performanceAcceptance: "pending-f03",
     });
+    expect(() => requireBudgets([assessBudget("component-addition", exceeded.gzip, 8000)])).toThrow(
+      /ADR-026 hard gate failed/,
+    );
+    // A metric without an ADR-026 entry, or one the ADR retired, cannot be assessed at all.
+    expect(() => assessBudget("consumer addition", 1)).toThrow(/no ADR-026 budget/);
+    expect(() => assessBudget("tier-source", 1)).toThrow(/retired by ADR-026/);
+    expect(PERFORMANCE_BUDGETS["component-addition"].limit).toBe(224_000);
   });
 
   it("sums separately compressed outputs and does not divide gzip by source or package proportions", () => {

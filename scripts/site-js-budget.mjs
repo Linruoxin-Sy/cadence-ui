@@ -1,8 +1,11 @@
 import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
+import { PERFORMANCE_BUDGETS } from "./performance-policy.mjs";
 
-// Explicit decimal KB convention for animation-system §7; gzip each HTTP entity.
-export const INITIAL_JS_LIMIT = 120_000;
+// ADR-026: decimal KB, gzip each HTTP entity separately. The historical 120 000 B limit
+// was never met by any route and is replaced by a recorded drift ceiling; the number a
+// route actually controls is the route remainder, measured from the same sweep.
+export const INITIAL_JS_LIMIT = PERFORMANCE_BUDGETS["page-total"].limit;
 export function summarizeLayoutShifts(entries) {
   let start = -Infinity;
   let last = -Infinity;

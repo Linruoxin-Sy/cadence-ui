@@ -361,10 +361,7 @@ else {
       protocol:
         "fresh context/cache disabled/no interception, scroll or interaction; load + networkidle +10s +networkidle; all automatic script URLs; decoded bodies gzip6 independently",
       status: "ADVISORY_PERFORMANCE_DEFERRED",
-      budgetAssessments: results.flatMap((r) => [
-        assessBudget("prototype cold CLS", r.cls, 0.02, "below"),
-        assessBudget("prototype initial JS gzip bytes", r.gzipBytes, 120000),
-      ]),
+      budgetAssessments: results.flatMap((r) => [assessBudget("cls", r.cls), assessBudget("page-total", r.gzipBytes)]),
       htmlSha256: hash(html),
       sourceHashes,
       moduleAttribution: {
@@ -414,14 +411,14 @@ else {
       "runtime or HTTP failure",
     );
     for (const result of results) {
-      reportBudget(assessBudget("prototype cold CLS", result.cls, 0.02, "below"));
-      reportBudget(assessBudget("prototype initial JS gzip bytes", result.gzipBytes, 120000));
+      reportBudget(assessBudget("cls", result.cls));
+      reportBudget(assessBudget("page-total", result.gzipBytes));
     }
     assert.ok(
       functionality.every((check) => check.status === "PASS"),
       "functional verification failed; see retained report",
     );
-    // Original numeric comparisons are advisory; functionality and HTTP assertions still gate.
+    // The page-total comparison is monitored (ADR-026); functionality and HTTP assertions still gate.
   } finally {
     await browser?.close();
     await new Promise((resolve) => server.close(resolve));

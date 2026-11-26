@@ -1,5 +1,6 @@
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
+import { PERFORMANCE_BUDGETS } from "../../scripts/performance-policy.mjs";
 import { INITIAL_JS_LIMIT, summarizeLayoutShifts, summarizeScripts } from "../../scripts/site-js-budget.mjs";
 
 describe("initial script accounting", () => {
@@ -27,6 +28,8 @@ describe("initial script accounting", () => {
     expect(summary.files).toHaveLength(2);
     expect(summary.gzipBytes).toBe(2 * gzipSync(body).length);
     expect(summary.gzipBytes).toBeGreaterThan(gzipSync(Buffer.concat([body, body])).length);
-    expect(INITIAL_JS_LIMIT).toBe(120_000);
+    // ADR-026: the collector's limit is the page-total budget, not a second copy of it.
+    expect(INITIAL_JS_LIMIT).toBe(PERFORMANCE_BUDGETS["page-total"].limit);
+    expect(INITIAL_JS_LIMIT).toBe(550_000);
   });
 });

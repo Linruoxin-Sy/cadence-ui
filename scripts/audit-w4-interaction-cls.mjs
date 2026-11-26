@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
-import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget, requireBudgets } from "./performance-policy.mjs";
 import { summarizeLayoutShifts } from "./site-js-budget.mjs";
 
 ensureAuditDirectory(".cache/audits", { recursive: true });
@@ -19,6 +19,7 @@ const report = {
     "Accordion/Tabs/Select; full mode, OS no-preference; desktop/mobile emulation; fresh context; navigation, scroll, specified interactions, 15s final dwell; not all routes/modes/lifetime/real-device certification",
   records: [],
 };
+const assessments = [];
 const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL ?? "msedge", headless: true });
 try {
   for (const width of [1280, 390]) {
@@ -128,6 +129,8 @@ try {
         assert.ok(sample.modes.includes("full"));
         assert.deepEqual(errors, []);
         const cls = summarizeLayoutShifts(sample.shifts);
+        const clsAssessment = reportBudget(assessBudget("cls", cls));
+        assessments.push(clsAssessment);
         report.records.push({
           id,
           width,
@@ -136,8 +139,8 @@ try {
           errors,
           ...sample,
           cls,
-          passed: cls < 0.02,
-          budgetAssessment: reportBudget(assessBudget(`${id} ${width} interaction CLS`, cls, 0.02, "below")),
+          passed: clsAssessment.comparisonPassed,
+          budgetAssessment: clsAssessment,
         });
         writeFileSync(".cache/audits/w4-interaction-cls.json", `${JSON.stringify(report, null, 2)}\n`);
         console.log(`${id} ${width}: CLS ${cls}`);
@@ -149,7 +152,8 @@ try {
 } finally {
   await browser.close();
 }
-// Browser/interaction assertions remain blocking; numeric CLS governance is deferred.
+// Browser/interaction failures already abort; ADR-026's CLS gate decides the rest.
+requireBudgets(assessments);
 console.log(
-  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (${PERFORMANCE_POLICY.authority}).`,
 );
