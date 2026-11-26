@@ -62,6 +62,15 @@ for (const os of [false, true])
       const panel = popup(page);
       await expect.poll(() => panel.evaluate((el) => el.getAnimations().length)).toBe(0);
       const frames = await panel.evaluate(async (el) => {
+        // The shell writer is a Web Animations recipe: the property it flies is named
+        // by the effect's keyframes, while `transitionProperty` only names a CSS clock.
+        const written = (node: Element) =>
+          node.getAnimations().flatMap((animation) => {
+            const keyframes = (animation.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
+            return keyframes.flatMap((frame) =>
+              Object.keys(frame).filter((key) => !["offset", "computedOffset", "easing", "composite"].includes(key)),
+            );
+          });
         const initial = el.getBoundingClientRect();
         (el.querySelector("button") as HTMLButtonElement).click();
         const frames = [];
@@ -77,6 +86,7 @@ for (const os of [false, true])
             scale: s.scale,
             same: el === document.querySelector('[data-slot="navigation-menu-popup"][data-open]'),
             properties: el.getAnimations().map((a) => (a as CSSTransition).transitionProperty),
+            written: written(el),
           });
         }
         return { initial: { width: initial.width, height: initial.height }, frames };
@@ -87,14 +97,15 @@ for (const os of [false, true])
       });
       expect(frames.frames.every((f) => f.same)).toBe(true);
       expect(frames.frames.at(-1)?.height).toBeGreaterThan(frames.initial.height);
+      const flying = (f: (typeof frames.frames)[number]) => [...f.properties, ...f.written];
       if (effectiveMode(mode, os) === "full")
-        expect(frames.frames.some((f) => f.properties.includes("height") || f.properties.includes("width"))).toBe(true);
+        expect(frames.frames.some((f) => flying(f).includes("height") || flying(f).includes("width"))).toBe(true);
       else
-        expect(frames.frames.every((f) => !f.properties.some((p) => ["height", "width", "scale"].includes(p)))).toBe(
-          true,
-        );
+        expect(
+          frames.frames.every((f) => !flying(f).some((p) => ["height", "width", "scale"].includes(p as string))),
+        ).toBe(true);
       if (effectiveMode(mode, os) === "none")
-        expect(frames.frames.every((f) => !f.properties.length && f.opacity === "1")).toBe(true);
+        expect(frames.frames.every((f) => !flying(f).length && f.opacity === "1")).toBe(true);
       await panel.getByRole("button", { name: "Show fewer guides" }).click();
       await expect(panel.getByRole("link", { name: "Accessibility guide" })).toHaveCount(0);
       await page.keyboard.press("Escape");
@@ -268,10 +279,22 @@ for (const next of ["none", "reduced", "os"])
     const button = p.getByRole("button", { name: "Toggle details" });
     await button.focus();
     await p.evaluate(async (n) => {
+      // The measured shell is one Motion value driving a fill-forwards Web Animations
+      // replacement, so its effect reports `finished` while the box flies; the in-flight
+      // state is an installed, non-idle effect whose keyframes name the size it owns.
+      const written = (animation: Animation) =>
+        ((animation.effect as KeyframeEffect | null)?.getKeyframes() ?? []).flatMap((frame) =>
+          Object.keys(frame).filter((key) => !["offset", "computedOffset", "easing", "composite"].includes(key)),
+        );
       (n.querySelector("button") as HTMLButtonElement).click();
       for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
       Object.assign(window, {
-        navigationRunning: { node: n, animations: n.getAnimations().filter((a) => a.playState === "running") },
+        navigationRunning: {
+          node: n,
+          animations: n
+            .getAnimations()
+            .filter((a) => a.playState !== "idle" && written(a).some((key) => key === "width" || key === "height")),
+        },
       });
     });
     expect(
@@ -290,13 +313,26 @@ for (const next of ["none", "reduced", "os"])
     const frames = await p.evaluate(async (n) => {
       const saved = (window as unknown as { navigationRunning: { node: Element; animations: Animation[] } })
         .navigationRunning;
+      // Every property the surface currently paints: a CSS clock names itself, and the
+      // Web Animations recipes name theirs in their keyframes.
+      const painted = (node: Element) =>
+        node.getAnimations().flatMap((animation) => {
+          const property = (animation as CSSTransition).transitionProperty;
+          const keyframes = (animation.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
+          return [
+            ...(property ? [property] : []),
+            ...keyframes.flatMap((frame) =>
+              Object.keys(frame).filter((key) => !["offset", "computedOffset", "easing", "composite"].includes(key)),
+            ),
+          ];
+        });
       const frames = [];
       for (let i = 0; i < 12; i++) {
         await new Promise(requestAnimationFrame);
         frames.push({
           same: saved.node === n,
           scale: getComputedStyle(n).scale,
-          animations: n.getAnimations().map((a) => (a as CSSTransition).transitionProperty),
+          animations: painted(n),
           old: saved.animations.map((a) => a.playState),
         });
       }
@@ -312,7 +348,8 @@ for (const next of ["none", "reduced", "os"])
           f.same &&
           f.scale === "none" &&
           !f.animations.some((p) => ["width", "height", "scale"].includes(p)) &&
-          f.old.every((s) => s !== "running"),
+          // The captured writer is cancelled, not left installed, by the downgrade.
+          f.old.every((s) => s === "idle"),
       ),
     ).toBe(true);
     await expect(button).toBeFocused();

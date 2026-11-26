@@ -350,12 +350,16 @@ function useRestingClosed(node: RefObject<HTMLElement | null>) {
 }
 
 /** The active content's own committed identity; a switch or a text revision bumps it. */
+function activeContentKey(host: HTMLElement) {
+  const element = host.querySelector<HTMLElement>('[data-slot="navigation-menu-content"][data-open]');
+  // Bounded identity only: never the whole menu, never a hidden copy.
+  return element ? `${element.id}|${(element.textContent ?? "").slice(0, 64)}` : "";
+}
+
 function useContentRevision(node: RefObject<HTMLElement | null>) {
   const [key, setKey] = useState("");
   const read = (host: HTMLElement) => () => {
-    const element = host.querySelector<HTMLElement>('[data-slot="navigation-menu-content"][data-open]');
-    // Bounded identity only: never the whole menu, never a hidden copy.
-    const next = element ? `${element.id}|${(element.textContent ?? "").slice(0, 64)}` : "";
+    const next = activeContentKey(host);
     setKey((previous) => (previous === next ? previous : next));
   };
   useHostObserver(node, read, ["data-open", "data-closed", "data-activation-direction"], true);
@@ -554,6 +558,15 @@ function NavigationMenuPositioner({
         content: node,
         axes: ["width", "height"],
         observeChildren: true,
+        // The panel is its own content tree, so the box the observer reports grows for
+        // two different causes. A new committed active-content identity is this owner's
+        // content revision and waits for the primitive's destination; only a reflow
+        // without that identity change is settled passively.
+        revision: () => activeContentKey(node),
+        // A trigger, link or disclosure inside the panel keeps working while the shell
+        // flies around it. A native editor owns a caret this writer must not move.
+        focusSafe: (active) =>
+          !(active instanceof HTMLElement) || !(active.matches("input,textarea,select") || active.isContentEditable),
         measure() {
           const css = node.ownerDocument.defaultView?.getComputedStyle(node);
           if (!css) return null;
