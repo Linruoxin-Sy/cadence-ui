@@ -652,10 +652,13 @@ test.describe("code-block", () => {
           const pill = list.locator('[data-slot="code-block-tab-indicator"]');
           await expect(pill).toHaveCount(1);
           await expect(pill).toHaveAttribute("data-motion", mode);
+          // The copy button owns two stacked icon layers (copy and check), each with its
+          // own hidden/live pose. Named by slot so a label span added beside them later
+          // cannot turn this into a count of something else.
           const glyphs = page
             .locator(scoped("code-block", '[data-slot="code-block-copy-button"]'))
             .first()
-            .locator("span[data-motion]");
+            .locator('span[data-slot="code-block-copy-icon"]');
           await expect(glyphs).toHaveCount(2);
           for (const glyph of await glyphs.all()) await expect(glyph).toHaveAttribute("data-motion", mode);
 
@@ -686,8 +689,18 @@ test.describe("code-block", () => {
           // click it just performed.
           const viewport = page.locator(scoped("code-block", '[data-slot="code-block-viewport"]')).first();
           const toggle = page.locator(scoped("code-block", '[data-slot="code-block-expand-button"]')).first();
+          // The toggle renders a label span and a decorative chevron span, and both carry
+          // `data-motion`. Each is named by its slot: a bare `span[data-motion]` matches
+          // both and is a strict-mode violation, not a stricter assertion.
+          //
+          // It also only exists once the block has measured itself as capped, so it appears
+          // a beat after the viewport — and under parallel workers that beat is occasionally
+          // longer than the default allowance. That wait is the hydration budget
+          // `openComponent` already grants, not a relaxed claim.
+          await expect(toggle).toBeVisible({ timeout: 15_000 });
           await expect(toggle).toHaveAccessibleName("Show all");
-          await expect(toggle.locator(":scope > span[data-motion]")).toHaveAttribute("data-motion", mode);
+          await expect(toggle.locator('[data-slot="code-block-expand-text"]')).toHaveAttribute("data-motion", mode);
+          await expect(toggle.locator('[data-slot="code-block-expand-icon"]')).toHaveAttribute("data-motion", mode);
 
           await expect(toggle).toHaveAttribute("aria-expanded", "false");
 
