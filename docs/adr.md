@@ -594,16 +594,18 @@ A component route is one item's documentation page: the item, its examples, and 
 examples compose. Its remainder is the **closure of what the page mounts**. The sweep attributes each
 chunk by a signature only its owner emits — a package marker (`recharts`, Shiki's `scopeName` /
 `tokenColors`, date-fns' French locale) or the item's own narrow `data-slot` literals — and nothing is
-apportioned: a chunk with no signature is reported with its size and left unnamed.
+apportioned: a chunk with no signature is reported with its size and left unnamed. The 214 B at the end of
+four rows — 361 B on `command`, where it shares a chunk with the search icon — is that of the highlighter's
+dynamic import, which every route able to reach a code block carries.
 
-| route         | remainder composition (gzip B)                                                                                                                                                            |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chart`       | 137 039 one chunk: Recharts plus the item's container/tooltip/legend · 214 runtime shim                                                                                                   |
-| `code-block`  | 3 651 the page's preview module · 83 975 the highlighter: core 53 469, grammars 16 606 + 6 189 + 867, two themes 3 121 + 3 186, loader 537                                                |
-| `date-picker` | 27 295 DayPicker + date-fns + the calendar item · 11 070 date-picker + calendar + popover · 9 477 popover + input · 9 336 field + label + separator · 214                                 |
-| `data-table`  | 20 811 one chunk carrying the item (TanStack Table features, `DataTableDemo`, its table and toggle parts) · 18 327 dropdown-menu · 7 585 checkbox + table + input · 7 165 separator · 214 |
-| `sidebar`     | 17 573 the item · 11 365 skeleton · 9 490 sheet · 8 688 tooltip · 214                                                                                                                     |
-| `command`     | 22 319 cmdk + the item · 9 750 dialog · 9 245 input-group + textarea · 361                                                                                                                |
+| route         | remainder composition (gzip B)                                                                                                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chart`       | 137 039 one chunk: Recharts plus the item's container/tooltip/legend · 214 the highlighter's import trampoline                                                                                                |
+| `code-block`  | 3 651 the page's preview module · 83 975 the highlighter: core 53 469, grammars 16 606 + 6 189 + 867, two themes 3 121 + 3 186, loader 537                                                                    |
+| `date-picker` | 27 295 DayPicker + date-fns + the calendar item · 11 070 date-picker + calendar + popover · 9 477 popover + input · 9 336 field + label + separator · 214 the same trampoline                                 |
+| `data-table`  | 20 811 one chunk carrying the item (TanStack Table features, `DataTableDemo`, its table and toggle parts) · 18 327 dropdown-menu · 7 585 checkbox + table + input · 7 165 separator · 214 the same trampoline |
+| `sidebar`     | 17 573 the item · 11 365 skeleton · 9 490 sheet · 8 688 tooltip · 214 the same trampoline                                                                                                                     |
+| `command`     | 22 319 cmdk + the item · 9 750 dialog · 9 245 input-group + textarea · 361 the search icon and the same trampoline                                                                                            |
 
 Every route in the table could be brought under the bar by deleting documentation; the question this ADR
 answers is whether any of those deletions is a composition decision with no reader cost. Two findings
