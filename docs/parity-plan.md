@@ -186,13 +186,19 @@ contract, registry metadata, public MDX and executed evidence — see
 [where the rollout plan lives](animation-system-plan.md) for how that is judged and what it does not
 cover.
 
-Three non-performance items stay open and are **not** delivered: #168 (Navigation Menu does not run its
-declared shell size writer for a content revision inside one open panel), #165 (the hover-card matrix
-probe asserts a pose and a CSS family its v2 recipe does not own, while the component matches its
-declaration) and #169 (44 `motion-matrix` cells across ten blocks read the presence fade out of the
-colour family, or match two `data-motion` spans; popover is evidenced as a probe mismatch and the other
-blocks are counted, not yet adjudicated). F02's audited defects #155, #156 and #158 are closed; the F02
-browser passes remain the record of what those audit slices exercised.
+The three non-performance items this section used to carry are closed and count as delivered: #168
+(Navigation Menu did not run its declared shell size writer for a content revision inside one open
+panel) in #175; #165 (the hover-card matrix probe asserted a pose and a CSS family its v2 recipe does not
+own) and #169 (44 `motion-matrix` cells across ten blocks read the presence fade out of the colour
+family, or matched two `data-motion` spans) in #174, with #165 closed as a subset of #169.
+
+One functional defect remains open and is **not** delivered: #173 — the drawer's declared edge flight on
+opening runs in no mode. `full` starts no envelope at all, because the presence controller yields to the
+primitive's own swipe family and nothing else writes the entrance; `reduced`/`none` run the opacity half
+only. The target in [drawer.md](motion/components/drawer.md) is unchanged by it, and
+`tests/e2e/motion-matrix.spec.ts` records the gap at the cell rather than asserting the absence as the
+contract. F02's audited defects #155, #156 and #158 are closed; the F02 browser passes remain the record
+of what those audit slices exercised.
 
 [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards) put effects first
 and made the old numbers advisory so the migration could finish; it stays the record of that decision.
