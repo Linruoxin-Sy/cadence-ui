@@ -193,7 +193,7 @@ own) and #169 (44 `motion-matrix` cells across ten blocks read the presence fade
 family, or matched two `data-motion` spans) in #174, with #165 closed as a subset of #169.
 
 One functional defect remains open and is **not** delivered: #173 — the drawer's declared edge flight on
-opening runs in no mode. `full` starts no envelope at all, because the presence controller yields to the
+opening never runs. `full` starts no envelope at all, because the presence controller yields to the
 primitive's own swipe family and nothing else writes the entrance; `reduced`/`none` run the opacity half
 only. The target in [drawer.md](motion/components/drawer.md) is unchanged by it, and
 `tests/e2e/motion-matrix.spec.ts` records the gap at the cell rather than asserting the absence as the
