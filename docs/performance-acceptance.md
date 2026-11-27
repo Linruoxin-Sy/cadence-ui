@@ -134,8 +134,12 @@ sweep independently recorded CLS 0.00000 in all 14 cells.
   both runs and an unmodified-collector control run. It reproduces (`dialog` 1.18/1.17/1.18%, `select` 192/174/165
   ms), so it is neither a harness artifact nor a single-window fluke. No attribution is claimed: nothing here
   says whether the block is the modal entrance, the popup's layout work, or host contention.
-- The 366 KB shell — [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177) still owns attributing it, and
-  it is the reason `page-total` sits at 503 KB while remaining inside its drift ceiling.
+- The 366 KB shell — [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177) attributed it after this
+  run, and it is the reason `page-total` sits at 503 KB while remaining inside its drift ceiling. The split is
+  recorded in [parity-plan.md §8](parity-plan.md#8-next-work): 135 115 B framework baseline, 209 610 B registry
+  runtime the page chrome mounts on every route, 6 361 B site chrome, 0 B documentation-only, 13 180 B shared
+  gzip dictionary. It explains the cost and changes none of it: the `page-total` measurement above, this run's
+  decision and its acceptances stand as measured.
 - Device ≥ 55 fps — no issue is filed, because an issue would not produce a phone; it stays unmeasured until a
   device trace exists, exactly as ADR-026 says.
 
