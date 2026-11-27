@@ -34,30 +34,31 @@ reference catalogue, new application behaviour or optional animation engine is a
 
 Functional migration is delivered across the catalogue — the 59 components and the four standalone
 primitives — with a target contract, registry metadata, public MDX and executed evidence for each id,
-except in the respects the three items below record.
+except in the respect the one item below records.
 `registry:check` walks all 63 reference graphs and keeps targets and payloads in sync; by its own
 output it is legacy enforcement, so it does not itself certify v2 runtime. That runtime evidence is
 the per-item `tests/components/<id>.test.tsx` suites and the v2 action plan they feed. This is a
 functional conclusion only.
 
-Read the three items below as part of the same conclusion, not as an afterthought: one id still declares
-a behaviour it does not run, one matrix probe is wrong rather than its component, and the browser smoke
-is red in one cell class across ten blocks.
+Read that item as part of the same conclusion, not as an afterthought: one id still declares a behaviour
+its `full` mode does not run.
 
-- **#168 — functional, open.** Navigation Menu does not run its declared shell size writer for a
-  content revision inside one open panel; the `navigation-menu-examples` geometry cases fail on it at
-  this HEAD.
-- **#165 — probe, open.** The hover-card matrix cell asserts a pose and a CSS family its v2 recipe
-  does not own. The component matches its declaration; the test does not.
-- **#169 — probe, open.** 44 `motion-matrix` cells across ten blocks read the presence fade out of the
-  colour family: they expect a single `transition-duration` where the popup publishes six colour
-  longhands, or expect `opacity` in `transition-property` where opacity is a Web Animation. Six
-  code-block cells also match two `data-motion` spans. Popover is evidenced as a probe mismatch — its
-  contract requires immediate settlement for an unprovable palette — and the other blocks are counted,
-  not adjudicated one by one.
+- **#173 — functional, open.** The drawer declares an edge flight on opening — "edge travel by the
+  popup's own extent on `transform`, plus opacity, on the popup's own edge clock" in
+  [drawer.md](motion/components/drawer.md) — and `full` starts none of it. `drawerSwipeClasses` installs
+  the primitive's `transform, translate` family with a non-zero duration, `createModalPresence` reads a
+  non-zero `transform`/`translate` family as caller paint and returns before writing anything, so no
+  property changes and the panel lands at its resting pose. `reduced` and `none` emit `transition-none`,
+  the guard passes, and the opacity envelope runs — which is why reduced fades and full does not. The
+  target above stays as written; the fix is not to weaken it.
 
-None of the three is counted as delivered. The four primitives, Carousel, Data Table and Sidebar also
-keep an explicit `legacy` migration marker by design; each contract records its reason.
+The three items this section used to carry are closed and counted as delivered: #168 (Navigation Menu's
+declared shell size writer for a content revision inside one open panel) in #175; #165 (the hover-card
+matrix pose) and #169 (44 `motion-matrix` cells across ten blocks) in #174, with #165 closed as a subset
+of #169. The browser smoke that read the presence fade out of the colour family now reads each entrance
+from the writer that owns it, and `motion-matrix.spec.ts` names #173 where the drawer's declared edge
+flight is still unobservable. The four primitives, Carousel, Data Table and Sidebar also keep an explicit
+`legacy` migration marker by design; each contract records its reason.
 
 Performance governance is **decided but not accepted**. [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
 sets the v2 budgets and their classes on the S02-A matrix; no budget, byte count or device measurement

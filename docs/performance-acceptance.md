@@ -10,13 +10,13 @@ limits and one required measurement does not exist. ADR-026 permits acceptance o
 green _and_ every monitored metric is at or under its limit (or an ADR names the exception), with the device
 criterion measured. That is not what this run found, so nothing here is a pass claim.
 
-|                        |                                                                                                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| Commit                 | `c232a50545ff3652b929de0166659dc3a58cc364` (`origin/main` at the start of F03)                    |
-| Production build       | `next build`, BUILD_ID `K-3wOELzLpmC66QN7F657`                                                    |
-| Run                    | 2026-11-26 UTC (2026-11-27 local), branch `chore/f03-performance`                                 |
-| Raw evidence           | `.cache/f03/`, ignored; `acceptance.json` is the assembled result                                 |
-| Decision it answers to | [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired) |
+|                        |                                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| Commit                 | `c232a50545ff3652b929de0166659dc3a58cc364` (`origin/main` at the start of F03)                       |
+| Production build       | `next build`, BUILD_ID `K-3wOELzLpmC66QN7F657`                                                       |
+| Run                    | 2026-11-26 UTC (2026-11-27 local), branch `chore/f03-performance`                                    |
+| Raw evidence           | `.cache/f03/` in the checkout that ran the sweep, ignored; `acceptance.json` is the assembled result |
+| Decision it answers to | [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)    |
 
 ## Verdicts
 
@@ -36,6 +36,30 @@ criterion measured. That is not what this run found, so nothing here is a pass c
 The device criterion is unmeasured, not failed and not waived: ADR-026 requires presented-frame timestamps from
 a real 2023–2024 60 Hz mid-range Android phone, and no device was available to this run. Desktop rAF cadence is
 the proxy those two frame rows come from, and it cannot stand in for that measurement.
+
+## Which frame figure each page reports
+
+ADR-026's table records `frame-share` as "0.33% / 0.48%" and `frame-block` as "133.9 ms". Those two shares are
+**pooled** over the seven interaction windows in the S02-A files — 9 long frames of 2 698 at 1280 (0.334%) and
+13 of 2 702 at 390 (0.481%) — while the worst single route in the same files is `dialog` at 0.69% (3/434) and
+0.93% (4/432). [#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180) read the ADR figure as a per-route
+one, could not reconcile it with the files and said so rather than picking an answer; both readings are
+arithmetically correct and the ADR does not say which statistic it means. The ADR is not edited here, because its
+own enforcement section makes an amendment a new ADR and no limit or class changes.
+
+This page reports the **per-route maximum**, and on this commit the difference decides the verdict:
+
+| frame-share statistic  | 1280           | 390            | against ≤ 1% |
+| ---------------------- | -------------- | -------------- | ------------ |
+| pooled over 7 windows  | 11/2 703 0.41% | 12/2 695 0.45% | inside       |
+| worst route (`dialog`) | 4/428 0.94%    | 5/426 1.18%    | over at 390  |
+
+A budget that protects "frames over 25 ms on an interaction" has to bind the route that stalls; pooling seven
+windows lets six smooth routes pay for one bad one, and would report this run as inside a limit that the route
+it names is over. So the breach is recorded against `dialog`@390, tracked in
+[#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180), and the choice of statistic is stated here instead
+of being left to whoever reads the two documents next. If the pooled reading is what ADR-026 intended, that is an
+ADR decision and not a page edit.
 
 ## The run, in the order it was taken
 
