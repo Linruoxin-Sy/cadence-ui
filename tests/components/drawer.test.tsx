@@ -142,8 +142,9 @@ describe("Drawer", () => {
  *   `transition-property` — the same reading that hid this defect, where the controller
  *   treated that family as caller paint and returned before writing anything.
  *
- * The rendered travel, the clock the matrix reads and the drag handoff stay in
- * `tests/e2e/motion-matrix.spec.ts`.
+ * The rendered travel and the browser's own clock reading stay in
+ * `tests/e2e/motion-matrix.spec.ts`; the handoff asserted below is driven by the same
+ * inline displacement Base UI writes while a pointer holds the panel.
  */
 type Paint = {
   slot: string | null;
