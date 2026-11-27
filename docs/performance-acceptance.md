@@ -1,9 +1,9 @@
 # F03 · performance acceptance against the v2 budgets
 
-**Functional status is not decided here.** The motion v2 migration is delivered and its remaining defect is
-tracked as [#173](https://github.com/Linruoxin-Sy/cadence-ui/issues/173) (drawer full-mode open starts no
-entrance envelope), which is a functional bug and not a performance result. This page records only what
-ADR-026's budgets measured on one commit.
+**Functional status is not decided here.** This page records only what ADR-026's budgets measured on one
+commit; it is not a functional result. The one functional defect open when the run was taken — [#173](https://github.com/Linruoxin-Sy/cadence-ui/issues/173)
+(drawer `full`-mode open started no entrance envelope) — is fixed in
+[#185](https://github.com/Linruoxin-Sy/cadence-ui/pull/185), which changes no number on this page.
 
 **Performance status: acceptance not met.** Every hard gate passed; three monitored metrics are over their
 limits and one required measurement does not exist. ADR-026 permits acceptance only when every hard gate is
@@ -145,7 +145,8 @@ measurement code.
 ## What this does not claim
 
 - **Not a functional acceptance.** Functional completion and this result are separate; [#173](https://github.com/Linruoxin-Sy/cadence-ui/issues/173)
-  remains open and unrelated to any number here.
+  was fixed in [#185](https://github.com/Linruoxin-Sy/cadence-ui/pull/185) after this run, and neither its
+  absence at measurement time nor its fix moves a number here.
 - **Not a device result.** Two monitored proxies on a 165 Hz desktop host are not ≥ 55 fps on a phone.
 - **Not a clean bill for `page-total`.** 503 395 B is inside a drift ceiling that ADR-026 explicitly calls
   "not a quality claim"; 366 142 B of it is a shell nobody has attributed yet.

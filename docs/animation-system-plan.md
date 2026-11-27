@@ -33,32 +33,31 @@ reference catalogue, new application behaviour or optional animation engine is a
 ## Status
 
 Functional migration is delivered across the catalogue — the 59 components and the four standalone
-primitives — with a target contract, registry metadata, public MDX and executed evidence for each id,
-except in the respect the one item below records.
+primitives — with a target contract, registry metadata, public MDX and executed evidence for each id.
 `registry:check` walks all 63 reference graphs and keeps targets and payloads in sync; by its own
 output it is legacy enforcement, so it does not itself certify v2 runtime. That runtime evidence is
 the per-item `tests/components/<id>.test.tsx` suites and the v2 action plan they feed. This is a
 functional conclusion only.
 
-Read that item as part of the same conclusion, not as an afterthought: one id still declares a behaviour
-its `full` mode does not run.
+The last item this section carried as open is closed:
 
-- **#173 — functional, open.** The drawer declares an edge flight on opening — "edge travel by the
+- **#173 — fixed in #185.** The drawer declares an edge flight on opening — "edge travel by the
   popup's own extent on `transform`, plus opacity, on the popup's own edge clock" in
-  [drawer.md](motion/components/drawer.md) — and `full` starts none of it. `drawerSwipeClasses` installs
-  the primitive's `transform, translate` family with a non-zero duration, `createModalPresence` reads a
-  non-zero `transform`/`translate` family as caller paint and returns before writing anything, so no
-  property changes and the panel lands at its resting pose. `reduced` and `none` emit `transition-none`,
-  the guard passes, and the opacity envelope runs — which is why reduced fades and full does not. The
-  target above stays as written; the fix is not to weaken it.
+  [drawer.md](motion/components/drawer.md) — and `full` used to start none of it. `drawerSwipeClasses`
+  installs the primitive's `transform, translate` family with a non-zero duration, `createModalPresence`
+  read that family as caller paint and returned before writing anything, and only `reduced`/`none` —
+  which emit `transition-none` — reached the opacity envelope. #185 composes that controller so the
+  primitive's release family is not mistaken for caller transform, and reports the live swipe state
+  into the commit so the envelope leases opacity alone while the pointer owns the drag channel.
+  `reduced`/`none` behaviour is unchanged, and the target above was not weakened to fit the fix.
 
 The three items this section used to carry are closed and counted as delivered: #168 (Navigation Menu's
 declared shell size writer for a content revision inside one open panel) in #175; #165 (the hover-card
 matrix pose) and #169 (44 `motion-matrix` cells across ten blocks) in #174, with #165 closed as a subset
 of #169. The browser smoke that read the presence fade out of the colour family now reads each entrance
-from the writer that owns it, and `motion-matrix.spec.ts` names #173 where the drawer's declared edge
-flight is still unobservable. The four primitives, Carousel, Data Table and Sidebar also keep an explicit
-`legacy` migration marker by design; each contract records its reason.
+from the writer that owns it, and `motion-matrix.spec.ts` asserts the drawer's declared edge flight
+against `CLOCKS.sheet[mode]` instead of recording its absence. The four primitives, Carousel, Data Table
+and Sidebar also keep an explicit `legacy` migration marker by design; each contract records its reason.
 
 Performance governance is **decided but not accepted**. [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
 sets the v2 budgets and their classes on the S02-A matrix; no budget, byte count or device measurement
