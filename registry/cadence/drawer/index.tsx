@@ -364,11 +364,22 @@ function DrawerPopupSurface({
       presence.current = null;
       connected.current = node;
     }
-    if (node && !presence.current) presence.current = createModalPresence(node, { edge: () => edge.current });
+    if (node && !presence.current)
+      presence.current = createModalPresence(node, {
+        edge: () => edge.current,
+        // `drawerSwipeClasses` installs the primitive's own `transform, translate`
+        // release family. Composing lets the authored edge flight keep `transform`
+        // for its frames instead of reading that family as caller paint and yielding
+        // before it writes anything.
+        compose: true,
+      });
     const open = state.open;
     presence.current?.commit({
       open,
       enter: open && (state.transitionStatus === "starting" || lastOpen.current === false),
+      // While Base UI is dragging, its inline displacement owns `transform`; the
+      // envelope writes opacity only and the pointer keeps the single writer.
+      gesture: state.swiping,
       cm,
     });
     lastOpen.current = open;
