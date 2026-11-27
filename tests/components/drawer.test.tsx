@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { Button } from "@/registry/cadence/button";
 import {
   Drawer,
@@ -126,6 +126,155 @@ describe("Drawer", () => {
 
     const overlay = document.querySelector('[data-slot="drawer-overlay"]');
     expect(overlay).toHaveAttribute("data-motion", mode);
+  });
+});
+
+/**
+ * `drawer.popup.enter` and `drawer.popup.exit` are the edge flight `createModalPresence`
+ * starts on the popup's own host, so no `transition-*` longhand can report them, and
+ * jsdom has no animation engine at all. Two browser facts are therefore simulated:
+ *
+ * - `animate` is stubbed, exactly as the dialog suite does, so "the declared envelope
+ *   started" is observable.
+ * - `getComputedStyle` reports the family `drawerSwipeClasses(cm)` installs in `full`
+ *   (`transition-[transform,translate] duration-slow`) and a resting `transform: none`.
+ *   Vitest runs with `css: false`, so jsdom applies no class and would report an empty
+ *   `transition-property` — the same reading that hid this defect, where the controller
+ *   treated that family as caller paint and returned before writing anything.
+ *
+ * The rendered travel, the clock the matrix reads and the drag handoff stay in
+ * `tests/e2e/motion-matrix.spec.ts`.
+ */
+type Paint = {
+  slot: string | null;
+  properties: string[];
+  duration: number;
+  from: string | undefined;
+  to: string | undefined;
+};
+
+function simulateInstalledSwipeFamily() {
+  const native = window.getComputedStyle.bind(window);
+  const spy = vi.spyOn(window, "getComputedStyle").mockImplementation(((element: Element) => {
+    const computed = native(element);
+    const node = element as HTMLElement;
+    if (!node.matches?.('[data-slot="drawer-popup"]')) return computed;
+    // `drawerSwipeClasses` removes the family under reduced/none; mirror that so the
+    // simulation never describes a surface the component did not produce.
+    if (node.className.includes("transition-none")) return computed;
+    return new Proxy(computed, {
+      get(target, property, receiver) {
+        if (property === "transitionProperty") return "transform, translate";
+        if (property === "transitionDuration") return "0.32s, 0.32s";
+        if (property === "transform") return node.style.transform || "none";
+        return Reflect.get(target, property, receiver);
+      },
+    }) as CSSStyleDeclaration;
+  }) as typeof window.getComputedStyle);
+  return () => spy.mockRestore();
+}
+
+function recordPresence() {
+  const calls: Paint[] = [];
+  const cancelled = vi.fn();
+  const animate = vi.fn(function record(this: Element, frames: Keyframe[], timing: KeyframeAnimationOptions) {
+    calls.push({
+      slot: this.getAttribute("data-slot"),
+      properties: [...new Set(frames.flatMap((frame) => Object.keys(frame ?? {})))].sort(),
+      duration: Number(timing.duration),
+      from: (frames[0] as { transform?: string } | undefined)?.transform,
+      to: (frames[frames.length - 1] as { transform?: string } | undefined)?.transform,
+    });
+    return {
+      effect: { setKeyframes: () => {}, getKeyframes: () => frames },
+      cancel: cancelled,
+      playState: "running",
+      // The envelope never resolves here: the assertion is that it started.
+      finished: new Promise(() => {}),
+    };
+  });
+  const previous = Element.prototype.animate;
+  Element.prototype.animate = animate as unknown as typeof Element.prototype.animate;
+  // The popup's own presence writers only; a measured height or a text run is another owner.
+  const envelope = () =>
+    calls
+      .filter((call) => call.slot === "drawer-popup")
+      .filter((call) => call.properties.some((property) => property === "opacity" || property === "transform"))
+      .map((call) => `${call.properties.join("+")}@${call.duration}`)
+      .sort();
+  return {
+    calls,
+    cancelled,
+    envelope,
+    restore: () => {
+      Element.prototype.animate = previous;
+    },
+  };
+}
+
+describe("Drawer popup entrance", () => {
+  it.each(modes)("starts the declared envelope in %s", async (mode) => {
+    const style = simulateInstalledSwipeFamily();
+    const presence = recordPresence();
+    try {
+      renderInMode(mode);
+      await open();
+      expect(presence.envelope()).toEqual(
+        { full: ["opacity@320", "transform@320"], reduced: ["opacity@192"], none: [] }[mode],
+      );
+      if (mode === "full") {
+        const travel = presence.calls.find((call) => call.properties.includes("transform"));
+        // The popup's own extent, from outside its edge to the resting placement.
+        expect(travel?.from).toBe("translateY(100%)");
+        expect(travel?.to).toBe("none");
+      }
+    } finally {
+      presence.restore();
+      style();
+    }
+  });
+
+  it("yields transform to the primitive's swipe channel while a drag owns it", async () => {
+    const style = simulateInstalledSwipeFamily();
+    const presence = recordPresence();
+    try {
+      renderInMode("full");
+      await open();
+      expect(presence.envelope()).toEqual(["opacity@320", "transform@320"]);
+      presence.calls.length = 0;
+      const shell = popup() as HTMLElement;
+      // Exactly what Base UI writes while the pointer holds the panel.
+      shell.style.transform = "translateY(64px)";
+      await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+      // The envelope keeps the dragged property out of its lease and fades only.
+      expect(presence.envelope()).toEqual(["opacity@220"]);
+      expect(shell.style.transform).toBe("translateY(64px)");
+    } finally {
+      presence.restore();
+      style();
+    }
+  });
+
+  it("cancels a running envelope on a live downgrade to reduced", async () => {
+    const style = simulateInstalledSwipeFamily();
+    const presence = recordPresence();
+    try {
+      const view = renderInMode("full");
+      await open();
+      expect(presence.envelope()).toEqual(["opacity@320", "transform@320"]);
+      presence.calls.length = 0;
+      view.rerender(
+        <CadenceProvider mode="reduced">
+          <Example />
+        </CadenceProvider>,
+      );
+      expect(popup()).toHaveAttribute("data-motion", "reduced");
+      expect(presence.cancelled).toHaveBeenCalled();
+      expect(presence.envelope()).toEqual([]);
+    } finally {
+      presence.restore();
+      style();
+    }
   });
 });
 

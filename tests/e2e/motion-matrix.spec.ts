@@ -586,9 +586,8 @@ test.describe("drawer", () => {
 
           // The popup carries exactly one CSS family: the primitive's own release glide,
           // which `drawerSwipeClasses` backs with the sheet clock in `full` and removes
-          // entirely under reduced/none. It is not a colour or presence family, so the
-          // panel spends no colour clock here and the reduced/none fade below is the only
-          // owner left.
+          // entirely under reduced/none. It is not a colour family, so the panel spends
+          // no colour clock here; the presence below is the entrance owner beside it.
           expect(await computed(page, '[data-slot="drawer-popup"]', "transition-property")).toBe(
             mode === "full" ? "transform, translate" : "none",
           );
@@ -597,16 +596,11 @@ test.describe("drawer", () => {
           );
 
           const presence = await recordedPresence(page, "initial", "drawer-popup");
-          if (mode === "full") {
-            // Nothing else writes the panel while that family is installed: the presence
-            // controller yields to it instead of starting a second animation. This cell
-            // records the current shape and not the contract — the declared edge flight is
-            // therefore unobservable in `full`; #173 tracks that gap, and when it lands this
-            // cell has to assert the envelope rather than its absence.
-            expect(presence).toEqual({ opacity: [], spatial: [] });
-          } else {
-            expect(presence).toEqual(CLOCKS.sheet[mode]);
-          }
+          // `full` starts the declared edge flight *and* keeps the primitive's release
+          // family: `createModalPresence` is composed on this host, so the family is not
+          // read as caller paint, and the drag channel keeps `transform` only while a
+          // pointer owns it. The recorded calls are the writers, in the sheet clocks.
+          expect(presence).toEqual(CLOCKS.sheet[mode]);
 
           // The backdrop owns its own opacity channel: its declared `background-color` family
           // stays at a zero clock, so the fade asserted next is the inline presence writer and
