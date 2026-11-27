@@ -192,13 +192,13 @@ panel) in #175; #165 (the hover-card matrix probe asserted a pose and a CSS fami
 own) and #169 (44 `motion-matrix` cells across ten blocks read the presence fade out of the colour
 family, or matched two `data-motion` spans) in #174, with #165 closed as a subset of #169.
 
-One functional defect remains open and is **not** delivered: #173 — the drawer's declared edge flight on
-opening never runs. `full` starts no envelope at all, because the presence controller yields to the
-primitive's own swipe family and nothing else writes the entrance; `reduced`/`none` run the opacity half
-only. The target in [drawer.md](motion/components/drawer.md) is unchanged by it, and
-`tests/e2e/motion-matrix.spec.ts` records the gap at the cell rather than asserting the absence as the
-contract. F02's audited defects #155, #156 and #158 are closed; the F02 browser passes remain the record
-of what those audit slices exercised.
+The last functional defect this section carried — #173, the drawer's declared edge flight on opening
+never running because the presence controller yielded to the primitive's own swipe family — is fixed
+in #185. The controller is composed on the popup, the live swipe state keeps the drag channel the only
+`transform` writer, and `tests/e2e/motion-matrix.spec.ts` now asserts that cell against
+`CLOCKS.sheet[mode]` instead of recording the gap. The target in
+[drawer.md](motion/components/drawer.md) was not changed by the fix. F02's audited defects #155, #156
+and #158 are closed; the F02 browser passes remain the record of what those audit slices exercised.
 
 [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards) put effects first
 and made the old numbers advisory so the migration could finish; it stays the record of that decision.

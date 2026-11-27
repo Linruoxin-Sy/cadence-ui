@@ -31,6 +31,12 @@ export type ModalPresenceCommit = {
   open: boolean;
   /** A genuine entrance (a later open), not an already-visible initial render. */
   enter?: boolean;
+  /**
+   * The primitive's own gesture channel currently holds `transform` (a live drag or
+   * snap). A composed host then writes only opacity, so the envelope never competes
+   * with the pointer's inline displacement.
+   */
+  gesture?: boolean;
   cm: CadenceMotion;
 };
 
@@ -141,8 +147,12 @@ export function createModalPresence(
     // the independently owned backdrop keeps its own clock.
     if (input.open && (immediate || node.contains(node.ownerDocument.activeElement))) return;
     const side = edge?.();
+    // A composed host's transform belongs to the primitive while its gesture channel is
+    // live — either an inline drag displacement or a commit that reports one. The
+    // envelope keeps the property only when that channel is idle.
+    const handOff = compose && (input.gesture === true || node.style.transform !== "");
     // A caller transform keeps that family; the presence then writes only opacity.
-    const ownsTransform = css.transform === "none" || fromTransform !== undefined;
+    const ownsTransform = !handOff && (css.transform === "none" || fromTransform !== undefined);
     const revision = transaction.revision("presence", input.open, node);
     const generation = ++epoch;
     lease = owner.begin(revision, side && ownsTransform ? ["opacity", "transform"] : ["opacity"], {}, () => {
