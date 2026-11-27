@@ -129,7 +129,11 @@ sweep independently recorded CLS 0.00000 in all 14 cells.
 ## Where the failures go
 
 - `route-remainder`, six routes — already owned by [#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178);
-  this run reproduces its numbers on the current source and adds nothing to the decision.
+  this run reproduces its numbers on the current source and adds nothing to the decision. [#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178)
+  then dispositioned them in
+  [ADR-027](adr.md#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item),
+  naming each route with its own sweep; no number on this page moved, and the six are still reported as
+  exceedances.
 - `frame-share` and `frame-block` — filed as [#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180) with
   both runs and an unmodified-collector control run. It reproduces (`dialog` 1.18/1.17/1.18%, `select` 192/174/165
   ms), so it is neither a harness artifact nor a single-window fluke. No attribution is claimed: nothing here

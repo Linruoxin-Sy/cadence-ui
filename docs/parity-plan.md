@@ -238,11 +238,15 @@ class; monitored never means "not measured", and deployment never turns an excee
    the cost rather than approving it.
    Keep the permanent `tests/e2e/site-js-budget.spec.ts` collector with its automatic-request, served-root
    hash, example-count, cold-layout and error assertions.
-2. **Six routes above the route remainder.** `chart` 137 300, `code-block` 87 600, `date-picker` 57 400,
-   `data-table` 54 100, `sidebar` 47 300 and `command` 41 700 B are recorded exceedances, each dominated by
-   the engine it wraps; [#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178) owns deciding them.
-   Until it does, the number stays on the record: the F03 run measured the same six and did not treat the page
-   metrics as passed.
+2. **Six routes above the route remainder — decided, not waived.** `chart` 137 300, `code-block` 87 600,
+   `date-picker` 57 400, `data-table` 54 100, `sidebar` 47 300 and `command` 41 700 B stay recorded as
+   exceedances, and
+   [ADR-027](adr.md#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item)
+   names each one an exception with its own measurement at `7990eba2`: the remainder is the closure of what
+   the page mounts, and on four of the six that closure is the item's own static imports, so no example was
+   worth deleting. The bar, its class and the collector are unchanged, so every sweep keeps reporting the
+   six — the F03 run measured the same six and did not treat the page metrics as passed, and this decision
+   does not either.
 3. **Motion runtime union.** Kept at 48 000 B as a gate, not a reference: the shipped union compiles to
    44 207 B, 44 450 B with the site's `useInView`, and the import list is asserted against the source tree
    so the measurement cannot drift silently. A registry-only reference compilation still cannot certify

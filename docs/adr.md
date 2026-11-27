@@ -6,8 +6,10 @@ and open work belong in the plan and test suite, not appended experiment histori
 
 [ADR-026](#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired) is current
 authority for Motion v2 budgets and enforcement; [ADR-023](#adr-023--effects-first-migration-performance-governance-afterwards)
-remains the record of why they were advisory during migration. Earlier ADR text remains historical;
-conflicting numerical budget/performance-stage requirements do not gate migration.
+remains the record of why they were advisory during migration.
+[ADR-027](#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item) is the
+disposition of the six `route-remainder` exceedances under that authority. Earlier ADR text remains
+historical; conflicting numerical budget/performance-stage requirements do not gate migration.
 
 ## ADR-001 · Distribute registry-first
 
@@ -540,3 +542,129 @@ metrics sit where they do: [#177](https://github.com/Linruoxin-Sy/cadence-ui/iss
 366 142 B shared shell, and
 [#178](https://github.com/Linruoxin-Sy/cadence-ui/issues/178) decides the six routes above
 `route-remainder`.
+
+## ADR-027 · `route-remainder` exceptions: the six pages whose remainder is their own item
+
+Accepted by S03 (#178), on a sweep taken for that decision. [ADR-026](#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired)
+keeps `route-remainder` at ≤ 40 000 B per route, monitored, and keeps its collector; this ADR is the
+"naming the exception with the measurement that justifies it" clause of ADR-026's acceptance, applied to
+the six routes S02-A recorded and F03 reproduced. No limit, class, collector, category or threshold
+changes, `scripts/performance-policy.mjs` is untouched, and no byte of shipped source moved.
+
+### The measurement
+
+`7990eba2`, production `pnpm build` (`BUILD_ID=Yh1A_wCTVzxZi2CcN7TUr`), `next start --port 3103`, then
+`node scripts/measure-routes.mjs page --base http://127.0.0.1:3103 --width 1280|390 --out .cache/s03-b/before`
+over the whole site: 73 routes, 63 of them component routes. The protocol is ADR-026's, unchanged: a fresh
+page per route in one context, cache disabled, load + networkidle + 10 s + networkidle, no interaction,
+JS total = gzip6 of every JavaScript HTTP entity the page fetched, prefetch and async included, remainder
+= total minus the shell. The shell is the union of URLs present on all 63 component routes: **19 chunks,
+366 142 B**. Population, both widths, identical: 1 411 B minimum, 9 996 B median, **38 312 B p90** (still
+under the bar), 137 253 B maximum, and exactly these six above 40 000 B — so the bar still separates an
+outlier from the catalogue, and this decision names the six rather than moving the bar under them. No
+route row carried a page error, a console error, an HTTP error or a missing response, and cold CLS was
+0.00000 everywhere except `input-otp` and `pagination` (0.00009 / 0.00022 at 1280, 0.00038 / 0.00055 at
+390). Host: AMD Ryzen 7 5800H, 16 threads, 34 204 610 560 B RAM, Windows_NT 10.0.22621, headless Edge
+158.0.4370.45, Node v22.23.2, `deviceScaleFactor` 1.
+
+The tree this ADR ships differs from the tree under measurement in `docs/*.md` only: no shipped source,
+no MDX and no registry metadata changed, all of which are inputs to the page build, and `.next` was not
+rebuilt between the two widths. Before and after are therefore the same build, and a repeated sweep of it
+is a reproducibility check rather than an after measurement.
+
+| route         | page total | remainder | share of the route |
+| ------------- | ---------: | --------: | -----------------: |
+| `chart`       |    503 395 |   137 253 |              27.3% |
+| `code-block`  |    453 768 |    87 626 |              19.3% |
+| `date-picker` |    423 534 |    57 392 |              13.6% |
+| `data-table`  |    420 244 |    54 102 |              12.9% |
+| `sidebar`     |    413 472 |    47 330 |              11.4% |
+| `command`     |    407 817 |    41 675 |              10.2% |
+
+Both widths served the same entity set and produced the same numbers to the byte, no console or HTTP
+error, no missing response, and CLS 0.00000 on all twelve cells. Read by CDP initiator, five of the six
+remainders are requested by the document's parser; `code-block` splits 3 651 B from the document and
+83 975 B fetched by the Turbopack runtime after parse. The collector's own declared/fetched split cannot
+show that, and this ADR does not rely on it: a Turbopack build fetches a lazy chunk by appending a
+`<script>` element, so by the end of the window every entity looks declared.
+
+### What the number is measuring
+
+A component route is one item's documentation page: the item, its examples, and the registry items those
+examples compose. Its remainder is the **closure of what the page mounts**. The sweep attributes each
+chunk by a signature only its owner emits — a package marker (`recharts`, Shiki's `scopeName` /
+`tokenColors`, date-fns' French locale) or the item's own narrow `data-slot` literals — and nothing is
+apportioned: a chunk with no signature is reported with its size and left unnamed. The 214 B at the end of
+four rows — 361 B on `command`, where it shares a chunk with the search icon — is that of the highlighter's
+dynamic import, which every route able to reach a code block carries.
+
+| route         | remainder composition (gzip B)                                                                                                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chart`       | 137 039 one chunk: Recharts plus the item's container/tooltip/legend · 214 the highlighter's import trampoline                                                                                                |
+| `code-block`  | 3 651 the page's preview module · 83 975 the highlighter: core 53 469, grammars 16 606 + 6 189 + 867, two themes 3 121 + 3 186, loader 537                                                                    |
+| `date-picker` | 27 295 DayPicker + date-fns + the calendar item · 11 070 date-picker + calendar + popover · 9 477 popover + input · 9 336 field + label + separator · 214 the same trampoline                                 |
+| `data-table`  | 20 811 one chunk carrying the item (TanStack Table features, `DataTableDemo`, its table and toggle parts) · 18 327 dropdown-menu · 7 585 checkbox + table + input · 7 165 separator · 214 the same trampoline |
+| `sidebar`     | 17 573 the item · 11 365 skeleton · 9 490 sheet · 8 688 tooltip · 214 the same trampoline                                                                                                                     |
+| `command`     | 22 319 cmdk + the item · 9 750 dialog · 9 245 input-group + textarea · 361 the search icon and the same trampoline                                                                                            |
+
+Every route in the table could be brought under the bar by deleting documentation; the question this ADR
+answers is whether any of those deletions is a composition decision with no reader cost. Two findings
+say no, and both were measured rather than argued:
+
+1. **On four of the six, deleting every example would not remove a byte.** `chart`, `data-table`,
+   `sidebar` and `command` reach their remainder through the _item's own static imports_ — Recharts;
+   TanStack Table with Dropdown Menu, Checkbox, Input and Table; Sheet, Tooltip and Skeleton; cmdk,
+   Dialog and InputGroup. Those imports are the item's documented surface, and a consumer installing the
+   item pays them too. The preview and the installed component are not the same surface in principle —
+   the page shows eight chart specimens, nine table states, fourteen sidebar states — but the surface is
+   not what sets the cost, so a composition decision has no bytes to decide.
+2. **On the two routes where the page does decide the load, the page is the feature.** `code-block`
+   fetches 95.8% of its remainder after parse: specimens carry `language`, the item's
+   `useHighlightedCode` does `import("./highlight")`, and the runtime pulls Shiki. The boundary is
+   genuine — outside the document's script set, not merely outside an observation window — and the
+   collector charges it anyway, because the protocol counts every entity the page fetches while it is
+   observed. Passing that route means shipping a code-block page that does not show colouring, at
+   3 651 B — an eleven-fold margin under the bar bought by not documenting the item's headline feature.
+   `date-picker` is the same shape, smaller: its `date-input` and `time` examples mount Field and Input,
+   9 336 B that the installed item never imports, and its `locale` example asks date-fns for a French
+   locale inside the 27 295 B chunk. That is a real preview-versus-install difference, it is measured,
+   and together it is under 12 000 B against a 17 392 B gap.
+
+Nothing was deleted to reach this decision, so this ADR records no reader-visible loss: the documentation
+on these six pages is exactly what it was before it.
+
+### What the bar would cost, route by route
+
+| route         | gap to 40 000 | what would have to go                                                                                | reader loses                                                                                                    |
+| ------------- | ------------: | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `chart`       |        97 253 | Recharts. Its body is 137 039 B and its reference graph is 120 936 B (ADR-026's recorded addition)   | the line, area, pie, legend, tooltip, live-data and later-insertion sections: the page stops being a chart page |
+| `code-block`  |        47 626 | Shiki. The core alone is 53 469 B, more than the whole bar, and the family is 83 975 B               | colour on every specimen, and the `Highlighting` section that documents `language`                              |
+| `date-picker` |        17 392 | DayPicker + date-fns (38 365 B), or every example-only body (≈11 300 B) and still 6 000 B short      | the picker itself; or the date-input, time and locale sections                                                  |
+| `data-table`  |        14 102 | the Columns control's Dropdown Menu (18 327 B), which the item imports and the page does not compose | column visibility, a documented part of the item and of upstream parity                                         |
+| `sidebar`     |         7 330 | one of Sheet, Tooltip or Skeleton — the smallest body (8 688 B) already exceeds the gap              | the mobile sheet, collapsed-mode tooltips, or the loading skeleton: each is a documented part of the item       |
+| `command`     |         1 675 | Dialog or InputGroup — the smallest body (9 245 B) is API, not an example                            | the dialog palette, or the input-group input                                                                    |
+
+Deleting a documented section to make a monitored bar green is the trade ADR-026 refuses in its own words:
+40 000 B is where outliers are "named instead of blessed", not a bar that authorises removing what the
+catalogue renders. This ADR therefore takes the other branch ADR-026 allows, and the six names are the
+record: a sweep keeps reporting them, and the bar keeps governing the next route that approaches it.
+
+### What this does not claim
+
+- **Not a pass.** The six remain exceedances, recorded on every sweep; monitored never means passed, and
+  this decision changes no reported number. F03's and S03-A's sweeps keep their own commits and values.
+- **No growth licence.** The values above are the accepted ones for this composition at `7990eba2`. A
+  named route that grows further is a new question, and a seventh route over the bar is not covered.
+- **No engine verdict.** Replacing Recharts, Shiki, DayPicker, TanStack Table, Base UI's sheet and menu,
+  or cmdk is an engine decision with its own ADR; none is proposed here, and none is implied.
+- **Not a device or interaction result.** Frame share, frame block and the ≥ 55 fps device criterion are
+  #180 and the unmeasured criterion, untouched by this decision.
+- **Not a preview reform.** The site keeps every example it had: the documentation is unchanged, so no
+  reader lost anything to reach this conclusion.
+
+### Reopening
+
+A route leaves this exception when the thing that puts it over stops being on the route: a first-load
+boundary that defers the engine past the _fetch_ rather than past paint, an engine replaced under its own
+ADR, or a documented example deliberately withdrawn with its reader cost recorded in the issue that does
+it. Until one of those happens the number is reported, not re-argued.
