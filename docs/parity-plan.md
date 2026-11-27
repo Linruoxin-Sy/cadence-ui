@@ -220,9 +220,22 @@ class; monitored never means "not measured", and deployment never turns an excee
    40 000 B route remainder, and does not claim the current cost is good: every component route costs
    367 600–503 400 B, of which 366 142 B is a 19-chunk shell all 63 routes load. The historical complete
    Button baseline of 221 511 B at source `4fe1a51` stays recorded as what the site cost before the
-   catalogue grew; it is not a target and it authorizes no runtime adoption. Attribution of that shell is
-   [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177); the F03 run reproduced it at 366 142 B and
-   recorded it in [performance-acceptance.md](performance-acceptance.md) rather than attributing it.
+   catalogue grew; it is not a target and it authorizes no runtime adoption. The F03 run reproduced the shell
+   at 366 142 B and recorded it in [performance-acceptance.md](performance-acceptance.md);
+   [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177) then attributed it chunk by chunk, and the
+   split accounts for every byte: 135 115 B is framework baseline (React 18 / React DOM, the Next client
+   router and hydration, the Turbopack runtime and the build manifest's `rootMainFiles`), 209 610 B is
+   registry runtime (the shared Motion engine — `framer-motion` plus the `registry/cadence/lib/` executors —
+   the components the site chrome mounts on every page — Select in the header, Tabs, ToggleGroup/Toggle,
+   code-block, Breadcrumb, Toc — and the Base UI and `tailwind-merge` code those import), 6 361 B is the
+   site's own chrome (16 569 B uncompressed: sidebar 10 670, header motion-mode controls 3 453,
+   package-manager context 2 360), 1 876 B is chunk scaffolding and 13 180 B is the gzip dictionary those
+   bodies share, which is a property of the container rather than a fifth category. Documentation-only code
+   measures 0 B in the shell. Nothing in that list was removable: every body is rendered by every component
+   route, the shell holds 8 `lucide` icon definitions rather than the library, its only duplicated bodies are
+   three 37 B re-export shims, and build-time highlighting ships no client highlighter. The 209 610 B
+   therefore stands as irreducible without removing a feature the catalogue renders, and the split describes
+   the cost rather than approving it.
    Keep the permanent `tests/e2e/site-js-budget.spec.ts` collector with its automatic-request, served-root
    hash, example-count, cold-layout and error assertions.
 2. **Six routes above the route remainder.** `chart` 137 300, `code-block` 87 600, `date-picker` 57 400,
