@@ -1,3 +1,4 @@
+import type { StyleBatch } from "./invalidation";
 import { type CadenceMode, textProofLimits } from "./motion";
 import { knownTextGeometry } from "./motion-transaction";
 import type { TextSnapshot, TextUnit } from "./text-diff";
@@ -437,48 +438,48 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
 }
 
 /** Exact inherited paint/allocation signature for native-height receipt coordination. */
-export function textPaintSignature(chain: readonly HTMLElement[], view: Window | null) {
+export function textPaintSignature(chain: readonly HTMLElement[], view: Window | null, batch?: StyleBatch) {
+  const project = (css: CSSStyleDeclaration) => ({
+    paint: [
+      css.font || `${css.fontStyle} ${css.fontWeight} ${css.fontSize}/${css.lineHeight} ${css.fontFamily}`,
+      css.color,
+      css.whiteSpace,
+      css.letterSpacing,
+      css.wordSpacing,
+      css.textTransform,
+      css.textDecorationLine,
+      css.fontFeatureSettings,
+      css.fontVariationSettings,
+      css.opacity,
+      css.visibility,
+      css.display,
+      css.translate,
+      css.scale,
+      css.rotate,
+      css.filter,
+      css.perspective,
+      css.position,
+      css.overflowX,
+      css.overflowY,
+      css.clipPath,
+      css.maskImage,
+      css.backdropFilter,
+      css.contentVisibility,
+      css.contain,
+      css.willChange,
+      css.borderTopLeftRadius,
+      css.borderTopRightRadius,
+      css.borderBottomLeftRadius,
+      css.borderBottomRightRadius,
+      css.zoom,
+    ].join("/"),
+    width: css.width,
+    height: css.height,
+    transform: css.transform,
+  });
   return chain.map((node) => {
+    if (batch) return batch.memo(node, "text-paint", project);
     const css = view?.getComputedStyle(node);
-    return css
-      ? {
-          paint: [
-            css.font || `${css.fontStyle} ${css.fontWeight} ${css.fontSize}/${css.lineHeight} ${css.fontFamily}`,
-            css.color,
-            css.whiteSpace,
-            css.letterSpacing,
-            css.wordSpacing,
-            css.textTransform,
-            css.textDecorationLine,
-            css.fontFeatureSettings,
-            css.fontVariationSettings,
-            css.opacity,
-            css.visibility,
-            css.display,
-            css.translate,
-            css.scale,
-            css.rotate,
-            css.filter,
-            css.perspective,
-            css.position,
-            css.overflowX,
-            css.overflowY,
-            css.clipPath,
-            css.maskImage,
-            css.backdropFilter,
-            css.contentVisibility,
-            css.contain,
-            css.willChange,
-            css.borderTopLeftRadius,
-            css.borderTopRightRadius,
-            css.borderBottomLeftRadius,
-            css.borderBottomRightRadius,
-            css.zoom,
-          ].join("/"),
-          width: css.width,
-          height: css.height,
-          transform: css.transform,
-        }
-      : null;
+    return css ? project(css) : null;
   });
 }

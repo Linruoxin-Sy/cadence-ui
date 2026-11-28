@@ -1,6 +1,7 @@
 "use client";
 
 import type { createCapturedHandoff } from "./captured-handoff";
+import { type Invalidation, invalidateBatch, type StyleBatch, subscribeNodes } from "./invalidation";
 import {
   bindMotionParameters,
   handoffValue,
@@ -34,6 +35,8 @@ import {
 } from "./text-layout";
 
 const binding = bindMotionParameters(textReplace, "text.change/changed-runs");
+/** Attributes this host reacts to on itself and on its ancestors; the bus observes their union. */
+const TEXT_ATTRIBUTES = ["class", "style", "hidden", "inert", "dir", "contenteditable"];
 type Capture = Parameters<ReturnType<typeof createCapturedHandoff>["commit"]>[0]["capture"];
 let nextMask = 0;
 export interface TextPresentationCommit {
@@ -92,7 +95,8 @@ export function createTextPresentation(
   let releaseLayoutAnchor: (() => void) | null = null;
   let mask: { name: string; highlight: Highlight; sheet: CSSStyleSheet } | null = null;
   let environment: MotionEnvironment = { hidden: false, immediate: false, reduced: false, themeOwned: false };
-  const signature = () => textPaintSignature(chain, view);
+  let batch: StyleBatch | undefined;
+  const signature = () => textPaintSignature(chain, view, batch);
   let auditFrame: number | null = null;
   let paintSignature: ReturnType<typeof signature> = [];
   const sameSignature = (nativeHeight: ReadonlySet<HTMLElement> = new Set()) => {
@@ -121,6 +125,9 @@ export function createTextPresentation(
   };
   const plain = () => host.childNodes.length <= 1 && (!host.firstChild || host.firstChild.nodeType === 3);
   const stop = () => {
+    // Only a stop that actually changes the document can stale a shared read; an idle host that simply
+    // re-compares its signature must not drop the batch for the hosts after it.
+    if (auditFrame !== null || animations.length || mask || layer || lease) invalidateBatch();
     if (auditFrame !== null) view?.cancelAnimationFrame(auditFrame);
     auditFrame = null;
     generation++;
@@ -165,17 +172,29 @@ export function createTextPresentation(
     )
       stop();
   };
-  const mutations = new MutationObserver((changes) => {
-    const nativeHeight = current?.stripGeometry ? nativeTextHeightEcho(changes, host) : new Set<HTMLElement>();
-    if (changes.some((change) => change.type !== "attributes") || !sameSignature(nativeHeight)) stop();
-    restrictions();
-    if (changes.some((change) => change.type !== "attributes")) {
-      if (editing) nativeOwned = true;
-      snapshot = createTextSnapshot(host.textContent ?? "", current?.locale);
-      baseline = true;
-    }
-  });
   const chain: HTMLElement[] = [];
+  let link: Invalidation | null = null;
+  /** One delivery per host per checkpoint: the bus's ancestor records and this host's own records arrive
+   * together, so `nativeTextHeightEcho` and `sameSignature` see the same set they saw with one observer. */
+  const handle = (changes: readonly MutationRecord[], delivered?: StyleBatch) => {
+    if (!alive) return;
+    batch = delivered;
+    try {
+      const nativeHeight = current?.stripGeometry ? nativeTextHeightEcho(changes, host) : new Set<HTMLElement>();
+      if (changes.some((change) => change.type !== "attributes") || !sameSignature(nativeHeight)) stop();
+      restrictions();
+      if (changes.some((change) => change.type !== "attributes")) {
+        if (editing) nativeOwned = true;
+        snapshot = createTextSnapshot(host.textContent ?? "", current?.locale);
+        baseline = true;
+      }
+    } finally {
+      batch = undefined;
+    }
+  };
+  // Host-local observer: this host's own attributes, its descendants' attributes and its text. The bus
+  // covers the ancestors, and `takeRecords()` below stays on this observer — never on the shared one.
+  const mutations = new MutationObserver((changes) => link?.enqueue(changes));
   const transition = (event: TransitionEvent) => {
     // Capture sees sibling/descendant feedback too. Only this host's actual
     // ancestor chain can invalidate its raster correspondence.
@@ -183,17 +202,17 @@ export function createTextPresentation(
   };
   for (let node: HTMLElement | null = host; node; node = node.parentElement) {
     chain.push(node);
-    mutations.observe(node, {
-      attributes: true,
-      attributeOldValue: true,
-      attributeFilter: ["class", "style", "hidden", "inert", "dir", "contenteditable"],
-    });
     node.addEventListener("transitionrun", transition, true);
   }
+  link = subscribeNodes({
+    nodes: chain.slice(1),
+    attributes: TEXT_ATTRIBUTES,
+    onInvalidate: handle,
+  });
   paintSignature = signature();
   mutations.observe(host, {
     attributes: true,
-    attributeFilter: ["class", "style", "hidden", "inert", "dir", "contenteditable"],
+    attributeFilter: TEXT_ATTRIBUTES,
     childList: true,
     characterData: true,
     subtree: true,
@@ -316,6 +335,7 @@ export function createTextPresentation(
     snapshot = diff.snapshot;
     mutations.takeRecords();
     expectedSize = host.getBoundingClientRect();
+    invalidateBatch();
     paintSignature = signature();
     return text;
   };
@@ -754,6 +774,8 @@ export function createTextPresentation(
       if (sharedHandoff) handoff?.cancel();
       else handoff?.dispose();
       registration.dispose();
+      link?.dispose();
+      link = null;
       mutations.disconnect();
       resize.disconnect();
       unsubscribe();

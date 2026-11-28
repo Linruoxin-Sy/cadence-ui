@@ -1327,7 +1327,11 @@ unavailable. No glyph inline-block, typography override, extra text tree or oute
 A temporary empty baseline probe must leave native layout rectangles unchanged and is removed before paint.
 The changed-text controller explicitly permits known background, border-colour and box-shadow
 transitions on its ancestor chain: these change neither glyph ink nor its coordinate map, so their
-native transition events do not cancel that text writer. The final-width selection-strip and
+native transition events do not cancel that text writer. Ancestor invalidation is shared rather than
+per host: each controller registers its ancestors on one per-document bus, and a single delivery reads
+each node's computed style once for every host that reacts to that node. A host that cancels a writer
+invalidates the current delivery's reads before the next host runs, so a shared read never outlives the
+write it should have seen. The final-width selection-strip and
 explicit non-scaling Label measured adapters may
 also explicitly opt into preserving changed-text paint through its own non-scaling geometry. Admission
 requires the actual Animation, exact effect target and property set, current transaction lease and committed full-mode
