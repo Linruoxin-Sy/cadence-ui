@@ -125,7 +125,9 @@ export function createTextPresentation(
   };
   const plain = () => host.childNodes.length <= 1 && (!host.firstChild || host.firstChild.nodeType === 3);
   const stop = () => {
-    invalidateBatch();
+    // Only a stop that actually changes the document can stale a shared read; an idle host that simply
+    // re-compares its signature must not drop the batch for the hosts after it.
+    if (auditFrame !== null || animations.length || mask || layer || lease) invalidateBatch();
     if (auditFrame !== null) view?.cancelAnimationFrame(auditFrame);
     auditFrame = null;
     generation++;

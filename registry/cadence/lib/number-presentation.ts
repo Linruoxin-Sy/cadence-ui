@@ -94,7 +94,9 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   }[] = [];
   const plain = () => host.childNodes.length <= 1 && (!host.firstChild || host.firstChild.nodeType === 3);
   const stop = () => {
-    invalidateBatch();
+    // Only a stop that actually changes the document can stale a shared read; an idle host that simply
+    // re-compares its signature must not drop the batch for the hosts after it.
+    if (lanes.length || mask || layer || lease || releaseLayoutAnchor) invalidateBatch();
     generation++;
     const old = lanes;
     lanes = [];
