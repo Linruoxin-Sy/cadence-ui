@@ -289,6 +289,19 @@ class; monitored never means "not measured", and deployment never turns an excee
    the device criterion as unmeasured and unwaived. Acceptance was not granted by F03 and this decision does not
    grant it.
 
+   **The text half of that fan-out is measured, not argued.** The first slice of #189 replaced the per-host
+   ancestor observers with one bus per document: a single delivery shares each node's computed-style read across
+   every host that reacts to it, the host keeps its own observer for its subtree, and a stop that actually
+   changes the document still invalidates the delivery. On 390, computed-style reads in the `dialog`/`select`
+   click window fall from 2 348 to 884 and from 16 991 to 15 326; the remaining select reads are the token-scope
+   publish below, which this slice does not touch. Same host, same protocol, two windows per width, baseline
+   `152ef723` (build `7pjdp7ggYTI1jKAwvCP8v`) against `1d5f1239` (build `svc-i-N4YNx5pCX4k14Fy`): `select`'s
+   longest block moves from 145.0/158.2 ms to 124.6/124.5 ms at 390 and from 130.2/126.4 ms to 122.9/122.0 ms at
+   1280, and `dialog`'s share stays inside the instrument's ±1-frame band at 0.69–0.93% on both. Every window in
+   that pair sits inside both limits, which is a measurement and not an acceptance: ADR-028's reopening clause
+   expects a new ADR to record it, the token-scope slice of #189 is still open, and this entry keeps reporting
+   both proxies on every sweep.
+
 Before adoption, reconcile the implementation with API/motion/SSR/accessibility/docs/distribution
 contracts, current payloads and frozen snapshots. Reuse still-applicable tests; verify actual changed
 paths, stop task-owned services and remove unused generated artifacts. Do not infer performance
