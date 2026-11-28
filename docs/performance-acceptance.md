@@ -61,6 +61,10 @@ it names is over. So the breach is recorded against `dialog`@390, tracked in
 of being left to whoever reads the two documents next. If the pooled reading is what ADR-026 intended, that is an
 ADR decision and not a page edit.
 
+[ADR-028](adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver) made that
+decision: `frame-share` is the worst single route cell, not a pooled share, so the per-route figure this
+page reports is the metric and no number above moves.
+
 ## The run, in the order it was taken
 
 ```bash
@@ -136,8 +140,14 @@ sweep independently recorded CLS 0.00000 in all 14 cells.
   exceedances.
 - `frame-share` and `frame-block` — filed as [#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180) with
   both runs and an unmodified-collector control run. It reproduces (`dialog` 1.18/1.17/1.18%, `select` 192/174/165
-  ms), so it is neither a harness artifact nor a single-window fluke. No attribution is claimed: nothing here
-  says whether the block is the modal entrance, the popup's layout work, or host contention.
+  ms), so it is neither a harness artifact nor a single-window fluke. #180 then attributed it, in #187 and on the
+  S03-C windows: not the entrance (the block survives `?motion=none`, and style plus layout account for 1–8 ms),
+  not the popup's own measurement, not the host — but the document-wide derivation fan-out a root-level change
+  triggers, 113 text-presentation deliveries in a single `dialog` task and a 65.6 ms token-scope publish in
+  `select`'s. [ADR-028](adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver)
+  dispositions it **without naming an exception**, because an implementation can remove that cost: both windows
+  stay recorded as exceedances here, and [#189](https://github.com/Linruoxin-Sy/cadence-ui/issues/189) owns the
+  work.
 - The 366 KB shell — [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177) attributed it after this
   run, and it is the reason `page-total` sits at 503 KB while remaining inside its drift ceiling. The split is
   recorded in [parity-plan.md §8](parity-plan.md#8-next-work): 135 115 B framework baseline, 209 610 B registry
@@ -146,6 +156,9 @@ sweep independently recorded CLS 0.00000 in all 14 cells.
   decision and its acceptances stand as measured.
 - Device ≥ 55 fps — no issue is filed, because an issue would not produce a phone; it stays unmeasured until a
   device trace exists, exactly as ADR-026 says.
+  [ADR-028](adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver) records that
+  as a disposition rather than a pending filing: unmeasured, unwaived and not substitutable by any desktop proxy,
+  so it is not a pass, not a failure, and not something a later sweep can close.
 
 No budget, limit, method or threshold was changed to produce this page. The only source F03 touched is
 measurement code.

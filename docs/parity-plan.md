@@ -282,6 +282,12 @@ class; monitored never means "not measured", and deployment never turns an excee
    `select` change moves either figure. Both
    proxies are still at or over their limits on this host, this entry records an attribution and not an acceptance,
    and the device criterion remains unmeasured. Desktop emulation and rAF frequency cannot close that requirement.
+   [ADR-028](adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver) is the
+   disposition ADR-026 requires, and it names **no exception**: the cause is a removable runtime cost, so both
+   windows stay recorded as failures and [#189](https://github.com/Linruoxin-Sy/cadence-ui/issues/189) owns the
+   work; it also fixes `frame-share` as the worst single route cell rather than a pooled share, and dispositions
+   the device criterion as unmeasured and unwaived. Acceptance was not granted by F03 and this decision does not
+   grant it.
 
 Before adoption, reconcile the implementation with API/motion/SSR/accessibility/docs/distribution
 contracts, current payloads and frozen snapshots. Reuse still-applicable tests; verify actual changed
