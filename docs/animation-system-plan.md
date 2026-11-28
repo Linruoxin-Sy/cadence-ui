@@ -242,7 +242,11 @@ inside `pnpm check` through `tests/lib/performance-budgets.test.tsx`, while the 
 need a production build and a 15-minute browser sweep that required CI does not run. Their values are
 recorded per sweep in `.cache/` and compared against the table; the acceptance run that reads them is
 [performance-acceptance.md](performance-acceptance.md), and it did not meet ADR-026's conditions: three
-monitored metrics are over their limits and no mid-range device trace exists for ≥ 55 fps. Historical
+monitored metrics are over their limits and no mid-range device trace exists for ≥ 55 fps. What S03
+delivered afterwards moved no number on that page and is not a pass either: #177 attributed the 366 142 B
+shared shell, #178 dispositioned the six route remainders in
+[ADR-027](adr.md#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item), and
+#180 attributed the two frame windows in #187. Historical
 failures and missing measurements stay source-bound: the 120 KB page bar was never met, 23 of 63 items
 exceeded the retired tier ladder, and no device frame trace exists.
 [parity-plan.md](parity-plan.md#8-next-work) records what is still open against that decision.
