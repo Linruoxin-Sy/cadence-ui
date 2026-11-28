@@ -299,8 +299,9 @@ class; monitored never means "not measured", and deployment never turns an excee
    longest block moves from 145.0/158.2 ms to 124.6/124.5 ms at 390 and from 130.2/126.4 ms to 122.9/122.0 ms at
    1280, and `dialog`'s share stays inside the instrument's ±1-frame band at 0.69–0.93% on both. Every window in
    that pair sits inside both limits, which is a measurement and not an acceptance: ADR-028's reopening clause
-   expects a new ADR to record it, the token-scope slice of #189 is still open, and this entry keeps reporting
-   both proxies on every sweep.
+   expects a new ADR to record it. The token-scope slice and the shared `transitionrun` capture have landed
+   since, but neither carries a recorded sweep of its own, so no number in this entry moved and it keeps
+   reporting both proxies on every sweep.
 
 Before adoption, reconcile the implementation with API/motion/SSR/accessibility/docs/distribution
 contracts, current payloads and frozen snapshots. Reuse still-applicable tests; verify actual changed

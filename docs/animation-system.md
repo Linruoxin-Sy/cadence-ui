@@ -1331,7 +1331,14 @@ native transition events do not cancel that text writer. Ancestor invalidation i
 per host: each controller registers its ancestors on one per-document bus, and a single delivery reads
 each node's computed style once for every host that reacts to that node. A host that cancels a writer
 invalidates the current delivery's reads before the next host runs, so a shared read never outlives the
-write it should have seen. The final-width selection-strip and
+write it should have seen. That bus owns one capture listener for `transitionrun` per document and
+resolves the target through the same node index, so a chain is not listened to once per host; delivery
+still reaches only the hosts whose own chain contains the target, which keeps the surface carve-outs
+above exactly as they were. Token scopes read their chain and their token probes through the same bus
+and the same per-delivery batch, so one token publish evaluates each chain node and each probe once for
+every scope on the page rather than once per scope; the batch is opened for the synchronous publish and
+dies with it, and a scope read taken outside a publish still reads for itself. The final-width
+selection-strip and
 explicit non-scaling Label measured adapters may
 also explicitly opt into preserving changed-text paint through its own non-scaling geometry. Admission
 requires the actual Animation, exact effect target and property set, current transaction lease and committed full-mode

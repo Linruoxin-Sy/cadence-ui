@@ -196,18 +196,17 @@ export function createTextPresentation(
   // covers the ancestors, and `takeRecords()` below stays on this observer — never on the shared one.
   const mutations = new MutationObserver((changes) => link?.enqueue(changes));
   const transition = (event: TransitionEvent) => {
-    // Capture sees sibling/descendant feedback too. Only this host's actual
-    // ancestor chain can invalidate its raster correspondence.
-    if (chain.includes(event.target as HTMLElement) && !textSurfacePaint(event.propertyName)) stop();
+    // The bus only delivers a transition that reached this host's own chain, so sibling and descendant
+    // feedback stays out exactly as it did with a capture listener per chain node.
+    if (!textSurfacePaint(event.propertyName)) stop();
   };
-  for (let node: HTMLElement | null = host; node; node = node.parentElement) {
-    chain.push(node);
-    node.addEventListener("transitionrun", transition, true);
-  }
+  for (let node: HTMLElement | null = host; node; node = node.parentElement) chain.push(node);
   link = subscribeNodes({
     nodes: chain.slice(1),
+    transitionNodes: chain,
     attributes: TEXT_ATTRIBUTES,
     onInvalidate: handle,
+    onTransition: transition,
   });
   paintSignature = signature();
   mutations.observe(host, {
@@ -789,7 +788,6 @@ export function createTextPresentation(
       view?.visualViewport?.removeEventListener("resize", stop);
       view?.visualViewport?.removeEventListener("scroll", stop);
       doc.fonts?.removeEventListener("loadingdone", stop);
-      for (const node of chain) node.removeEventListener("transitionrun", transition, true);
     },
   };
 }
