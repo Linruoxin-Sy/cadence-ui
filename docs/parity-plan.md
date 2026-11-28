@@ -269,9 +269,19 @@ class; monitored never means "not measured", and deployment never turns an excee
    to the acceptance run, which had no device and recorded it as **unmeasured**, not as failed. That run records
    environment and refresh metadata and main-thread cadence instead of presented frames; the desktop proxies —
    p95 interval, share of frames over 25 ms and the longest long-animation-frame entry — are labelled that way
-   and never presented as frames. Both proxies are over their limits on the current source (`dialog` 1.18% at 390,
-   `select` 192 ms), tracked in [#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180). Desktop emulation
-   and rAF frequency cannot close this requirement.
+   and never presented as frames. [#180](https://github.com/Linruoxin-Sy/cadence-ui/issues/180) attributed the two
+   recorded exceedances instead of removing them. Re-measured on `c9e24430` (build `WlrzJ1Xt5BkqDAYYQMyoL`, 164 Hz
+   idle cadence, three windows per width), `select` at 390 still crosses the block limit in two of three windows
+   (152.8 and 158.7 ms against 150) and `dialog`'s frame share straddles its own: 0.69%, 0.92% and 1.15% at 390,
+   0.69%, 1.15% and 0.92% at 1280 — three to five long frames around a limit of 4.3 in a settled window, which is
+   the instrument's own ±1 tolerance and not a width effect. Neither is the entrance: the same 60–120 ms tasks run
+   under `?motion=none` and `?motion=reduced`, with style and layout accounting for 1–8 ms of each. They are the
+   shared derivation cascade a popup's mount perturbs — one mutation-observer delivery per text-presentation host on
+   the route (113 deliveries inside a single `dialog` task, on a route that rests at 97 text parts), each re-reading
+   its ancestor chain, plus the token-scope publish a route's first colour-owner probe triggers — so no `dialog` or
+   `select` change moves either figure. Both
+   proxies are still at or over their limits on this host, this entry records an attribution and not an acceptance,
+   and the device criterion remains unmeasured. Desktop emulation and rAF frequency cannot close that requirement.
 
 Before adoption, reconcile the implementation with API/motion/SSR/accessibility/docs/distribution
 contracts, current payloads and frozen snapshots. Reuse still-applicable tests; verify actual changed
