@@ -222,7 +222,7 @@ if (pageRows.length) {
     worstRemainder.gzip,
     limit("route-remainder"),
     over.length
-      ? `${over.length} route-viewport cell(s) tracked in #178: ${over
+      ? `${over.length} route-viewport cell(s) dispositioned in ADR-027: ${over
           .map((row) => `${row.route}@${row.viewport} ${row.gzip}`)
           .join(", ")}`
       : `no component route-viewport cell over the bar; worst ${worstRemainder.route}@${worstRemainder.viewport}`,

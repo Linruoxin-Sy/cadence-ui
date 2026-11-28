@@ -157,7 +157,8 @@ measurement code.
   absence at measurement time nor its fix moves a number here.
 - **Not a device result.** Two monitored proxies on a 165 Hz desktop host are not ≥ 55 fps on a phone.
 - **Not a clean bill for `page-total`.** 503 395 B is inside a drift ceiling that ADR-026 explicitly calls
-  "not a quality claim"; 366 142 B of it is a shell nobody has attributed yet.
+  "not a quality claim"; 366 142 B of it is the shell [#177](https://github.com/Linruoxin-Sy/cadence-ui/issues/177)
+  attributed without reducing it.
 - **Not a waiver of the failures.** `route-remainder` and the two frame windows are recorded as exceedances and
   tracked, not relabelled as noise. The historical 120 KB page bar stays recorded as never met.
 
