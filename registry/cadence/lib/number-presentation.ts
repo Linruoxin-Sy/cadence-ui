@@ -1,6 +1,7 @@
 "use client";
 
 import { animateSingleValue, motionValue, type Transition } from "motion/react";
+import { type Invalidation, invalidateBatch, type StyleBatch, subscribeNodes } from "./invalidation";
 import { bindMotionParameters, motionLimits, numberCompact, numberRoll, textProofLimits } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import {
@@ -28,6 +29,9 @@ import {
   selectedTextContext,
   textPaintSignature,
 } from "./text-layout";
+
+/** Attributes this host reacts to on itself and on its ancestors; the bus observes their union. */
+const NUMBER_ATTRIBUTES = ["class", "style", "hidden", "inert", "aria-hidden", "dir", "contenteditable"];
 
 export interface NumberPresentationCommit {
   snapshot: NumberSnapshot;
@@ -90,6 +94,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   }[] = [];
   const plain = () => host.childNodes.length <= 1 && (!host.firstChild || host.firstChild.nodeType === 3);
   const stop = () => {
+    invalidateBatch();
     generation++;
     const old = lanes;
     lanes = [];
@@ -133,51 +138,58 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       stop();
   };
   const chain: HTMLElement[] = [];
+  let link: Invalidation | null = null;
+  let batch: StyleBatch | undefined;
   let paintSignature: ReturnType<typeof textPaintSignature> = [];
   const transition = (event: TransitionEvent) => {
     // A sibling's hover/focus transition does not move or repaint this glyph.
     if (chain.includes(event.target as HTMLElement)) stop();
   };
-  const observer = new MutationObserver((changes) => {
-    const nativeHeight = nativeTextHeightEcho(changes, host);
-    const next = nativeHeight.size ? textPaintSignature(chain, view) : [];
-    const echoed =
-      next.length > 0 &&
-      next.length === paintSignature.length &&
-      next.every((value, index) => {
-        const before = paintSignature[index];
-        const node = chain[index];
-        return (
-          value &&
-          before &&
-          node &&
-          value.paint === before.paint &&
-          value.width === before.width &&
-          value.transform === before.transform &&
-          (nativeHeight.has(node) || value.height === before.height)
-        );
-      });
-    if (echoed) paintSignature = next;
-    else stop();
-    restrict();
-    if (changes.some((change) => change.type !== "attributes")) {
-      if (editing) nativeOwned = true;
-      snapshot = null;
-      baseline = true;
+  /** One delivery per host per checkpoint; ancestor records arrive through the bus, the host's own
+   * attributes and content through the local observer below. */
+  const handle = (changes: readonly MutationRecord[], delivered?: StyleBatch) => {
+    if (!alive) return;
+    batch = delivered;
+    try {
+      const nativeHeight = nativeTextHeightEcho(changes, host);
+      const next = nativeHeight.size ? textPaintSignature(chain, view, batch) : [];
+      const echoed =
+        next.length > 0 &&
+        next.length === paintSignature.length &&
+        next.every((value, index) => {
+          const before = paintSignature[index];
+          const node = chain[index];
+          return (
+            value &&
+            before &&
+            node &&
+            value.paint === before.paint &&
+            value.width === before.width &&
+            value.transform === before.transform &&
+            (nativeHeight.has(node) || value.height === before.height)
+          );
+        });
+      if (echoed) paintSignature = next;
+      else stop();
+      restrict();
+      if (changes.some((change) => change.type !== "attributes")) {
+        if (editing) nativeOwned = true;
+        snapshot = null;
+        baseline = true;
+      }
+    } finally {
+      batch = undefined;
     }
-  });
+  };
+  const observer = new MutationObserver((changes) => link?.enqueue(changes));
   for (let node: HTMLElement | null = host; node; node = node.parentElement) {
     chain.push(node);
-    observer.observe(node, {
-      attributes: true,
-      attributeOldValue: true,
-      attributeFilter: ["class", "style", "hidden", "inert", "aria-hidden", "dir", "contenteditable"],
-    });
     node.addEventListener("transitionrun", transition, true);
   }
+  link = subscribeNodes({ nodes: chain.slice(1), attributes: NUMBER_ATTRIBUTES, onInvalidate: handle });
   observer.observe(host, {
     attributes: true,
-    attributeFilter: ["class", "style", "hidden", "inert", "aria-hidden", "dir", "contenteditable"],
+    attributeFilter: NUMBER_ATTRIBUTES,
     childList: true,
     characterData: true,
     subtree: true,
@@ -399,7 +411,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       snapshot = plan.snapshot;
       baseline = false;
       const after = before && proveTextLayout(host, textSnapshot(snapshot));
-      paintSignature = textPaintSignature(chain, view);
+      paintSignature = textPaintSignature(chain, view, batch);
       observer.takeRecords();
       if (
         !before ||
@@ -590,6 +602,8 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       alive = false;
       stop();
       registration.dispose();
+      link?.dispose();
+      link = null;
       observer.disconnect();
       resize.disconnect();
       unsubscribe();

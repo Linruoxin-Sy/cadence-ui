@@ -1,5 +1,5 @@
 import { act, cleanup, render } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useMotionHostRef } from "@/registry/cadence/lib/motion-ref";
 import { createMotionTransaction } from "@/registry/cadence/lib/motion-transaction";
 import { type CadenceMotion, CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
@@ -207,5 +207,34 @@ describe("internal native text boundary", () => {
     );
     expect(host.firstChild).toBe(text);
     expect(host.textContent).toBe("Save!");
+  });
+});
+
+// The measured cost of a popup mount was one chain read per text host for the same DOM state. The bus
+// shares those reads within a delivery; this pins the property on the real controller rather than on the
+// module alone.
+describe("shared paint reads", () => {
+  it("reads each distinct node once for every host under the same ancestor", async () => {
+    const wrapper = document.createElement("div");
+    document.body.append(wrapper);
+    const hosts = [document.createElement("span"), document.createElement("span")];
+    for (const host of hosts) {
+      host.textContent = "text";
+      wrapper.append(host);
+    }
+    const presentations = hosts.map((host) => createTextPresentation(host));
+    try {
+      const style = vi.spyOn(window, "getComputedStyle");
+      style.mockClear();
+      document.documentElement.className = "shared-paint-read";
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      // Two hosts, one wrapper, body and html: five distinct nodes. Without the shared batch this is
+      // eight reads, one full chain per host.
+      expect(style.mock.calls.length).toBeGreaterThan(0);
+      expect(style.mock.calls.length).toBeLessThanOrEqual(5);
+    } finally {
+      for (const presentation of presentations) presentation.dispose();
+      wrapper.remove();
+    }
   });
 });

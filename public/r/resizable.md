@@ -54,6 +54,7 @@ npm install clsx tailwind-merge motion react-resizable-panels@4.16.0 lucide-reac
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/invalidation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | resizable | `@components/cadence/resizable/index.tsx` | [JSON files[].content](https://cadence.dev/r/resizable.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)

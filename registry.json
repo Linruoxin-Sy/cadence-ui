@@ -1733,6 +1733,11 @@
           "path": "registry/cadence/lib/inline-presence.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/inline-presence.ts"
+        },
+        {
+          "path": "registry/cadence/lib/invalidation.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/invalidation.ts"
         }
       ]
     },
