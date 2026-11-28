@@ -2,6 +2,7 @@
 
 import type { CSSProperties, RefObject } from "react";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { currentBatch, type StyleBatch, subscribeNodes, withBatch } from "./invalidation";
 import {
   cssEasing,
   defaultMotionTokens,
@@ -86,9 +87,14 @@ function snapshot(
 
 export const defaultMotionScope = snapshot(defaultMotionTokens(), {}, false, null, false);
 
-/** Call after a CSSOM-only edit or an application-specific non-DOM theme signal. */
+/** Call after a CSSOM-only edit or an application-specific non-DOM theme signal. The whole synchronous
+ * fan-out shares one batch, so every scope evaluating the same chain node or the same token probe does it
+ * once rather than once per scope. */
 export function refreshCadenceMotionTokens() {
-  if (typeof document !== "undefined") document.dispatchEvent(new Event(TOKEN_EVENT));
+  if (typeof document === "undefined") return;
+  const view = document.defaultView;
+  if (view) withBatch(view, () => document.dispatchEvent(new Event(TOKEN_EVENT)));
+  else document.dispatchEvent(new Event(TOKEN_EVENT));
 }
 
 /** Private fallbacks transport inputs without overriding the actual part's public CSS variables. */
@@ -116,22 +122,35 @@ export function motionScopeStyle(scope: MotionScopeSnapshot, timeScale: number):
 const simpleNumber = /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i;
 const simpleUnit = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*(ms|s|px|deg)$/i;
 
-/** Committed client read only. No rectangle reads, rendering engines or animation writers. */
-export function readMotionTokenScope(element: MotionElement, inherited = defaultMotionScope): MotionScopeSnapshot {
+/** Committed client read only. No rectangle reads, rendering engines or animation writers.
+ * `batch` shares the chain and probe reads with every other scope notified in the same delivery or publish.
+ * Without one, the read still joins whatever batch the current synchronous work opened — a token publish
+ * opens one for its whole `dispatchEvent` fan-out — and outside any batch it reads for itself, as a
+ * commit-time refresh wants. */
+export function readMotionTokenScope(
+  element: MotionElement,
+  inherited = defaultMotionScope,
+  batch = currentBatch() ?? undefined,
+): MotionScopeSnapshot {
   const view = element.ownerDocument.defaultView;
   if (!view) return inherited;
-  const css = view.getComputedStyle(element);
+  const css = batch?.style(element) ?? view.getComputedStyle(element);
   const supported = css.getPropertyValue("--motion-source-version").trim() === String(motionCssVersion);
   if (!supported) return snapshot(defaultMotionTokens(), {}, false, element);
   const tokens = defaultMotionTokens();
   const evaluate = (raw: string, property: "transitionDuration" | "marginLeft" | "rotate" | "flexGrow") => {
     if (raw.includes("%") || /anchor(?:-size)?\(/i.test(raw))
       throw new RangeError("Motion token units cannot depend on percentage/anchor geometry");
-    const probe = isolatedProbe(element.ownerDocument, css, element);
-    probe.style[property] = "";
-    probe.style[property] = raw;
-    if (!probe.style[property]) throw new RangeError(`Invalid motion token: ${raw}`);
-    return view.getComputedStyle(probe)[property];
+    const measure = () => {
+      const probe = isolatedProbe(element.ownerDocument, css, element);
+      probe.style[property] = "";
+      probe.style[property] = raw;
+      if (!probe.style[property]) throw new RangeError(`Invalid motion token: ${raw}`);
+      return view.getComputedStyle(probe)[property];
+    };
+    // The probe is one shared element whose font context is copied from this element, so a probe result is
+    // only reusable for the element it was measured against — not document-wide.
+    return batch ? batch.memo(element, `probe:${property}:${raw}`, measure) : measure();
   };
   const numeric = (raw: string, unit: MotionTokenEntry["unit"]): number => {
     let text = raw;
@@ -195,7 +214,7 @@ export function readMotionTokenScope(element: MotionElement, inherited = default
     for (let node: MotionElement | null = element; node && node !== boundary; node = node.parentElement)
       ancestors.push(node);
     for (const node of ancestors.reverse()) {
-      const style = node === element ? css : view.getComputedStyle(node);
+      const style = node === element ? css : (batch?.style(node) ?? view.getComputedStyle(node));
       for (const key of Object.keys(tokens.duration) as (keyof typeof tokens.duration)[]) {
         const raw = style.getPropertyValue(`--motion-duration-${key}`).trim();
         if (raw && (!isGeneratedMotionTime(raw) || (node !== element && /\+\s*0s\s*\*\s*2\s*\)$/.test(raw)))) {
@@ -218,27 +237,33 @@ function tokenStyle(text: string | null) {
     .join(";");
 }
 
-function observeScope(element: MotionElement, refresh: () => void, root = false) {
+/** Attributes whose change can alter a public token declaration on a scope chain. */
+const SCOPE_ATTRIBUTES = ["class", "style", "data-motion", "data-theme", "data-color-scheme", "lang", "dir"];
+
+function observeScope(element: MotionElement, refresh: (batch?: StyleBatch) => void, root = false) {
   const doc = element.ownerDocument;
   const view = doc.defaultView;
   if (!view) return () => {};
-  const observer = new MutationObserver((records) => {
-    if (
-      records.some(
-        (record) =>
-          record.attributeName !== "style" ||
-          tokenStyle(record.oldValue) !== tokenStyle((record.target as HTMLElement).getAttribute("style")),
+  const chain: MotionElement[] = [];
+  for (let node: MotionElement | null = element; node; node = node.parentElement) chain.push(node);
+  // Same bus and same batch as the text and number hosts, so one root-level write reads each chain node and
+  // evaluates each token probe once for every scope on the page instead of once per scope.
+  const link = subscribeNodes({
+    nodes: chain,
+    attributes: SCOPE_ATTRIBUTES,
+    onInvalidate(records, batch) {
+      if (
+        records.some(
+          (record) =>
+            record.attributeName !== "style" ||
+            tokenStyle(record.oldValue) !== tokenStyle((record.target as Element).getAttribute("style")),
+        )
       )
-    )
-      refresh();
+        refresh(batch);
+    },
   });
-  for (let node: MotionElement | null = element; node; node = node.parentElement)
-    observer.observe(node, {
-      attributes: true,
-      attributeOldValue: true,
-      attributeFilter: ["class", "style", "data-motion", "data-theme", "data-color-scheme", "lang", "dir"],
-    });
-  const stylesheetChanged = () => doc.dispatchEvent(new Event(TOKEN_EVENT));
+  const reload = () => refresh();
+  const stylesheetChanged = () => withBatch(view, () => doc.dispatchEvent(new Event(TOKEN_EVENT)));
   const head = root
     ? new MutationObserver((records) => {
         if (
@@ -260,20 +285,20 @@ function observeScope(element: MotionElement, refresh: () => void, root = false)
     attributes: true,
     attributeFilter: ["href", "media", "disabled"],
   });
-  view.addEventListener("resize", refresh);
-  doc.addEventListener(TOKEN_EVENT, refresh);
+  view.addEventListener("resize", reload);
+  doc.addEventListener(TOKEN_EVENT, reload);
   if (root) doc.head.addEventListener("load", stylesheetChanged, true);
   if (root) doc.fonts?.addEventListener("loadingdone", stylesheetChanged);
   const preference = root ? view.matchMedia("(prefers-reduced-motion: reduce)") : undefined;
-  preference?.addEventListener("change", refresh);
+  preference?.addEventListener("change", reload);
   return () => {
-    observer.disconnect();
+    link.dispose();
     head?.disconnect();
-    view.removeEventListener("resize", refresh);
-    doc.removeEventListener(TOKEN_EVENT, refresh);
+    view.removeEventListener("resize", reload);
+    doc.removeEventListener(TOKEN_EVENT, reload);
     if (root) doc.head.removeEventListener("load", stylesheetChanged, true);
     if (root) doc.fonts?.removeEventListener("loadingdone", stylesheetChanged);
-    preference?.removeEventListener("change", refresh);
+    preference?.removeEventListener("change", reload);
   };
 }
 
@@ -283,8 +308,8 @@ let stopRoot: (() => void) | undefined;
 function subscribeRoot(listener: () => void) {
   rootListeners.add(listener);
   if (!stopRoot) {
-    const refresh = () => {
-      const next = readMotionTokenScope(document.documentElement);
+    const refresh = (batch?: StyleBatch) => {
+      const next = readMotionTokenScope(document.documentElement, defaultMotionScope, batch);
       if (next.signature !== rootScope.signature) {
         rootScope = next;
         for (const notify of rootListeners) notify();
@@ -345,8 +370,8 @@ export function useLocalMotionScope(ref: RefObject<MotionElement | null> | undef
       observed.current = null;
       return;
     }
-    const refresh = () => {
-      const next = readMotionTokenScope(node, parent.current);
+    const refresh = (batch?: StyleBatch) => {
+      const next = readMotionTokenScope(node, parent.current, batch);
       store.publish(next);
     };
     if (observed.current?.node !== node) {

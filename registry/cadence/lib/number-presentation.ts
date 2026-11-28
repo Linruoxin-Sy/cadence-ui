@@ -143,9 +143,10 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   let link: Invalidation | null = null;
   let batch: StyleBatch | undefined;
   let paintSignature: ReturnType<typeof textPaintSignature> = [];
-  const transition = (event: TransitionEvent) => {
-    // A sibling's hover/focus transition does not move or repaint this glyph.
-    if (chain.includes(event.target as HTMLElement)) stop();
+  const transition = () => {
+    // A sibling's hover/focus transition does not move or repaint this glyph: the bus delivers only
+    // transitions that reached a node of this host's chain.
+    stop();
   };
   /** One delivery per host per checkpoint; ancestor records arrive through the bus, the host's own
    * attributes and content through the local observer below. */
@@ -184,11 +185,15 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
     }
   };
   const observer = new MutationObserver((changes) => link?.enqueue(changes));
-  for (let node: HTMLElement | null = host; node; node = node.parentElement) {
-    chain.push(node);
-    node.addEventListener("transitionrun", transition, true);
-  }
-  link = subscribeNodes({ nodes: chain.slice(1), attributes: NUMBER_ATTRIBUTES, onInvalidate: handle });
+  for (let node: HTMLElement | null = host; node; node = node.parentElement) chain.push(node);
+  link = subscribeNodes({
+    nodes: chain.slice(1),
+    transitionNodes: chain,
+    attributes: NUMBER_ATTRIBUTES,
+    onInvalidate: handle,
+    // The bus delivers only transitions that reached this host's own chain.
+    onTransition: transition,
+  });
   observer.observe(host, {
     attributes: true,
     attributeFilter: NUMBER_ATTRIBUTES,
@@ -618,7 +623,6 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       view?.visualViewport?.removeEventListener("resize", stop);
       view?.visualViewport?.removeEventListener("scroll", stop);
       doc.fonts?.removeEventListener("loadingdone", stop);
-      for (const node of chain) node.removeEventListener("transitionrun", transition, true);
     },
   };
 }

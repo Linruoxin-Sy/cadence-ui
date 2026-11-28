@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { type Invalidation, invalidateBatch, subscribeNodes } from "@/registry/cadence/lib/invalidation";
+import { type Invalidation, invalidateBatch, subscribeNodes, withBatch } from "@/registry/cadence/lib/invalidation";
 
 /**
  * The bus exists to make one delivery read each node once. These tests pin the two properties the
@@ -146,5 +146,81 @@ describe("shared invalidation", () => {
     root.className = "after-dispose";
     await checkpoint();
     expect(deliveries).toBe(1);
+  });
+
+  it("shares one read with every projection and every fan-out caller in the same batch", () => {
+    const node = element("span");
+    const style = vi.spyOn(window, "getComputedStyle");
+    style.mockClear();
+    withBatch(window, (batch) => {
+      batch.style(node);
+      batch.memo(node, "paint", (css) => css.color);
+      batch.memo(node, "geometry", (css) => css.width);
+      batch.value("token", () => "1s");
+    });
+    expect(style).toHaveBeenCalledTimes(1);
+
+    // The batch died with the call: the next one reads again rather than serving a stale value.
+    withBatch(window, (batch) => batch.style(node));
+    expect(style).toHaveBeenCalledTimes(2);
+  });
+
+  it("registers one document capture and targets transitions through the index", () => {
+    const shared = element("div");
+    const left = element("span");
+    const right = element("span");
+    shared.append(left, right);
+    const seen: string[] = [];
+    const listener = vi.spyOn(document, "addEventListener");
+    disposals.push(
+      subscribeNodes({
+        nodes: [shared],
+        transitionNodes: [shared, left],
+        attributes: ["class"],
+        onInvalidate: () => {},
+        onTransition: () => seen.push("left"),
+      }),
+      subscribeNodes({
+        nodes: [shared],
+        transitionNodes: [shared, right],
+        attributes: ["class"],
+        onInvalidate: () => {},
+        onTransition: () => seen.push("right"),
+      }),
+    );
+
+    expect(listener.mock.calls.filter(([type]) => type === "transitionrun")).toHaveLength(1);
+
+    left.dispatchEvent(new Event("transitionrun", { bubbles: true }));
+    right.dispatchEvent(new Event("transitionrun", { bubbles: true }));
+    shared.dispatchEvent(new Event("transitionrun", { bubbles: true }));
+    expect(seen).toEqual(["left", "right", "left", "right"]);
+  });
+
+  it("delivers a transition on a host that registered only its ancestors for attributes", async () => {
+    const host = element("span");
+    const parent = host.parentElement as HTMLElement;
+    let attributes = 0;
+    let transitions = 0;
+    disposals.push(
+      subscribeNodes({
+        nodes: [parent],
+        transitionNodes: [host, parent],
+        attributes: ["class"],
+        onInvalidate: () => {
+          attributes += 1;
+        },
+        onTransition: () => {
+          transitions += 1;
+        },
+      }),
+    );
+
+    host.className = "own-host";
+    await checkpoint();
+    host.dispatchEvent(new Event("transitionrun", { bubbles: true }));
+
+    expect(attributes).toBe(0);
+    expect(transitions).toBe(1);
   });
 });
