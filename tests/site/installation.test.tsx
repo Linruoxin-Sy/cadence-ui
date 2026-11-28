@@ -53,7 +53,7 @@ describe("shared installation plan", () => {
       }
     }
     const button = installationPlan(registry.items, "button");
-    expect(button.files).toHaveLength(30);
+    expect(button.files).toHaveLength(31);
     for (const helper of [
       "motion-transaction.ts",
       "motion-presence.tsx",
@@ -66,9 +66,10 @@ describe("shared installation plan", () => {
     expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/motion-scope.tsx");
     expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/css-motion.ts");
     expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/motion-environment.ts");
-    expect(button.items.find((item) => item.name === "cadence-provider")?.files).toHaveLength(14);
+    expect(button.items.find((item) => item.name === "cadence-provider")?.files).toHaveLength(15);
     for (const helper of [
       "inline-presence.ts",
+      "invalidation.ts",
       "measured-geometry.ts",
       "use-text-presentation.ts",
       "use-number-presentation.ts",
