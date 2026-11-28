@@ -246,7 +246,11 @@ monitored metrics are over their limits and no mid-range device trace exists for
 delivered afterwards moved no number on that page and is not a pass either: #177 attributed the 366 142 B
 shared shell, #178 dispositioned the six route remainders in
 [ADR-027](adr.md#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item), and
-#180 attributed the two frame windows in #187. Historical
+#180 attributed the two frame windows in #187.
+[ADR-028](adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver) dispositions
+those two windows without an exception — the cause is a removable runtime cost, owned by
+[#189](https://github.com/Linruoxin-Sy/cadence-ui/issues/189) — and leaves the device criterion unmeasured and
+unwaived. Historical
 failures and missing measurements stay source-bound: the 120 KB page bar was never met, 23 of 63 items
 exceeded the retired tier ladder, and no device frame trace exists.
 [parity-plan.md](parity-plan.md#8-next-work) records what is still open against that decision.

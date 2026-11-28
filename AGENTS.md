@@ -40,6 +40,12 @@ semantic convergence; no infinite backlog or removal of native-safety/invalid-in
 ADR-026 replaced that advisory phase with a decision. Its acceptance run has happened and is recorded in
 [docs/performance-acceptance.md](docs/performance-acceptance.md): every hard gate is green, three monitored
 metrics are over their limits and the device criterion is unmeasured, so acceptance was **not** granted.
+[ADR-027](docs/adr.md#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item)
+names the six `route-remainder` exceptions, and
+[ADR-028](docs/adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver)
+disposes the two frame proxies without an exception (the cause is removable, owned by #189) and the device
+criterion as unmeasured and unwaived. None of them turns a breach into a pass, and closing the governance
+epic does not.
 Historical limits remain inputs, and one of them (the 120 KB page bar) is recorded as never met.
 Distinguish functional completion from performance acceptance: a merged feature is not a measured
 result. Page and device remeasurement belongs to a recorded sweep or the acceptance run, not to every

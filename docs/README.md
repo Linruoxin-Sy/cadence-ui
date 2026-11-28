@@ -39,7 +39,9 @@ could finish; [ADR-026](adr.md#adr-026--v2-performance-budgets-what-is-gated-wha
 now decides the v2 budgets and classifies each metric as a hard gate, monitored or retired, on the S02-A
 cost matrix. The run that was supposed to accept them is recorded in
 [performance-acceptance.md](performance-acceptance.md): hard gates green, three monitored metrics over, the
-device criterion unmeasured, so acceptance is not met. Historical failures and missing measurements stay
+device criterion unmeasured, so acceptance is not met. ADR-027 and
+[ADR-028](adr.md#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver) disposition
+those exceedances without converting any of them to a pass. Historical failures and missing measurements stay
 recorded. See animation-system §7 and the rollout plan before interpreting older budget wording.
 
 Keep rules in their owning document and link to them. Update future work by replacing resolved items,

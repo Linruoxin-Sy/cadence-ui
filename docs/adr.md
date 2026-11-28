@@ -8,7 +8,10 @@ and open work belong in the plan and test suite, not appended experiment histori
 authority for Motion v2 budgets and enforcement; [ADR-023](#adr-023--effects-first-migration-performance-governance-afterwards)
 remains the record of why they were advisory during migration.
 [ADR-027](#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item) is the
-disposition of the six `route-remainder` exceedances under that authority. Earlier ADR text remains
+disposition of the six `route-remainder` exceedances under that authority, and
+[ADR-028](#adr-028--the-two-frame-proxies-and-the-device-criterion-no-exception-no-waiver) disposes the two
+frame proxies and the device criterion: it names no exception, keeps both breaches on the record and leaves
+the device requirement unmeasured and unwaived. Earlier ADR text remains
 historical; conflicting numerical budget/performance-stage requirements do not gate migration.
 
 ## ADR-001 · Distribute registry-first
@@ -668,3 +671,137 @@ A route leaves this exception when the thing that puts it over stops being on th
 boundary that defers the engine past the _fetch_ rather than past paint, an engine replaced under its own
 ADR, or a documented example deliberately withdrawn with its reader cost recorded in the issue that does
 it. Until one of those happens the number is reported, not re-argued.
+
+## ADR-028 · The two frame proxies and the device criterion: no exception, no waiver
+
+Accepted by S03 (#188), on the sweep #180 and #187 recorded rather than a new one.
+[ADR-026](#adr-026--v2-performance-budgets-what-is-gated-what-is-monitored-what-is-retired) keeps
+`frame-share` at ≤ 1% of frames over 25 ms and `frame-block` at ≤ 150 ms longest long-animation-frame,
+both **monitored**, and keeps ≥ 55 fps on a 2023–2024 60 Hz mid-range Android phone as the **device
+criterion**. ADR-027 dispositioned the third monitored metric, `route-remainder`. This ADR is the
+disposition of the two that are left, of the statistic they are read with, and of the device criterion;
+it is the one ADR-026's acceptance clause requires before the governance epic can close. No limit, class,
+collector, tolerance, observation window or `scripts/performance-policy.mjs` entry changes, and no byte of
+shipped source moved.
+
+### The measurement it decides on
+
+Frames measure a host's main-thread cadence under an exclusive machine, so a third sweep on the same
+source would answer a question two recorded ones already answer. This ADR therefore decides on the
+windows [ADR-027](#adr-027--route-remainder-exceptions-the-six-pages-whose-remainder-is-their-own-item)
+did not cover, at the commits they were taken:
+
+- **F03** (`c232a505`, build `K-3wOELzLpmC66QN7F657`): `dialog`@390 share 1.18 / 1.17 / 1.18%,
+  `select`@390 block 192 / 174 / 165 ms — the run that produced the "not met" verdict.
+- **S03-C** (`c9e24430`, build `WlrzJ1Xt5BkqDAYYQMyoL`, three windows per width plus an
+  unmodified-collector control): the table below.
+
+| window              | run 1         | run 2             | control           | limit    |
+| ------------------- | ------------- | ----------------- | ----------------- | -------- |
+| `dialog`@390 share  | 0.69% (3/433) | 0.92% (4/434)     | **1.15% (5/433)** | ≤ 1%     |
+| `dialog`@1280 share | 0.69% (3/434) | **1.15% (5/436)** | 0.92% (4/435)     | ≤ 1%     |
+| `select`@390 block  | **152.8 ms**  | **158.7 ms**      | 123.8 ms          | ≤ 150 ms |
+| `select`@1280 block | 140.0 ms      | 132.1 ms          | 138.6 ms          | ≤ 150 ms |
+
+The bar is about 4.3 long frames in a settled window, so both metrics sit on their instrument's own
+boundary: `dialog` crosses in one window of three at each width, `select` in two of three at 390 and none
+at 1280. Every other window stayed inside both limits in all six runs — `accordion` 0.24–0.48%, `tabs`
+0.23–0.47%, `animated-text` / `reveal` / `data-table` at 0.00% with no long-animation frame. Host: AMD
+Ryzen 7 5800H (16 logical), 31.9 GiB, Windows_NT 10.0.22621 x64, headless Edge 158.0.4370.45,
+`deviceScaleFactor` 1, idle rAF cadence 164 Hz read before every window. Raw windows and traces are in
+the ignored `.cache/s03-c/` and `.cache/f03/`.
+
+### Which statistic `frame-share` means
+
+#180 could not reconcile ADR-026's row ("0.33% / 0.48%") with the files it was computed from, and both
+readings are arithmetically correct: those two figures are the share **pooled** over the seven
+interaction windows (9/2 698 and 13/2 702 in the S02-A files), while the worst single route in the same
+files is 0.69% / 0.93%. `docs/performance-acceptance.md` said the choice was an ADR decision and reported
+the per-route maximum in the meantime.
+
+This ADR makes the decision: **`frame-share` is the worst single route cell**, not a pooled share.
+ADR-026 defines the measurement as one 2 s window after a scripted interaction, so the unit of record is
+the window, and a budget that protects "frames over 25 ms on an interaction" has to bind the interaction
+that stalls. Pooling seven windows lets six smooth routes pay for the one that does not, and would report
+as inside a limit the route it is named for is over — 0.41% / 0.45% pooled against 0.94% / 1.18% worst
+route on F03's own sweep. Nothing changes numerically: the acceptance page and both S03 runs already report
+the per-route maximum, so this closes the ambiguity without moving a figure, a cell or a limit.
+
+### Why this does not take ADR-027's shape
+
+ADR-027 could name six route exceptions because their cost was the page's own composition being the
+feature: deleting documentation could not remove a byte, so the exception was the only alternative to
+deleting a feature. The measurement here is the opposite shape.
+
+The block survives `?motion=none` and `?motion=reduced` — 71.5 / 68.2 / 71.1 ms for `dialog`@390 and
+116.8 / 111.8 / 113.3 ms for `select`@390 — so no entrance and no recipe produces it. Style and layout
+inside the worst task are 1.6 + 0.3 ms and 8.1 + 1.2 ms. Three idle 2 s windows on the same route record
+zero long frames, so the host floor is not it either. What remains is a document-wide derivation fan-out
+that a root-level change triggers:
+
+- `dialog`@390, `full`: a `pointerdown` task of 45–49 ms (React dispatch 40, work loop 35), then two Base
+  UI transition-status timers of 68 and 65 ms dominated by the text-presentation mutation observer —
+  **113 deliveries in one task, 63 ms**, one per text host on the route, each re-reading its ancestor
+  chain's computed style (the chain comparator alone is called 4 585 times in the blur task).
+- `select`@390, `full`: a transition timer of **116.8 ms** — token-scope publish 65.6 ms (a `head`
+  mutation dispatch, then every scope subscriber re-reads the root's computed style), React work 31 ms,
+  text observer 5 ms — plus a `load` task of 73.5 ms on the same publish path and two more timers of 65.2
+  and 63.4 ms dominated by that observer.
+- The two routes mount their MDX body live: `dialog`@390 is 90 390 elements, 22 027 `[data-slot]` and 97
+  text parts; `select` is 82 695 / 19 875 / 113. One delivery per host at roughly 1.5 ms each is 60 ms on
+  these pages, and it grows with the page.
+
+That cost is removable by a different implementation of two library files —
+`registry/cadence/lib/text-presentation.ts` and `registry/cadence/lib/motion-scope.tsx` — which is what
+separates it from ADR-027's six routes. **Naming an exception here would convert fixable library work
+into an accepted cost**, and ADR-026's exception clause exists for the other case. So:
+
+**No exception is named for `frame-share` or `frame-block`.** Both windows stay recorded as exceedances on
+every sweep; acceptance is not met on them; and the work that would change that is
+[#189](https://github.com/Linruoxin-Sy/cadence-ui/issues/189), which carries the attribution's numbers as
+its acceptance. A sweep that puts both windows inside their limits on the same host is what ends this
+state, and it is a new ADR that records it.
+
+### The device criterion
+
+No trace exists from a 2023–2024 60 Hz mid-range Android phone, and ADR-026 refuses desktop emulation,
+rAF cadence and CPU throttling as substitutes in its own words. An exception needs "the measurement that
+justifies it", and there is no measurement, so an exception is not available either.
+
+The criterion is therefore **unmeasured, unwaived and not substitutable**. It stays a requirement that no
+current evidence satisfies. This is a disposition of the governance question — nothing here is pending on
+a filing that could produce a phone — and it is explicitly not a result in either direction: unmeasured
+is not failed, and no page may report the device criterion as passing, near-passing or accepted.
+
+### What closing the governance epic means
+
+#40 closes when #173 is fixed, the three S03 issues are closed or dispositioned, and the device criterion
+is measured or dispositioned. After this ADR: #173 is fixed in #185, `route-remainder` is dispositioned in
+ADR-027, the two frame proxies are dispositioned here as kept failures with an owner, and the device
+criterion is dispositioned here as unmeasured and unwaived.
+
+The epic may therefore close as **governance delivered**, and the record it closes on is that performance
+acceptance was **not granted**. Closing it is not an acceptance, does not turn any monitored breach into a
+pass, and must not be cited as either. `docs/performance-acceptance.md` keeps its verdict, its commit and
+its numbers; `docs/parity-plan.md` §8 keeps reporting both proxies and the device gap.
+
+### What this does not claim
+
+- **Not a pass.** Both proxies are at or over their limits on this host, now and after this decision.
+- **Not a waiver.** No class, limit, tolerance or window changed, and no metric was retired to make one.
+- **Not a device result.** Unmeasured is not failed and not passed; this ADR says nothing about how a
+  phone would behave.
+- **No growth licence.** These are the accepted values for this composition at `c9e24430`. A third window
+  over the bar, or another route over it, is a new question.
+- **No new statistic to pass.** The per-route reading is the one F03 already reported and the one
+  ADR-026's cell definition implies; the pooled figure was never the page's number, and deciding between
+  them moves no value.
+- **No engine, preview or component verdict.** No shipped source moved to reach this decision, and #189 is
+  scoped to two runtime files rather than to a component's choreography.
+- **Not the end of the work.** The attribution is finished; the cost is not.
+
+### Reopening
+
+This ADR stops describing the state when #189 lands and a recorded sweep puts both windows inside their
+limits on the same host, or when a real device trace exists for ≥ 55 fps. Either outcome is a new ADR:
+this one pre-approves neither, and it does not authorise lowering a limit to reach either.
